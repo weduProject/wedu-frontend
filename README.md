@@ -154,8 +154,8 @@ docs: README 업데이트
 # 💻 실행 방법
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ---
