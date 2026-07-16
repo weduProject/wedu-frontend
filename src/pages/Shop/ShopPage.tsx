@@ -2,11 +2,9 @@ import { useState, useRef } from 'react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
-import ProductModal from './components/ProductModal';
 import TasteFinder from './components/TasteFinder';
 import ShopCTA from './components/ShopCTA';
 import { PRODUCTS } from './shopData';
-import type { Product } from './shopData';
 
 const CATEGORIES = ['전체', '장소', '서비스', '경험', '선물'];
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '모험적', '아늑한', '깜짝', '감성적'];
@@ -49,8 +47,6 @@ export default function ShopPage() {
   // 취향 다중 선택 상태 (TasteFinder에서 끌어올림)
   const [selectedTastes, setSelectedTastes] = useState<string[]>([]);
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
   // 상품 그리드 위치 참조 (취향 선택 시 여기로 스크롤)
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -70,22 +66,18 @@ export default function ShopPage() {
   };
   
   // 클라이언트 사이드 필터링 (임시)
-  // TODO(데이터 연결): 백엔드 검색/필터 API 나오면 API 호출로 교체
+  // TODO: 백엔드 검색/필터 API 나오면 API 호출로 교체
   const products = PRODUCTS.filter((product) => {
-    // 카테고리
     const categoryMatch =
       filters.category === '전체' || product.categoryType === filters.category;
 
-    // 스타일
     const styleMatch =
       filters.styleTag === '전체 스타일' ||
       product.styles.includes(filters.styleTag);
 
-    // 취향
     const tasteMatch =
       selectedTastes.length === 0 ||
       selectedTastes.some((t) => product.tastes.includes(t));
-
     
     const keywordMatch =
       keyword === '' ||
@@ -119,7 +111,7 @@ export default function ShopPage() {
         />
       </div>
 
-      {/* 상품 목록 영역 — 취향 선택 시 여기로 스크롤 */}
+      {/* 취향 선택 시 상품 목록으로 스크롤 */}
       <div ref={gridRef} className="scroll-mt-6">
         <p className="mt-6 text-sm text-[#968178]">총 {products.length}개</p>
 
@@ -128,7 +120,6 @@ export default function ShopPage() {
             <ProductCard
               key={product.id}
               product={product}
-              onDetailClick={setSelectedProduct}
             />
           ))}
         </div>
@@ -140,7 +131,6 @@ export default function ShopPage() {
         )}
       </div>
 
-      {/* 취향으로 찾기 */}
       <div className="mt-8">
         <TasteFinder selected={selectedTastes} onToggle={toggleTaste} />
       </div>
@@ -149,10 +139,6 @@ export default function ShopPage() {
         <ShopCTA />
       </div>
 
-      <ProductModal
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
     </div>
   );
 }

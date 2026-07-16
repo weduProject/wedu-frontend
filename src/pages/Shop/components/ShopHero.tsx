@@ -5,13 +5,11 @@ export default function ShopHero() {
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-[#463730]">
-      {/* 배경 이미지 자리 — 실제 이미지 들어오면 여기 교체 */}
+      {/* TODO: 배경 이미지 들어오면 여기 교체 */}
       <div className="absolute inset-0 bg-[#463730]" />
 
-      {/* 어두운 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-black/20" />
 
-      {/* 콘텐츠 */}
       <div className="relative flex flex-col items-start px-14 py-20">
         <p className="mb-3 text-sm font-medium tracking-wide text-white/70">
           Proposal Studio

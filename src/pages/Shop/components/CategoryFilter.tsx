@@ -8,8 +8,8 @@ interface CategoryFilterProps {
   activeStyle: string;
   onCategoryChange: (category: string) => void;
   onStyleChange: (styleTag: string) => void;
-  keyword: string;                        // 검색어
-  onKeywordChange: (keyword: string) => void; // 검색어 변경
+  keyword: string;                       
+  onKeywordChange: (keyword: string) => void; 
 }
 
 export default function CategoryFilter({
@@ -32,9 +32,7 @@ export default function CategoryFilter({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 카테고리 (좌) + 검색창 (우) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* 카테고리 pill */}
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => {
             const active = cat === activeCategory;
@@ -57,9 +55,7 @@ export default function CategoryFilter({
           })}
         </div>
 
-        {/* 검색창 */}
         <div className="flex items-center gap-3">
-          {/* 입력창: 아이콘 왼쪽, radius 12px */}
           <div className="flex items-center rounded-xl border border-[#DDD7C9] bg-white px-4 focus-within:border-[#FC4A4D] transition-colors">
             <input
               type="text"
@@ -78,7 +74,6 @@ export default function CategoryFilter({
             />
           </div>
 
-          {/* 검색 버튼 */}
           <button
             type="button"
             onClick={handleSearch}
@@ -89,7 +84,6 @@ export default function CategoryFilter({
         </div>
       </div>
 
-      {/* 스타일 태그 */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-1 text-xs font-medium text-[#968178]">스타일:</span>
         {styleTags.map((tag) => {

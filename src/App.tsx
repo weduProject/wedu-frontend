@@ -17,6 +17,7 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+import ShopDetailPage from './pages/Shop/ShopDetailPage';
 
 function OnboardingRoutes() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
       <Route element={<PageLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/shop/:id" element={<ShopDetailPage />} />
         <Route path="/wedding-hall" element={<WeddingHallPage />} />
         <Route path="/seudeume" element={<SeudeuimePage />} />
         <Route path="/honeymoon" element={<HoneymoonPage />} />

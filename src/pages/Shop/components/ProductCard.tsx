@@ -1,18 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
 
 interface ProductCardProps {
   product: Product;
-  onDetailClick: (product: Product) => void; // 상세보기 클릭 시 부모에 알림
 }
 
-export default function ProductCard({ product, onDetailClick }: ProductCardProps) {
-  // 하트(찜) 상태 — 카드별 개별 관리
+export default function ProductCard({ product }: ProductCardProps) {
+  const navigate = useNavigate();
+  // TODO: 전역 상태로 교체 예정 — 찜 연동
   const [liked, setLiked] = useState(false);
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
-      {/* 이미지 영역 */}
       <div className="relative h-48 w-full bg-[#F2EEE6]">
         {product.image && (
           <img
@@ -22,12 +22,10 @@ export default function ProductCard({ product, onDetailClick }: ProductCardProps
           />
         )}
 
-        {/* 카테고리 뱃지 */}
         <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-[#463730] backdrop-blur-sm">
           {product.category}
         </span>
 
-        {/* 좋아요 버튼 — 클릭 시 색 토글 */}
         <button
           type="button"
           aria-label="좋아요"
@@ -41,7 +39,6 @@ export default function ProductCard({ product, onDetailClick }: ProductCardProps
         </button>
       </div>
 
-      {/* 콘텐츠 영역 */}
       <div className="flex flex-1 flex-col p-5">
         <h3 className="mb-2 text-base font-semibold text-[#0D0A09]">
           {product.title}
@@ -51,7 +48,6 @@ export default function ProductCard({ product, onDetailClick }: ProductCardProps
           {product.description}
         </p>
 
-        {/* 해시태그 */}
         <div className="mb-4 flex flex-wrap gap-1.5">
           {product.tags.map((tag) => (
             <span
@@ -63,14 +59,13 @@ export default function ProductCard({ product, onDetailClick }: ProductCardProps
           ))}
         </div>
 
-        {/* 가격 + 상세보기 (하단 고정) */}
         <div className="mt-auto flex items-center justify-between">
           <span className="text-sm font-bold text-[#0D0A09]">
             {product.price}
           </span>
           <button
             type="button"
-            onClick={() => onDetailClick(product)}
+            onClick={() => navigate(`/shop/${product.id}`)}
             className="rounded-full bg-[#FC4A4D] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             상세보기
