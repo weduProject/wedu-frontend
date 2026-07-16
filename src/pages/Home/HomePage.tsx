@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 import DdayCard from './components/DdayCard';
 import BudgetCard from './components/BudgetCard';
 import ChecklistSummaryCard from './components/ChecklistSummaryCard';
@@ -5,10 +6,13 @@ import QuickMenu from './components/QuickMenu';
 import UpcomingSchedule from './components/UpcomingSchedule';
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const userName = user?.name ?? 'OOO';
+
   return (
     <main className="flex flex-col gap-8">
       <section>
-        <h1 className="text-2xl">안녕하세요, OOO님!</h1>
+        <h1 className="text-2xl">안녕하세요, {userName}님!</h1>
       </section>
 
       <section>
