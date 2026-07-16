@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import clsx from 'clsx';
 
-// 취향 태그
 const TASTE_OPTIONS = [
   { emoji: '🌷', label: '꽃과 장미' },
   { emoji: '🕯️', label: '캔들 무드' },
@@ -17,18 +15,12 @@ const TASTE_OPTIONS = [
   { emoji: '🎬', label: '영상 편지' },
 ];
 
-export default function TasteFinder() {
-  // 다중 선택 가능 (여러 취향 조합)
-  const [selected, setSelected] = useState<string[]>([]);
+interface TasteFinderProps {
+  selected: string[];
+  onToggle: (label: string) => void;
+}
 
-  const toggle = (label: string) => {
-    setSelected((prev) =>
-      prev.includes(label)
-        ? prev.filter((l) => l !== label)
-        : [...prev, label],
-    );
-  };
-
+export default function TasteFinder({ selected, onToggle }: TasteFinderProps) {
   return (
     <section className="rounded-2xl border border-[#EAE4D8] bg-white p-8">
       <h2 className="mb-2 text-xl font-bold text-[#0D0A09]">취향으로 찾기</h2>
@@ -43,7 +35,7 @@ export default function TasteFinder() {
             <button
               key={label}
               type="button"
-              onClick={() => toggle(label)}
+              onClick={() => onToggle(label)}
               aria-pressed={active}
               className={clsx(
                 'flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm transition-colors',
