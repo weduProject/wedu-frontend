@@ -1,10 +1,15 @@
+import { useState } from 'react';
 import type { Product } from '../shopData';
 
 interface ProductCardProps {
   product: Product;
+  onDetailClick: (product: Product) => void; // 상세보기 클릭 시 부모에 알림
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, onDetailClick }: ProductCardProps) {
+  // 하트(찜) 상태 — 카드별 개별 관리
+  const [liked, setLiked] = useState(false);
+
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
       {/* 이미지 영역 */}
@@ -17,18 +22,22 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         )}
 
-        {/* 카테고리 뱃지 (좌상단) */}
+        {/* 카테고리 뱃지 */}
         <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-[#463730] backdrop-blur-sm">
           {product.category}
         </span>
 
-        {/* 좋아요 버튼 (우상단) */}
+        {/* 좋아요 버튼 — 클릭 시 색 토글 */}
         <button
           type="button"
           aria-label="좋아요"
+          aria-pressed={liked}
+          onClick={() => setLiked((prev) => !prev)}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
-          <span className="text-sm text-[#5C4840]">♡</span>
+          <span className={liked ? 'text-sm text-[#FC4A4D]' : 'text-sm text-[#5C4840]'}>
+            {liked ? '♥' : '♡'}
+          </span>
         </button>
       </div>
 
@@ -61,6 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
           <button
             type="button"
+            onClick={() => onDetailClick(product)}
             className="rounded-full bg-[#FC4A4D] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             상세보기

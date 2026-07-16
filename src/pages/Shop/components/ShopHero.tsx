@@ -1,10 +1,14 @@
+import { useNavigate } from 'react-router-dom';
+
 export default function ShopHero() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden rounded-3xl bg-[#463730]">
       {/* 배경 이미지 자리 — 실제 이미지 들어오면 여기 교체 */}
       <div className="absolute inset-0 bg-[#463730]" />
 
-      {/* 어두운 그라데이션 오버레이 (좌→우) */}
+      {/* 어두운 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-black/20" />
 
       {/* 콘텐츠 */}
@@ -22,6 +26,7 @@ export default function ShopHero() {
 
         <button
           type="button"
+          onClick={() => navigate('/builder')}
           className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#FC4A4D] transition-opacity hover:opacity-90"
         >
           나만의 프로포즈 만들기

@@ -2,41 +2,30 @@ import { useState } from 'react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
+import ProductModal from './components/ProductModal'; 
 import TasteFinder from './components/TasteFinder';
 import ShopCTA from './components/ShopCTA';
 import { PRODUCTS } from './shopData';
-
-// ⚠️ 임시 색상 상수 — 나중에 index.css @theme 토큰으로 교체 예정
-export const SHOP_COLORS = {
-  accent: '#FC4A4D',    // 포인트 (버튼/가격)
-  titleText: '#0D0A09', // 제목
-  bodyText: '#7C6358',  // 본문 (브라운)
-  mutedText: '#968178', // 보조
-  cardBorder: '#EAE4D8',// 카드 테두리
-  pillBg: '#F2EEE6',    // pill 배경
-};
+import type { Product } from './shopData'; 
 
 const CATEGORIES = ['전체', '장소', '서비스', '경험', '선물'];
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '모험적', '아늑한', '깜짝', '감성적'];
 
 export default function ShopPage() {
-  // 필터 상태를 하나의 객체로 관리 (여러 조건 동시 적용에 유리)
   const [filters, setFilters] = useState({
     category: '전체',
     styleTag: '전체 스타일',
   });
 
-  // TODO(데이터 연결): filters 값으로 PRODUCTS 실제 필터링
+  // 상세 모달에 띄울 상품 (null이면 닫힘)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const products = PRODUCTS;
 
   return (
-    // PageLayout의 <main>이 이미 패딩을 주므로 바깥 래퍼/패딩 없음.
-    // 콘텐츠 최대폭만 제한하고 가운데 정렬.
     <div className="mx-auto max-w-[1024px]">
-      {/* 1. Hero 배너 */}
       <ShopHero />
 
-      {/* 2. 카테고리 + 스타일 필터 */}
       <div className="mt-8">
         <CategoryFilter
           categories={CATEGORIES}
@@ -52,22 +41,30 @@ export default function ShopPage() {
         />
       </div>
 
-      {/* 3. 상품 카드 그리드 (3열) */}
+      {/* 상품 그리드 — onDetailClick으로 모달 열기 */}
       <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            onDetailClick={setSelectedProduct}
+          />
         ))}
       </div>
 
-      {/* 4. 취향으로 찾기 */}
       <div className="mt-8">
         <TasteFinder />
       </div>
 
-      {/* 5. 하단 CTA 배너 */}
       <div className="mt-8">
         <ShopCTA />
       </div>
+
+      {/* 상세 모달 — selectedProduct 있을 때만 뜸 */}
+      <ProductModal
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   );
 }

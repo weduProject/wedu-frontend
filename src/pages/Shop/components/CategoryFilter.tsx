@@ -42,7 +42,7 @@ export default function CategoryFilter({
         })}
       </div>
 
-      {/* 2줄: 스타일 태그 */}
+      {/* 2줄: 스타일 태그 */} 
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-1 text-xs font-medium text-[#968178]">스타일:</span>
         {styleTags.map((tag) => {

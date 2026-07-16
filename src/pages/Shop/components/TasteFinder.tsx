@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 
-// 취향 태그 (이모지 + 라벨)
+// 취향 태그
 const TASTE_OPTIONS = [
   { emoji: '🌷', label: '꽃과 장미' },
   { emoji: '🕯️', label: '캔들 무드' },

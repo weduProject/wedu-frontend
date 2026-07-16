@@ -1,12 +1,11 @@
 // 상품 placeholder 데이터 (데이터 연결 전 임시)
-// 시안의 카드 8개를 그대로 옮김
 export interface Product {
   id: number;
-  category: string;      // 뱃지에 표시 (🍽️ 장소 등)
+  category: string;      
   title: string;
   description: string;
-  tags: string[];        // 해시태그
-  price: string;         // "80만원~" 형태
+  tags: string[];        
+  price: string;         
   image?: string;        // 나중에 실제 이미지 URL
 }
 
