@@ -1,7 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { ScheduleItem } from '../CalendarPage';
 
-export function useSchedules() {
+interface ScheduleContextType {
+  schedules: ScheduleItem[];
+  isLoading: boolean;
+  addSchedule: (newSchedule: Omit<ScheduleItem, 'id'>) => void;
+  deleteSchedule: (id: string) => void;
+  updateSchedule: (id: string, data: Partial<ScheduleItem>) => void;
+}
+
+// Context 생성
+const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
+
+// Provider 컴포넌트
+export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,6 +37,10 @@ export function useSchedules() {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchSchedules();
+  }, [fetchSchedules]);
 
   // 2. CREATE
   const addSchedule = async (newSchedule: Omit<ScheduleItem, 'id'>) => {
@@ -77,16 +93,18 @@ export function useSchedules() {
     }
     };
 
-  // 초기 렌더링 시 데이터 로드
-  useEffect(() => {
-    fetchSchedules();
-  }, [fetchSchedules]);
+ 
+  return (
+    <ScheduleContext.Provider value={{ schedules, isLoading, addSchedule, deleteSchedule, updateSchedule }}>
+      {children}
+    </ScheduleContext.Provider>
+  );
+}
 
-  return {
-    schedules,
-    isLoading,
-    addSchedule,
-    deleteSchedule,
-    updateSchedule
-  };
+export function useSchedules() {
+  const context = useContext(ScheduleContext);
+  if (context === undefined) {
+    throw new Error('useSchedules는 ScheduleProvider 안에서 사용되어야 합니다.');
+  }
+  return context;
 }

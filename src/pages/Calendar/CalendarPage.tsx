@@ -3,7 +3,7 @@ import CalendarFilter from './components/CalendarFilter.tsx';
 import CalendarGrid from './components/CalendarGrid.tsx';
 import UpcomingList from './components/UpcomingList.tsx';
 import ScheduleModal from './components/ScheduleModal';
-import { useSchedules } from './hooks/useSchedules.ts';
+import { useSchedules } from './hooks/useSchedules.tsx';
 import ScheduleDetailModal from './components/ScheduleDetailModal.tsx';
 
 export type CategoryType = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';

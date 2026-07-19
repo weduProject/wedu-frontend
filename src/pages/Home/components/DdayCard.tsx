@@ -4,7 +4,7 @@ import BaseCard from '../../../components/ui/BaseCard';
 interface DDayCardProps {
   targetDate: string;
   weddingDateText: string;
-  showEditButton?: boolean; // 대시보드/상세페이지 구분용
+  showEditButton?: boolean; // 대시보드/상세페이지 구분
   onEditClick?: () => void;
 }
 

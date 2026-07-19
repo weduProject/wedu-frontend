@@ -19,6 +19,7 @@ import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
 import DDayPage from './pages/Home/DDayPage';
+import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 
 function OnboardingRoutes() {
   return (
@@ -30,7 +31,8 @@ function OnboardingRoutes() {
 
 export default function App() {
   return (
-    <Routes>
+    <ScheduleProvider>
+      <Routes>
       <Route path="/" element={<LoginPage />} />
 
       <Route element={<OnboardingRoutes />}>
@@ -56,5 +58,7 @@ export default function App() {
         <Route path="/mypage" element={<MypagePage />} />
       </Route>
     </Routes>
+    </ScheduleProvider>
+    
   );
 }

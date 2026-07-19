@@ -39,7 +39,7 @@ export default function ScheduleModal({ initialData, onClose, onSubmit }: Schedu
       <div className="w-full max-w-110 animate-in zoom-in-95 fade-in duration-200 rounded-2xl bg-white p-6 shadow-xl">
         
         <h3 className="text-base font-bold text-text md:text-lg">
-          {isEditMode ? '일정 상세' : '새 일정 추가'}
+          {isEditMode ? '일정 수정' : '새 일정 추가'}
         </h3>
         
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
