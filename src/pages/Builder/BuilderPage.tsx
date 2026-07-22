@@ -1,4 +1,5 @@
 import { Button } from "../../components";
+import { useBuilder } from "./BuilderContext";
 
 const steps = [
   "웨딩홀",
@@ -8,12 +9,14 @@ const steps = [
 ];
 
 export default function BuilderPage() {
-  const currentStep = 1;
+  const {
+    builder,
+    nextStep,
+    prevStep,
+    totalPrice,
+  } = useBuilder();
 
-  const totalPrice =
-    3500000 +
-    2500000 +
-    4000000;
+  const currentStep = builder.step;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -39,23 +42,23 @@ export default function BuilderPage() {
 
       <div className="bg-white rounded-2xl shadow p-8">
         <h2 className="text-2xl font-bold mb-6">
-          1단계 · 웨딩홀 선택
+          {currentStep}단계
         </h2>
 
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex justify-between">
             <span>웨딩홀</span>
-            <span>강남 웨딩홀</span>
+            <span>{builder.weddingHall || "미선택"}</span>
           </div>
 
           <div className="border rounded-xl p-4 flex justify-between">
             <span>스드메</span>
-            <span>프리미엄 패키지</span>
+            <span>{builder.seudeume || "미선택"}</span>
           </div>
 
           <div className="border rounded-xl p-4 flex justify-between">
             <span>허니문</span>
-            <span>몰디브</span>
+            <span>{builder.honeymoon || "미선택"}</span>
           </div>
         </div>
 
@@ -70,11 +73,18 @@ export default function BuilderPage() {
         </div>
 
         <div className="flex justify-end gap-3 mt-8">
-          <Button variant="secondary">
+          <Button
+            variant="secondary"
+            onClick={prevStep}
+            disabled={currentStep === 1}
+          >
             이전
           </Button>
 
-          <Button>
+          <Button
+            onClick={nextStep}
+            disabled={currentStep === 4}
+          >
             다음
           </Button>
         </div>
