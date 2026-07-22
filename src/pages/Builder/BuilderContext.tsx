@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
+import type { BuilderOption } from "./builderDummy";
 
 type BuilderState = {
   step: number;
@@ -18,10 +19,12 @@ type BuilderContextType = {
   builder: BuilderState;
 
   nextStep: () => void;
-
   prevStep: () => void;
-
   reset: () => void;
+
+  selectWeddingHall: (item: BuilderOption) => void;
+  selectSeudeume: (item: BuilderOption) => void;
+  selectHoneymoon: (item: BuilderOption) => void;
 
   totalPrice: number;
 };
@@ -72,6 +75,27 @@ export function BuilderProvider({
       honeymoonPrice: 0,
     });
 
+  const selectWeddingHall = (item: BuilderOption) =>
+    setBuilder((prev) => ({
+      ...prev,
+      weddingHall: item.name,
+      weddingHallPrice: item.price,
+    }));
+
+  const selectSeudeume = (item: BuilderOption) =>
+    setBuilder((prev) => ({
+      ...prev,
+      seudeume: item.name,
+      seudeumePrice: item.price,
+    }));
+
+  const selectHoneymoon = (item: BuilderOption) =>
+    setBuilder((prev) => ({
+      ...prev,
+      honeymoon: item.name,
+      honeymoonPrice: item.price,
+    }));
+
   const totalPrice =
     builder.weddingHallPrice +
     builder.seudeumePrice +
@@ -84,6 +108,11 @@ export function BuilderProvider({
         nextStep,
         prevStep,
         reset,
+
+        selectWeddingHall,
+        selectSeudeume,
+        selectHoneymoon,
+
         totalPrice,
       }}
     >

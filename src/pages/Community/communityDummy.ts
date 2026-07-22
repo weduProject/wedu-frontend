@@ -47,4 +47,88 @@ export const communityPosts: CommunityPost[] = [
     content:
       "평균적으로 얼마 정도 생각하면 될까요?",
   },
+    {
+    id: 4,
+    title: "프로포즈 장소 추천 부탁드려요",
+    author: "민수",
+    date: "2026.07.17",
+    category: "질문",
+    likes: 9,
+    comments: 2,
+    views: 61,
+    content:
+      "서울 근교에서 분위기 좋은 프로포즈 장소 추천 부탁드립니다.",
+  },
+  {
+    id: 5,
+    title: "제주 신혼여행 후기",
+    author: "지은",
+    date: "2026.07.16",
+    category: "후기",
+    likes: 18,
+    comments: 5,
+    views: 130,
+    content:
+      "제주도에서 3박 4일 다녀왔는데 정말 만족스러웠습니다.",
+  },
+  {
+    id: 6,
+    title: "결혼 준비 체크리스트 공유합니다",
+    author: "현우",
+    date: "2026.07.15",
+    category: "자유",
+    likes: 12,
+    comments: 3,
+    views: 88,
+    content:
+      "제가 사용했던 체크리스트 공유드려요. 도움이 되었으면 좋겠습니다.",
+  },
+  {
+    id: 7,
+    title: "예식장 예약은 언제 하는 게 좋나요?",
+    author: "수빈",
+    date: "2026.07.14",
+    category: "질문",
+    likes: 7,
+    comments: 6,
+    views: 75,
+    content:
+      "예식 날짜 기준으로 몇 달 전에 예약하는 게 적당할까요?",
+  },
+  {
+    id: 8,
+    title: "프로포즈 성공 후기!",
+    author: "다은",
+    date: "2026.07.13",
+    category: "후기",
+    likes: 27,
+    comments: 9,
+    views: 214,
+    content:
+      "많이 긴장했지만 성공했습니다. 응원해주신 분들 감사합니다.",
+  },
+  {
+    id: 9,
+    title: "반지 브랜드 추천",
+    author: "태훈",
+    date: "2026.07.12",
+    category: "자유",
+    likes: 10,
+    comments: 4,
+    views: 91,
+    content:
+      "가성비 좋은 프로포즈 반지 브랜드 추천 부탁드립니다.",
+  },
+  {
+    id: 10,
+    title: "웨딩홀 투어 꿀팁",
+    author: "유진",
+    date: "2026.07.11",
+    category: "정보",
+    likes: 20,
+    comments: 7,
+    views: 166,
+    content:
+      "웨딩홀 투어 전에 꼭 체크해야 할 사항들을 정리했습니다.",
+  },
 ];
