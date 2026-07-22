@@ -88,8 +88,8 @@ export default function CommunityDetailPage() {
             placeholder="댓글을 입력하세요."
           />
 
-          <Button className="mt-3">
-            댓글 작성
+          <Button className="mt-3" disabled>
+            댓글 작성 (준비중)
           </Button>
         </div>
       </div>

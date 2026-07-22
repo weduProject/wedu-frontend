@@ -1,17 +1,15 @@
 import type { CommunityPost } from "./communityDummy";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Props {
   post: CommunityPost;
 }
 
 export default function CommunityCard({ post }: Props) {
-  const navigate = useNavigate();
-
   return (
-    <div
-      onClick={() => navigate(`/community/${post.id}`)}
-      className="bg-white rounded-2xl shadow p-5 hover:shadow-lg transition cursor-pointer"
+    <Link
+      to={`/community/${post.id}`}
+      className="block bg-white rounded-2xl shadow p-5 hover:shadow-lg transition"
     >
       <div className="flex justify-between">
         <span className="text-pink-500 text-sm font-semibold">
@@ -36,6 +34,6 @@ export default function CommunityCard({ post }: Props) {
         <span>💬 {post.comments}</span>
         <span>👀 {post.views}</span>
       </div>
-    </div>
+    </Link>
   );
 }
