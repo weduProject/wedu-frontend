@@ -17,9 +17,12 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+import CommunityDetailPage from './pages/Community/CommunityDetailPage';
+import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
+import { BuilderProvider } from './pages/Builder/BuilderContext';
 
 function OnboardingRoutes() {
   return (
@@ -50,11 +53,13 @@ export default function App() {
         <Route path="/wedding-hall" element={<WeddingHallPage />} />
         <Route path="/seudeume" element={<SeudeuimePage />} />
         <Route path="/honeymoon" element={<HoneymoonPage />} />
-        <Route path="/builder" element={<BuilderPage />} />
+        <Route path="/builder" element={<BuilderProvider><BuilderPage /></BuilderProvider>} />
         <Route path="/checklist" element={<ChecklistPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/budget" element={<BudgetPage />} />
         <Route path="/community" element={<CommunityPage />} />
+        <Route path="/community/:id" element={<CommunityDetailPage />} />
+        <Route path="/community/write" element={<CommunityWritePage />} />
         <Route path="/mypage" element={<MypagePage />} />
       </Route>
     </Routes>
