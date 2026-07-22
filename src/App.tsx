@@ -17,8 +17,14 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+
 import CommunityDetailPage from "./pages/Community/CommunityDetailPage";
 import CommunityWritePage from "./pages/Community/CommunityWritePage";
+
+
+import ShopDetailPage from './pages/Shop/ShopDetailPage';
+import DDayPage from './pages/Home/DDayPage';
+import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 
 
 function OnboardingRoutes() {
@@ -31,7 +37,8 @@ function OnboardingRoutes() {
 
 export default function App() {
   return (
-    <Routes>
+    <ScheduleProvider>
+      <Routes>
       <Route path="/" element={<LoginPage />} />
 
       <Route element={<OnboardingRoutes />}>
@@ -43,7 +50,9 @@ export default function App() {
 
       <Route element={<PageLayout />}>
         <Route path="/home" element={<HomePage />} />
+        <Route path="/dday" element={<DDayPage />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/shop/:id" element={<ShopDetailPage />} />
         <Route path="/wedding-hall" element={<WeddingHallPage />} />
         <Route path="/seudeume" element={<SeudeuimePage />} />
         <Route path="/honeymoon" element={<HoneymoonPage />} />
@@ -57,5 +66,7 @@ export default function App() {
         <Route path="/mypage" element={<MypagePage />} />
       </Route>
     </Routes>
+    </ScheduleProvider>
+    
   );
 }
