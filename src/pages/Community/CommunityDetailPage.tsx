@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "../../components";
+import { Button, CategoryBadge } from "../../components";
 import { communityPosts } from "./communityDummy";
 
 export default function CommunityDetailPage() {
@@ -30,9 +30,7 @@ export default function CommunityDetailPage() {
 
       <div className="bg-white rounded-2xl shadow p-8">
         <div className="flex justify-between items-center">
-          <span className="text-primary font-semibold">
-            {post.category}
-          </span>
+          <CategoryBadge category={post.category} />
 
           <span className="text-gray-400">
             {post.date}

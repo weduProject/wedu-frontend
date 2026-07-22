@@ -17,14 +17,12 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
-import CommunityDetailPage from "./pages/Community/CommunityDetailPage";
-import CommunityWritePage from "./pages/Community/CommunityWritePage";
+import CommunityDetailPage from './pages/Community/CommunityDetailPage';
+import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
-import { BuilderProvider } from "./pages/Builder/BuilderContext";
-
-
+import { BuilderProvider } from './pages/Builder/BuilderContext';
 
 function OnboardingRoutes() {
   return (

@@ -1,5 +1,6 @@
 import type { CommunityPost } from "./communityDummy";
 import { Link } from "react-router-dom";
+import { CategoryBadge } from "../../components";
 
 interface Props {
   post: CommunityPost;
@@ -12,9 +13,7 @@ export default function CommunityCard({ post }: Props) {
       className="block bg-white rounded-2xl shadow p-5 hover:shadow-lg transition"
     >
       <div className="flex justify-between">
-        <span className="text-pink-500 text-sm font-semibold">
-          {post.category}
-        </span>
+        <CategoryBadge category={post.category} />
 
         <span className="text-gray-400 text-sm">
           {post.date}
