@@ -10,12 +10,19 @@ export default function CommunityWritePage() {
   const [content, setContent] = useState("");
 
   const handleSubmit = () => {
-    if (!title || !content) {
+    if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해주세요.");
       return;
     }
 
-    alert("게시글 등록 기능은 준비 중입니다.");
+    // TODO: API 연결 예정
+    console.log({
+      title,
+      category,
+      content,
+    });
+
+    alert("게시글이 등록되었습니다.");
 
     navigate("/community");
   };
@@ -27,7 +34,6 @@ export default function CommunityWritePage() {
       </h1>
 
       <div className="bg-white rounded-2xl shadow p-8">
-
         <div className="mb-6">
           <label className="block font-semibold mb-2">
             제목
@@ -40,7 +46,6 @@ export default function CommunityWritePage() {
             placeholder="제목을 입력하세요."
           />
         </div>
-
 
         <div className="mb-6">
           <label className="block font-semibold mb-2">
@@ -59,7 +64,6 @@ export default function CommunityWritePage() {
           </select>
         </div>
 
-
         <div className="mb-8">
           <label className="block font-semibold mb-2">
             내용
@@ -74,9 +78,7 @@ export default function CommunityWritePage() {
           />
         </div>
 
-
         <div className="flex justify-end gap-3">
-
           <Button
             variant="secondary"
             onClick={() => navigate(-1)}
@@ -84,15 +86,10 @@ export default function CommunityWritePage() {
             취소
           </Button>
 
-
-          <Button
-            onClick={handleSubmit}
-          >
+          <Button onClick={handleSubmit}>
             등록
           </Button>
-
         </div>
-
       </div>
     </div>
   );

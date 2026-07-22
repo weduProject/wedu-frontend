@@ -1,5 +1,11 @@
 import { Button } from "../../components";
 import { useBuilder } from "./BuilderContext";
+import BuilderOptionCard from "./BuilderOptionCard";
+import {
+  weddingHallList,
+  seudeumeList,
+  honeymoonList,
+} from "./builderDummy";
 
 const steps = [
   "웨딩홀",
@@ -13,10 +19,20 @@ export default function BuilderPage() {
     builder,
     nextStep,
     prevStep,
+    reset,
     totalPrice,
+    selectWeddingHall,
+    selectSeudeume,
+    selectHoneymoon,
   } = useBuilder();
 
   const currentStep = builder.step;
+
+  const canNext =
+    (currentStep === 1 && builder.weddingHall !== "") ||
+    (currentStep === 2 && builder.seudeume !== "") ||
+    (currentStep === 3 && builder.honeymoon !== "") ||
+    currentStep === 4;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -42,24 +58,75 @@ export default function BuilderPage() {
 
       <div className="bg-white rounded-2xl shadow p-8">
         <h2 className="text-2xl font-bold mb-6">
-          {currentStep}단계
+          {steps[currentStep - 1]}
         </h2>
 
         <div className="space-y-4">
-          <div className="border rounded-xl p-4 flex justify-between">
-            <span>웨딩홀</span>
-            <span>{builder.weddingHall || "미선택"}</span>
-          </div>
+          {currentStep === 1 &&
+            weddingHallList.map((item) => (
+              <BuilderOptionCard
+                key={item.id}
+                title={item.name}
+                price={item.price}
+                selected={builder.weddingHall === item.name}
+                onClick={() => selectWeddingHall(item)}
+              />
+            ))}
 
-          <div className="border rounded-xl p-4 flex justify-between">
-            <span>스드메</span>
-            <span>{builder.seudeume || "미선택"}</span>
-          </div>
+          {currentStep === 2 &&
+            seudeumeList.map((item) => (
+              <BuilderOptionCard
+                key={item.id}
+                title={item.name}
+                price={item.price}
+                selected={builder.seudeume === item.name}
+                onClick={() => selectSeudeume(item)}
+              />
+            ))}
 
-          <div className="border rounded-xl p-4 flex justify-between">
-            <span>허니문</span>
-            <span>{builder.honeymoon || "미선택"}</span>
-          </div>
+          {currentStep === 3 &&
+            honeymoonList.map((item) => (
+              <BuilderOptionCard
+                key={item.id}
+                title={item.name}
+                price={item.price}
+                selected={builder.honeymoon === item.name}
+                onClick={() => selectHoneymoon(item)}
+              />
+            ))}
+
+          {currentStep === 4 && (
+            <div className="space-y-5">
+              <div className="border rounded-xl p-4 flex justify-between">
+                <span>웨딩홀</span>
+                <span>{builder.weddingHall}</span>
+              </div>
+
+              <div className="border rounded-xl p-4 flex justify-between">
+                <span>스드메</span>
+                <span>{builder.seudeume}</span>
+              </div>
+
+              <div className="border rounded-xl p-4 flex justify-between">
+                <span>허니문</span>
+                <span>{builder.honeymoon}</span>
+              </div>
+
+              <div className="rounded-xl bg-primary/10 p-5 text-center">
+                <h3 className="text-xl font-bold mb-2">
+                  예상 총 견적
+                </h3>
+
+                <p className="text-3xl font-bold text-primary">
+                  {totalPrice.toLocaleString()}원
+                </p>
+
+                <p className="text-gray-500 mt-3">
+                  선택한 항목을 확인한 후 프로포즈 플랜을 완성하세요.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center border-t pt-6 mt-8">
@@ -73,20 +140,41 @@ export default function BuilderPage() {
         </div>
 
         <div className="flex justify-end gap-3 mt-8">
-          <Button
-            variant="secondary"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-          >
-            이전
-          </Button>
+          {currentStep === 4 ? (
+            <>
+              <Button
+                variant="secondary"
+                onClick={reset}
+              >
+                처음부터
+              </Button>
 
-          <Button
-            onClick={nextStep}
-            disabled={currentStep === 4}
-          >
-            다음
-          </Button>
+              <Button
+                onClick={() =>
+                  alert("프로포즈 플랜이 완성되었습니다!")
+                }
+              >
+                완료하기
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="secondary"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+              >
+                이전
+              </Button>
+
+              <Button
+                onClick={nextStep}
+                disabled={!canNext}
+              >
+                다음
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
