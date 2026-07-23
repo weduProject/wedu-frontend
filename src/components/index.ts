@@ -9,3 +9,4 @@ export { default as ProgressBar } from './ui/ProgressBar';
 export { default as Tabs } from './ui/Tabs';
 export type { TabItem } from './ui/Tabs';
 export { default as SelectableCard } from './ui/SelectableCard';
+export { default as CategoryBadge } from './ui/CategoryBadge';
