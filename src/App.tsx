@@ -1,4 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router-dom';
+import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
@@ -28,8 +29,14 @@ function OnboardingRoutes() {
 
 export default function App() {
   return (
+<<<<<<< Updated upstream
     <Routes>
       <Route path="/" element={<LoginPage />} />
+=======
+    <ScheduleProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+>>>>>>> Stashed changes
 
       <Route element={<OnboardingRoutes />}>
         <Route path="/onboarding" element={<OnboardingStartPage />} />
@@ -38,6 +45,7 @@ export default function App() {
         <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
       </Route>
 
+<<<<<<< Updated upstream
       <Route element={<PageLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
@@ -52,5 +60,46 @@ export default function App() {
         <Route path="/mypage" element={<MypagePage />} />
       </Route>
     </Routes>
+=======
+        <Route
+          element={
+            <CommunityProvider>
+              <PageLayout />
+            </CommunityProvider>
+          }
+        >
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/dday" element={<DDayPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/shop/:id" element={<ShopDetailPage />} />
+          <Route path="/wedding-hall" element={<WeddingHallPage />} />
+          <Route path="/seudeume" element={<SeudeuimePage />} />
+          <Route path="/honeymoon" element={<HoneymoonPage />} />
+          <Route
+            path="/builder"
+            element={
+              <BuilderProvider>
+                <BuilderPage />
+              </BuilderProvider>
+            }
+          />
+          <Route path="/checklist" element={<ChecklistPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/budget" element={<BudgetPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route
+            path="/community/:id"
+            element={<CommunityDetailPage />}
+          />
+          <Route
+            path="/community/write"
+            element={<CommunityWritePage />}
+          />
+          <Route path="/mypage" element={<MypagePage />} />
+        </Route>
+      </Routes>
+    </ScheduleProvider>
+>>>>>>> Stashed changes
   );
 }
