@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
+import { useWishlist } from '../WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -8,8 +8,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
-  // TODO: 전역 상태로 교체 예정 — 찜 연동
-  const [liked, setLiked] = useState(false);
+  const { isWished, toggleWish } = useWishlist();
+  const liked = isWished(product.id);
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
@@ -28,9 +28,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <button
           type="button"
-          aria-label="좋아요"
+          aria-label="찜하기"
           aria-pressed={liked}
-          onClick={() => setLiked((prev) => !prev)}
+          onClick={() => toggleWish(product.id)}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
           <span className={liked ? 'text-sm text-[#FC4A4D]' : 'text-sm text-[#5C4840]'}>

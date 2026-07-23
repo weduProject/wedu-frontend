@@ -20,10 +20,12 @@ import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
 import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
+import WishlistPage from './pages/Shop/WishlistPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
+import { WishlistProvider } from './pages/Shop/WishlistContext';
 
 
 function OnboardingRoutes() {
@@ -50,7 +52,9 @@ export default function App() {
         <Route
           element={
             <CommunityProvider>
-              <PageLayout />
+              <WishlistProvider>
+                <PageLayout />
+              </WishlistProvider>
             </CommunityProvider>
           }
         >
@@ -58,6 +62,7 @@ export default function App() {
           <Route path="/dday" element={<DDayPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/shop/:id" element={<ShopDetailPage />} />
+          <Route path="/shop/wishlist" element={<WishlistPage />} />
           <Route path="/wedding-hall" element={<WeddingHallPage />} />
           <Route path="/seudeume" element={<SeudeuimePage />} />
           <Route path="/honeymoon" element={<HoneymoonPage />} />
