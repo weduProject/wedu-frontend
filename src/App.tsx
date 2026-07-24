@@ -24,7 +24,8 @@ import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
-
+import BuilderStartPage from './pages/Builder/BuilderStartPage';
+import BuilderCartPage from "./pages/Builder/BuilderCartPage";
 
 function OnboardingRoutes() {
   return (
@@ -61,11 +62,23 @@ export default function App() {
           <Route path="/wedding-hall" element={<WeddingHallPage />} />
           <Route path="/seudeume" element={<SeudeuimePage />} />
           <Route path="/honeymoon" element={<HoneymoonPage />} />
+          <Route 
+            path="/builder-start" 
+            element={<BuilderStartPage />} 
+          />
           <Route
             path="/builder"
             element={
               <BuilderProvider>
                 <BuilderPage />
+              </BuilderProvider>
+            }
+          />
+          <Route
+            path="/builder/cart"
+            element={
+              <BuilderProvider>
+                <BuilderCartPage />
               </BuilderProvider>
             }
           />

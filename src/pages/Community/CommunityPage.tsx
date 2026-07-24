@@ -1,140 +1,81 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../components";
+import { Button } from "../../components"; 
 import CommunityCard from "./CommunityCard";
 import { useCommunity } from "./CommunityContext";
-import CommunityStats from "./CommunityStats";
-import HotPosts from "./HotPosts";
 
 const categories = [
   "전체",
-  "자유",
-  "후기",
-  "질문",
+  "프로포즈",
+  "웨딩준비",
+  "신혼생활",
+  "고민상담",
+  "Tip공유",
 ];
 
-const POSTS_PER_PAGE = 5;
+const POSTS_PER_PAGE = 8;
 
 export default function CommunityPage() {
   const navigate = useNavigate();
   const { posts } = useCommunity();
-  console.log("posts:", posts.length);
-  console.log(posts);
 
   const [keyword, setKeyword] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("전체");
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [sortType, setSortType] = useState<
-    "latest" | "popular"
-  >("latest");
-
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-  // HOT 게시글 ID
-  const hotPostIds = [...posts]
-    .sort((a, b) => b.likes - a.likes)
-    .slice(0, 3)
-    .map((post) => post.id);
-
-  // 일반 게시글 (HOT 제외)
   const filteredPosts = posts
     .filter((post) => {
       const matchCategory =
         selectedCategory === "전체" ||
-        post.category === selectedCategory;
+        post.category.includes(selectedCategory) || 
+        selectedCategory.includes(post.category);
 
       const matchKeyword =
-        post.title.includes(keyword) ||
-        post.content.includes(keyword);
+        post.title.includes(keyword) || post.content.includes(keyword);
 
-      const notHot = !hotPostIds.includes(post.id);
-
-      return (
-        matchCategory &&
-        matchKeyword &&
-        notHot
-      );
+      return matchCategory && matchKeyword;
     })
-    .sort((a, b) => {
-      if (sortType === "popular") {
-        return b.likes - a.likes;
-      }
+    .sort((a, b) => b.id - a.id);
 
-      return b.id - a.id;
-    });
-
-  const totalPages = Math.ceil(
-    filteredPosts.length / POSTS_PER_PAGE
-  );
-
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const pagedPosts = filteredPosts.slice(
     (currentPage - 1) * POSTS_PER_PAGE,
     currentPage * POSTS_PER_PAGE
   );
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto py-12 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">
-          커뮤니티
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold">커뮤니티</h1>
+          <p className="text-gray-500 mt-2">
+            예비 신랑신부들과 경험과 정보를 나눠보세요
+          </p>
+        </div>
 
-        <Button
-          onClick={() => navigate("/community/write")}
-        >
+        <Button onClick={() => navigate("/community/write")} className="px-6">
           글쓰기
         </Button>
       </div>
 
-      <CommunityStats />
-
-      <HotPosts posts={posts} />
-
-      <input
-        value={keyword}
-        onChange={(e) => {
-          setKeyword(e.target.value);
-          setCurrentPage(1);
-        }}
-        placeholder="검색어를 입력하세요."
-        className="w-full border rounded-xl p-3 mb-6"
-      />
-
-      <div className="flex justify-end gap-2 mb-4">
-        <Button
-          size="sm"
-          variant={
-            sortType === "latest"
-              ? "main"
-              : "secondary"
-          }
-          onClick={() => {
-            setSortType("latest");
-            setCurrentPage(1);
-          }}
-        >
-          최신순
-        </Button>
-
-        <Button
-          size="sm"
-          variant={
-            sortType === "popular"
-              ? "main"
-              : "secondary"
-          }
-          onClick={() => {
-            setSortType("popular");
-            setCurrentPage(1);
-          }}
-        >
-          인기순
-        </Button>
+      <div className="flex gap-2 mb-6">
+        <div className="relative flex-1">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            🔍
+          </span>
+          <input
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="검색어를 입력하세요"
+            className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:border-primary transition shadow-sm"
+          />
+        </div>
       </div>
 
-      <div className="flex gap-3 mb-8">
+      <div className="flex flex-wrap gap-2 mb-8">
         {categories.map((category) => (
           <button
             key={category}
@@ -142,53 +83,53 @@ export default function CommunityPage() {
               setSelectedCategory(category);
               setCurrentPage(1);
             }}
-            className={
-              selectedCategory === category
-                ? "bg-primary text-white rounded-full px-5 py-2"
-                : "border rounded-full px-5 py-2"
-            }
+            className={`
+              rounded-full px-5 py-2 text-sm font-medium transition
+              ${
+                selectedCategory === category
+                  ? "bg-[#C48E96] text-white shadow-md"
+                  : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
+              }
+            `}
           >
             {category}
           </button>
         ))}
       </div>
 
-      <div className="space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {pagedPosts.length > 0 ? (
           pagedPosts.map((post) => (
-            <CommunityCard
-              key={post.id}
-              post={post}
-            />
+            <CommunityCard key={post.id} post={post} />
           ))
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            검색 결과가 없습니다.
+          <div className="col-span-1 md:col-span-2 bg-white border border-gray-100 rounded-3xl py-24 flex flex-col items-center justify-center text-center shadow-sm mt-4">
+            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 text-3xl mb-4 border border-gray-100">
+              💬
+            </div>
+            <p className="text-gray-400 mb-6 text-sm">아직 게시글이 없어요</p>
+            <button
+              onClick={() => navigate("/community/write")}
+              className="text-[#C48E96] font-bold text-sm hover:underline"
+            >
+              첫 게시글 작성하기
+            </button>
           </div>
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-10">
-          {Array.from(
-            { length: totalPages },
-            (_, index) => (
-              <Button
-                key={index}
-                size="sm"
-                variant={
-                  currentPage === index + 1
-                    ? "main"
-                    : "secondary"
-                }
-                onClick={() =>
-                  setCurrentPage(index + 1)
-                }
-              >
-                {index + 1}
-              </Button>
-            )
-          )}
+        <div className="flex justify-center gap-2 mt-12">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <Button
+              key={index}
+              size="sm"
+              variant={currentPage === index + 1 ? "main" : "secondary"}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </Button>
+          ))}
         </div>
       )}
     </div>
