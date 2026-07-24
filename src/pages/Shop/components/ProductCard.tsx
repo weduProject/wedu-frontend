@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
 import { useWishlist } from '../WishlistContext';
+import { Heart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -12,8 +13,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const liked = isWished(product.id);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
-      <div className="relative h-48 w-full bg-[#F2EEE6]">
+    <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-white">
+      <div className="relative h-48 w-full bg-primary-light">
         {product.image && (
           <img
             src={product.image}
@@ -33,14 +34,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={() => toggleWish(product.id)}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
-          <span className={liked ? 'text-sm text-primary' : 'text-sm text-[#5C4840]'}>
-            {liked ? '♥' : '♡'}
-          </span>
+          <Heart
+            className={liked ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-[#5C4840]'}
+            fill={liked ? 'currentColor' : 'none'}
+            strokeWidth={1.8}
+          />
         </button>
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-2 text-base font-semibold text-[#0D0A09]">
+        <h3 className="mb-2 text-base font-semibold text-text">
           {product.title}
         </h3>
 
@@ -52,7 +55,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-md bg-[#FAF8F4] px-2 py-0.5 text-xs text-[#968178]"
+              className="rounded-md bg-[#FAF8F4] px-2 py-0.5 text-xs text-text-muted"
             >
               #{tag}
             </span>
@@ -60,7 +63,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-sm font-bold text-[#0D0A09]">
+          <span className="text-sm font-bold text-text">
             {product.price}
           </span>
           <button

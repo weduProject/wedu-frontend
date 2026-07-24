@@ -29,7 +29,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* 히어로 */}
       <section className="relative h-[560px] flex items-center bg-[#463730] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/30 to-transparent" />
         <div className="relative px-12 md:px-24 max-w-2xl">
           <p className="text-sm text-white/70 mb-3 tracking-wide">당신의 특별한 순간</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-5">
@@ -115,7 +115,7 @@ export default function LandingPage() {
       </section>
 
       {/* 통계 */}
-      <section className="py-16 px-8 bg-gradient-to-r from-[#C36978] to-[#DDA06B]">
+      <section className="py-16 px-8 bg-linear-to-r from-[#C36978] to-[#DDA06B]">
         <div className="max-w-5xl mx-auto text-center">
           <h3 className="text-2xl font-bold text-white mb-2">수많은 커플이 WEDU를 통해<br />특별한 순간을 만들었습니다</h3>
           <p className="text-white/80 text-sm mb-10">당신도 WEDU와 함께 잊지 못할 순간을 만들어보세요</p>
@@ -148,7 +148,7 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="relative py-20 px-8 bg-[#463730] text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/50 to-black/20" />
         <div className="relative max-w-lg mx-auto">
           <h3 className="text-3xl font-bold text-white mb-3">지금 시작하는<br />당신만의 프로포즈</h3>
           <p className="text-white/80 text-sm mb-8">WEDU와 함께 잊지 못할 순간을 만들어보세요</p>

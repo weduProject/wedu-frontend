@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { PRODUCTS } from './shopData';
 import { useWishlist } from './WishlistContext';
+import { Heart } from 'lucide-react';
 
 export default function ShopDetailPage() {
   const { id } = useParams();
@@ -120,9 +121,11 @@ export default function ShopDetailPage() {
               onClick={() => toggleWish(product.id)}
               className="flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
             >
-              <span className={liked ? 'text-primary' : 'text-[#594941]'}>
-                {liked ? '♥' : '♡'}
-              </span>
+              <Heart
+                className={liked ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-[#594941]'}
+                fill={liked ? 'currentColor' : 'none'}
+                strokeWidth={1.8}
+              />
               {liked ? '찜 완료' : '찜하기'}
             </button>
           </div>

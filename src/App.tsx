@@ -43,6 +43,7 @@ export default function App() {
   return (
     <ScheduleProvider>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route element={<OnboardingRoutes />}>
@@ -61,7 +62,7 @@ export default function App() {
             </CommunityProvider>
           }
         >
-          <Route path="/" element={<LandingPage />} />
+
           <Route path="/home" element={<HomePage />} />
           <Route path="/dday" element={<DDayPage />} />
           <Route path="/shop" element={<ShopPage />} />
