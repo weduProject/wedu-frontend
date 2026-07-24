@@ -1,179 +1,305 @@
-import { Button } from "../../components";
+import { Button } from "../../components"; 
 import { useBuilder } from "./BuilderContext";
 import BuilderOptionCard from "./BuilderOptionCard";
+import { useNavigate } from "react-router-dom";
 import {
   weddingHallList,
   seudeumeList,
   honeymoonList,
+  budgetList, 
 } from "./builderDummy";
 
-const steps = [
-  "웨딩홀",
-  "스드메",
-  "허니문",
-  "최종 확인",
+const steps = ["1", "2", "3", "4"];
+
+const stepInfo = [
+  { step: "Step 1", title: "어디서 프로포즈할까요?", subtitle: "원하는 장소를 하나 선택해주세요" },
+  { step: "Step 2", title: "어떤 분위기를 원하세요?", subtitle: "프로포즈의 전체적인 무드를 결정해주세요" },
+  { step: "Step 3", title: "어떤 음식이 어울릴까요?", subtitle: "프로포즈와 함께할 식사 스타일을 골라주세요" },
+  { step: "Step 4", title: "마지막 단계! 예산을 알려주세요", subtitle: "전체 프로포즈 예산 범위를 선택해주세요" },
 ];
 
 export default function BuilderPage() {
+  const navigate = useNavigate();
+
   const {
     builder,
     nextStep,
     prevStep,
-    reset,
-    totalPrice,
     selectWeddingHall,
     selectSeudeume,
     selectHoneymoon,
+    selectBudget, 
   } = useBuilder();
 
   const currentStep = builder.step;
+  const currentInfo = stepInfo[currentStep - 1];
 
   const canNext =
-    (currentStep === 1 && builder.weddingHall !== "") ||
-    (currentStep === 2 && builder.seudeume !== "") ||
-    (currentStep === 3 && builder.honeymoon !== "") ||
-    currentStep === 4;
+    (currentStep === 1 && builder.weddingHall !== null) ||
+    (currentStep === 2 && builder.seudeume !== null) ||
+    (currentStep === 3 && builder.honeymoon !== null) ||
+    (currentStep === 4 && builder.budget !== null);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">
-        나만의 프로포즈
-      </h1>
+    <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="flex items-center justify-center gap-2 mb-8">
+        {steps.map((_, index) => {
+          const stepNumber = index + 1;
+          const completed = currentStep > stepNumber;
+          const active = currentStep === stepNumber;
 
-      <div className="grid grid-cols-4 gap-4 mb-10">
-        {steps.map((step, index) => (
-          <div
-            key={step}
-            className={`rounded-xl p-4 text-center font-semibold ${
-              currentStep === index + 1
-                ? "bg-primary text-white"
-                : "bg-gray-100"
-            }`}
-          >
-            <div className="text-lg">{index + 1}</div>
-            <div>{step}</div>
-          </div>
-        ))}
+          return (
+            <div key={stepNumber} className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition
+                  ${
+                    completed || active
+                      ? "bg-primary text-white"
+                      : "bg-gray-200 text-gray-400"
+                  }
+                `}
+              >
+                {completed ? "✓" : stepNumber}
+              </div>
+              {index !== steps.length - 1 && (
+                <div
+                  className={`w-12 h-[2px] mx-2 ${
+                    currentStep > stepNumber ? "bg-primary" : "bg-gray-200"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      <div className="bg-white rounded-2xl shadow p-8">
-        <h2 className="text-2xl font-bold mb-6">
-          {steps[currentStep - 1]}
-        </h2>
+      <div className="text-center mb-10">
+        <span className="text-primary font-bold text-sm bg-primary/10 px-3 py-1 rounded-full mb-3 inline-block">
+          {currentInfo.step}
+        </span>
+        <h2 className="text-3xl font-bold mb-2">{currentInfo.title}</h2>
+        <p className="text-gray-500">{currentInfo.subtitle}</p>
+      </div>
 
-        <div className="space-y-4">
-          {currentStep === 1 &&
-            weddingHallList.map((item) => (
-              <BuilderOptionCard
-                key={item.id}
-                title={item.name}
-                price={item.price}
-                selected={builder.weddingHall === item.name}
-                onClick={() => selectWeddingHall(item)}
-              />
-            ))}
+      <div className="bg-white rounded-2xl p-2">
+        {currentStep !== 4 ? (
+          <div>
+            <p className="text-sm font-bold text-gray-700 mb-4 ml-1">모든 옵션</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentStep === 1 &&
+                weddingHallList.map((item) => (
+                  <BuilderOptionCard
+                    key={item.id}
+                    title={item.name}
+                    description={item.description}
+                    tags={item.tags}
+                    icon={item.icon}
+                    showPrice={false}
+                    selected={builder.weddingHall?.id === item.id}
+                    onClick={() => selectWeddingHall(item)}
+                  />
+                ))}
 
-          {currentStep === 2 &&
-            seudeumeList.map((item) => (
-              <BuilderOptionCard
-                key={item.id}
-                title={item.name}
-                price={item.price}
-                selected={builder.seudeume === item.name}
-                onClick={() => selectSeudeume(item)}
-              />
-            ))}
+              {currentStep === 2 &&
+                seudeumeList.map((item) => (
+                  <BuilderOptionCard
+                    key={item.id}
+                    title={item.name}
+                    description={item.description}
+                    tags={item.tags}
+                    icon={item.icon}
+                    showPrice={false}
+                    selected={builder.seudeume?.id === item.id}
+                    onClick={() => selectSeudeume(item)}
+                  />
+                ))}
 
-          {currentStep === 3 &&
-            honeymoonList.map((item) => (
-              <BuilderOptionCard
-                key={item.id}
-                title={item.name}
-                price={item.price}
-                selected={builder.honeymoon === item.name}
-                onClick={() => selectHoneymoon(item)}
-              />
-            ))}
+              {currentStep === 3 &&
+                honeymoonList.map((item) => (
+                  <BuilderOptionCard
+                    key={item.id}
+                    title={item.name}
+                    description={item.description}
+                    tags={item.tags}
+                    icon={item.icon}
+                    showPrice={false}
+                    selected={builder.honeymoon?.id === item.id}
+                    onClick={() => selectHoneymoon(item)}
+                  />
+                ))}
+            </div>
+            <div className="mt-8 animate-fade-in">
+              {currentStep === 1 && builder.weddingHall && (
+                <BuilderOptionCard
+                  title={builder.weddingHall.name}
+                  description={builder.weddingHall.description}
+                  tags={builder.weddingHall.tags}
+                  icon={builder.weddingHall.icon}
+                  showPrice={false}
+                  selected={true} 
+                  onClick={() => {}}
+                  showCheckmark={false} 
+                />
+              )}
 
-          {currentStep === 4 && (
-            <div className="space-y-5">
-              <div className="border rounded-xl p-4 flex justify-between">
-                <span>웨딩홀</span>
-                <span>{builder.weddingHall}</span>
-              </div>
+              {currentStep === 2 && builder.seudeume && (
+                <BuilderOptionCard
+                  title={builder.seudeume.name}
+                  description={builder.seudeume.description}
+                  tags={builder.seudeume.tags}
+                  icon={builder.seudeume.icon}
+                  showPrice={false}
+                  selected={true}
+                  onClick={() => {}}
+                  showCheckmark={false}
+                />
+              )}
 
-              <div className="border rounded-xl p-4 flex justify-between">
-                <span>스드메</span>
-                <span>{builder.seudeume}</span>
-              </div>
-
-              <div className="border rounded-xl p-4 flex justify-between">
-                <span>허니문</span>
-                <span>{builder.honeymoon}</span>
-              </div>
-
-              <div className="rounded-xl bg-primary/10 p-5 text-center">
-                <h3 className="text-xl font-bold mb-2">
-                  예상 총 견적
-                </h3>
-
-                <p className="text-3xl font-bold text-primary">
-                  {totalPrice.toLocaleString()}원
-                </p>
-
-                <p className="text-gray-500 mt-3">
-                  선택한 항목을 확인한 후 프로포즈 플랜을 완성하세요.
-                </p>
+              {currentStep === 3 && builder.honeymoon && (
+                <BuilderOptionCard
+                  title={builder.honeymoon.name}
+                  description={builder.honeymoon.description}
+                  tags={builder.honeymoon.tags}
+                  icon={builder.honeymoon.icon}
+                  showPrice={false}
+                  selected={true}
+                  onClick={() => {}}
+                  showCheckmark={false}
+                />
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="bg-gray-50 rounded-2xl p-6">
+              <h3 className="font-bold text-lg mb-4">지금까지의 선택</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{builder.weddingHall?.icon}</span>
+                    <div>
+                      <p className="text-xs text-gray-500">장소</p>
+                      <p className="font-bold">{builder.weddingHall?.name}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{builder.seudeume?.icon}</span>
+                    <div>
+                      <p className="text-xs text-gray-500">분위기</p>
+                      <p className="font-bold">{builder.seudeume?.name}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{builder.honeymoon?.icon}</span>
+                    <div>
+                      <p className="text-xs text-gray-500">음식</p>
+                      <p className="font-bold">{builder.honeymoon?.name}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
 
-        <div className="flex justify-between items-center border-t pt-6 mt-8">
-          <h2 className="text-xl font-bold">
-            예상 견적
-          </h2>
+            <div>
+              <p className="text-sm font-bold text-gray-700 mb-4 ml-1">예산 범위</p>
+              <div className="grid grid-cols-2 gap-4">
+                {budgetList?.map((item) => (
+                  <BuilderOptionCard
+                    key={item.id}
+                    title={item.name}
+                    description={item.description}
+                    tags={item.tags}
+                    icon={item.icon}
+                    showPrice={false}
+                    selected={builder.budget?.id === item.id}
+                    onClick={() => selectBudget(item)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="mt-12 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-bold text-lg">🚀 추천 상품</h3>
+                <span className="bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  선택한 스타일 기반
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mb-5">
+                선택하신 옵션에 어울리는 상품들입니다. 종료 시 장바구니에 자동으로 담겨요.
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-primary/30 transition">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center bg-blue-50 text-blue-500 rounded-lg text-lg">
+                      🍽️
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">한강 뷰 프라이빗 다이닝</p>
+                      <p className="text-xs text-gray-500">장소</p>
+                    </div>
+                  </div>
+                  <span className="font-bold text-sm">800,000원~</span>
+                </div>
+                
+                <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-primary/30 transition">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center bg-orange-50 text-orange-500 rounded-lg text-lg">
+                      🏨
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">5성급 호텔 스위트 프로포즈</p>
+                      <p className="text-xs text-gray-500">장소</p>
+                    </div>
+                  </div>
+                  <span className="font-bold text-sm">1,500,000원~</span>
+                </div>
+                
+                <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-primary/30 transition">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center bg-pink-50 text-pink-500 rounded-lg text-lg">
+                      💐
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">프리미엄 플라워 데코</p>
+                      <p className="text-xs text-gray-500">서비스</p>
+                    </div>
+                  </div>
+                  <span className="font-bold text-sm">300,000원~</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-          <span className="text-2xl font-bold text-primary">
-            {totalPrice.toLocaleString()}원
-          </span>
-        </div>
+        <div className="flex justify-between items-center gap-3 mt-12 border-t pt-6">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              if (currentStep === 1) navigate("/builder-start");
+              else prevStep();
+            }}
+          >
+            ← 이전
+          </Button>
 
-        <div className="flex justify-end gap-3 mt-8">
           {currentStep === 4 ? (
-            <>
-              <Button
-                variant="secondary"
-                onClick={reset}
-              >
-                처음부터
-              </Button>
-
-              <Button
-                onClick={() =>
-                  alert("프로포즈 플랜이 완성되었습니다!")
-                }
-              >
-                완료하기
-              </Button>
-            </>
+            <Button 
+              onClick={() => navigate("/builder/cart")} 
+              disabled={!canNext}
+            >
+              플랜 생성하고 장바구니 보기 🛒
+            </Button>
           ) : (
-            <>
-              <Button
-                variant="secondary"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-              >
-                이전
-              </Button>
-
-              <Button
-                onClick={nextStep}
-                disabled={!canNext}
-              >
-                다음
-              </Button>
-            </>
+            <Button onClick={nextStep} disabled={!canNext}>
+              {currentStep === 1 && "다음: 분위기 선택 →"}
+              {currentStep === 2 && "다음: 음식 선택 →"}
+              {currentStep === 3 && "다음: 예산 확인 →"}
+            </Button>
           )}
         </div>
       </div>

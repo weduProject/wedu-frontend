@@ -1,18 +1,15 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import type { BuilderOption } from "./builderDummy";
+import type { BuilderItem } from "./builderDummy";
 
 type BuilderState = {
   step: number;
 
-  weddingHall: string;
-  weddingHallPrice: number;
+  weddingHall: BuilderItem | null;
+  seudeume: BuilderItem |null;
+  honeymoon: BuilderItem | null;
 
-  seudeume: string;
-  seudeumePrice: number;
-
-  honeymoon: string;
-  honeymoonPrice: number;
+  budget: BuilderItem | null;
 };
 
 type BuilderContextType = {
@@ -22,11 +19,10 @@ type BuilderContextType = {
   prevStep: () => void;
   reset: () => void;
 
-  selectWeddingHall: (item: BuilderOption) => void;
-  selectSeudeume: (item: BuilderOption) => void;
-  selectHoneymoon: (item: BuilderOption) => void;
-
-  totalPrice: number;
+  selectWeddingHall: (item: BuilderItem) => void;
+  selectSeudeume: (item: BuilderItem) => void;
+  selectHoneymoon: (item: BuilderItem) => void;
+  selectBudget: (item: BuilderItem) => void;
 };
 
 const BuilderContext = createContext<BuilderContextType | null>(null);
@@ -39,14 +35,11 @@ export function BuilderProvider({
   const [builder, setBuilder] = useState<BuilderState>({
     step: 1,
 
-    weddingHall: "",
-    weddingHallPrice: 0,
+    weddingHall: null,
+    seudeume: null,
+    honeymoon: null,
 
-    seudeume: "",
-    seudeumePrice: 0,
-
-    honeymoon: "",
-    honeymoonPrice: 0,
+    budget: null,
   });
 
   const nextStep = () =>
@@ -65,41 +58,36 @@ export function BuilderProvider({
     setBuilder({
       step: 1,
 
-      weddingHall: "",
-      weddingHallPrice: 0,
+      weddingHall: null,
+      seudeume: null,
+      honeymoon: null,
 
-      seudeume: "",
-      seudeumePrice: 0,
-
-      honeymoon: "",
-      honeymoonPrice: 0,
+      budget: null,
     });
 
-  const selectWeddingHall = (item: BuilderOption) =>
+  const selectWeddingHall = (item: BuilderItem) =>
     setBuilder((prev) => ({
       ...prev,
-      weddingHall: item.name,
-      weddingHallPrice: item.price,
+      weddingHall: item,
     }));
 
-  const selectSeudeume = (item: BuilderOption) =>
+  const selectSeudeume = (item: BuilderItem) =>
     setBuilder((prev) => ({
       ...prev,
-      seudeume: item.name,
-      seudeumePrice: item.price,
+      seudeume: item,
     }));
 
-  const selectHoneymoon = (item: BuilderOption) =>
+  const selectHoneymoon = (item: BuilderItem) =>
     setBuilder((prev) => ({
       ...prev,
-      honeymoon: item.name,
-      honeymoonPrice: item.price,
+      honeymoon: item,
     }));
 
-  const totalPrice =
-    builder.weddingHallPrice +
-    builder.seudeumePrice +
-    builder.honeymoonPrice;
+  const selectBudget = (item: BuilderItem) =>
+    setBuilder((prev) => ({
+      ...prev,
+      budget: item,
+    }));
 
   return (
     <BuilderContext.Provider
@@ -112,8 +100,7 @@ export function BuilderProvider({
         selectWeddingHall,
         selectSeudeume,
         selectHoneymoon,
-
-        totalPrice,
+        selectBudget,
       }}
     >
       {children}

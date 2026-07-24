@@ -9,7 +9,6 @@ import {
   type CommunityPost,
 } from "./communityDummy";
 
-
 type CreatePost = {
   title: string;
   category: string;
@@ -43,7 +42,6 @@ export function CommunityProvider({
       author: "나",
       likes: 0,
       comments: 0,
-      views: 0,
       date: new Date().toLocaleDateString(),
     };
 
