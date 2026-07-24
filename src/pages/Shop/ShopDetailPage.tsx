@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { PRODUCTS } from './shopData';
+import { useWishlist } from './WishlistContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ShopDetailPage() {
-  const { id } = useParams();               
+  const { id } = useParams();
   const navigate = useNavigate();
-  // TODO: 전역 상태로 교체 예정 — 찜 연동
-  const [liked, setLiked] = useState(false);
+  const { user } = useAuth();
+  const { isWished, toggleWish } = useWishlist();
 
-  // 페이지 열릴 때 / 다른 상품으로 바뀔 때 맨 위로 스크롤
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // id로 상품 찾기
-  // TODO: 백엔드 상품상세 조회 API 호출로 교체
   const product = PRODUCTS.find((p) => p.id === Number(id));
 
-  // 없는 상품일 때 안내
   if (!product) {
     return (
       <div className="mx-auto max-w-[1024px] py-20 text-center">
@@ -33,8 +32,16 @@ export default function ShopDetailPage() {
     );
   }
 
-  // 함께 보면 좋은 상품
+  const liked = isWished(product.id);
   const related = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
+
+  const handleWishClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWish(product.id);
+  };
 
   return (
     <div className="mx-auto max-w-[1024px]">
@@ -48,7 +55,7 @@ export default function ShopDetailPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="h-96 w-full overflow-hidden rounded-2xl bg-[#F2EEE6]">
-          {product.image && (   
+          {product.image && (
             <img
               src={product.image}
               alt={product.title}
@@ -120,13 +127,18 @@ export default function ShopDetailPage() {
             <button
               type="button"
               aria-pressed={liked}
-              onClick={() => setLiked((prev) => !prev)}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-[#EAE4D8] py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
+              onClick={handleWishClick}
+              className="group flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
             >
-              <span className={liked ? 'text-[#FC4A4D]' : 'text-[#594941]'}>
-                {liked ? '♥' : '♡'}
-              </span>
-              찜하기
+              <Heart
+                className={
+                  liked
+                    ? 'h-4 w-4 text-primary fill-primary'
+                    : 'h-4 w-4 text-[#594941] transition-colors group-hover:fill-primary group-hover:text-primary'
+                }
+                strokeWidth={1.8}
+              />
+              {liked ? '찜 완료' : '찜하기'}
             </button>
           </div>
         </div>

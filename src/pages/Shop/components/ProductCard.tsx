@@ -1,6 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
+import { Heart } from 'lucide-react';
+import { useWishlist } from '../WishlistContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface ProductCardProps {
   product: Product;
@@ -8,8 +10,17 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
-  // TODO: 전역 상태로 교체 예정 — 찜 연동
-  const [liked, setLiked] = useState(false);
+  const { user } = useAuth();
+  const { isWished, toggleWish } = useWishlist();
+  const liked = isWished(product.id);
+
+  const handleWishClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWish(product.id);
+  };
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
@@ -28,14 +39,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <button
           type="button"
-          aria-label="좋아요"
+          aria-label="찜하기"
           aria-pressed={liked}
-          onClick={() => setLiked((prev) => !prev)}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
+          onClick={handleWishClick}
+          className="group absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
-          <span className={liked ? 'text-sm text-[#FC4A4D]' : 'text-sm text-[#5C4840]'}>
-            {liked ? '♥' : '♡'}
-          </span>
+          <Heart
+            className={
+              liked
+                ? 'h-4 w-4 text-primary fill-primary'
+                : 'h-4 w-4 text-[#5C4840] transition-colors group-hover:fill-primary group-hover:text-primary'
+            }
+            strokeWidth={1.8}
+          />
         </button>
       </div>
 
