@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={() => setLiked((prev) => !prev)}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
-          <span className={liked ? 'text-sm text-[#FC4A4D]' : 'text-sm text-[#5C4840]'}>
+          <span className={liked ? 'text-sm text-primary' : 'text-sm text-[#5C4840]'}>
             {liked ? '♥' : '♡'}
           </span>
         </button>
@@ -66,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => navigate(`/shop/${product.id}`)}
-            className="rounded-full bg-[#FC4A4D] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             상세보기
           </button>
