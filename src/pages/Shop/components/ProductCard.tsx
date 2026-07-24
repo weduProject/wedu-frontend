@@ -14,7 +14,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { isWished, toggleWish } = useWishlist();
   const liked = isWished(product.id);
 
-  const handleWishClick = () => {
+  const handleWishClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!user) {
       navigate('/login');
       return;
@@ -22,8 +23,16 @@ export default function ProductCard({ product }: ProductCardProps) {
     toggleWish(product.id);
   };
 
+  const handleDetailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/shop/${product.id}`);
+  };
+
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-white">
+    <article
+      onClick={() => navigate(`/shop/${product.id}`)}
+      className="flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-white transition-shadow hover:shadow-md"
+    >
       <div className="relative h-48 w-full bg-primary-light">
         {product.image && (
           <img
@@ -81,7 +90,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
           <button
             type="button"
-            onClick={() => navigate(`/shop/${product.id}`)}
+            onClick={handleDetailClick}
             className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             상세보기

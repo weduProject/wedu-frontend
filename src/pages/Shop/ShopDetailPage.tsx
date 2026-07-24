@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-react';
 import { PRODUCTS } from './shopData';
 import { useWishlist } from './WishlistContext';
+import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function ShopDetailPage() {
@@ -10,6 +11,7 @@ export default function ShopDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isWished, toggleWish } = useWishlist();
+  const { isInCart, addToCart } = useCart();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -33,6 +35,7 @@ export default function ShopDetailPage() {
   }
 
   const liked = isWished(product.id);
+  const inCart = isInCart(product.id);
   const related = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
 
   const handleWishClick = () => {
@@ -41,6 +44,14 @@ export default function ShopDetailPage() {
       return;
     }
     toggleWish(product.id);
+  };
+
+  const handleCartClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product.id);
   };
 
   return (
@@ -120,9 +131,12 @@ export default function ShopDetailPage() {
           <div className="mt-auto flex flex-col gap-3">
             <button
               type="button"
-              className="rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              onClick={handleCartClick}
+              disabled={inCart}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              장바구니에 담기
+              <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
+              {inCart ? '담았어요' : '장바구니에 담기'}
             </button>
             <button
               type="button"

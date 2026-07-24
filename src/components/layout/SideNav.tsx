@@ -19,7 +19,7 @@ export default function SideNav() {
   return (
     <nav
       aria-label="메인 메뉴"
-      className="order-2 sticky bottom-0 w-full bg-primary-light border-t border-border px-4 py-2 md:order-none md:w-[220px] md:shrink-0 md:h-screen md:sticky md:top-0 md:bottom-auto md:border-r md:border-t-0 md:p-6"
+      className="order-2 sticky bottom-0 w-full bg-primary-light border-t border-border px-4 py-2 md:order-0 md:w-55 md:shrink-0 md:h-screen md:sticky md:top-0 md:bottom-auto md:border-r md:border-t-0 md:p-6"
     >
       <h1 className="hidden md:block text-primary text-xl mb-6">WEDU</h1>
       <ul className="flex justify-around list-none md:block">
@@ -28,7 +28,7 @@ export default function SideNav() {
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                clsx(navLinkBase, isActive ? 'bg-primary/[.15] text-primary font-semibold' : 'text-text')
+                clsx(navLinkBase, isActive ? 'bg-primary/15 text-primary font-semibold' : 'text-text')
               }
             >
               {item.label}
