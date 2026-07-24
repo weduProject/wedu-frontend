@@ -6,6 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const STORAGE_KEY = 'wedu-wishlist';
 
@@ -19,7 +20,6 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
-// localStorage에서 초기값 불러오기 (없거나 파싱 실패 시 빈 배열)
 function loadInitialWishlist(): number[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -30,23 +30,37 @@ function loadInitialWishlist(): number[] {
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [wishedIds, setWishedIds] = useState<number[]>(loadInitialWishlist);
 
-  // wishedIds가 바뀔 때마다 localStorage에 동기화
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(wishedIds));
   }, [wishedIds]);
+
+  // 로그아웃되면 로컬 찜 목록도 비워서, 다음 사람/비회원이 이전 계정 찜을 보는 문제 방지
+  useEffect(() => {
+    if (!user) {
+      setWishedIds([]);
+    }
+  }, [user]);
 
   const isWished = useCallback(
     (id: number) => wishedIds.includes(id),
     [wishedIds],
   );
 
-  const toggleWish = useCallback((id: number) => {
-    setWishedIds((prev) =>
-      prev.includes(id) ? prev.filter((wid) => wid !== id) : [...prev, id],
-    );
-  }, []);
+  const toggleWish = useCallback(
+    (id: number) => {
+      if (!user) {
+        // 비회원은 찜 불가 — 호출부(컴포넌트)에서 로그인 유도 처리
+        return;
+      }
+      setWishedIds((prev) =>
+        prev.includes(id) ? prev.filter((wid) => wid !== id) : [...prev, id],
+      );
+    },
+    [user],
+  );
 
   const removeWish = useCallback((id: number) => {
     setWishedIds((prev) => prev.filter((wid) => wid !== id));

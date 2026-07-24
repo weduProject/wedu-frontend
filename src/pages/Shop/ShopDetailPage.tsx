@@ -1,19 +1,20 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { PRODUCTS } from './shopData';
 import { useWishlist } from './WishlistContext';
-import { Heart } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ShopDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isWished, toggleWish } = useWishlist();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // TODO: 백엔드 상품상세 조회 API 호출로 교체
   const product = PRODUCTS.find((p) => p.id === Number(id));
 
   if (!product) {
@@ -33,6 +34,14 @@ export default function ShopDetailPage() {
 
   const liked = isWished(product.id);
   const related = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
+
+  const handleWishClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWish(product.id);
+  };
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -118,12 +127,15 @@ export default function ShopDetailPage() {
             <button
               type="button"
               aria-pressed={liked}
-              onClick={() => toggleWish(product.id)}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
+              onClick={handleWishClick}
+              className="group flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
             >
               <Heart
-                className={liked ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-[#594941]'}
-                fill={liked ? 'currentColor' : 'none'}
+                className={
+                  liked
+                    ? 'h-4 w-4 text-primary fill-primary'
+                    : 'h-4 w-4 text-[#594941] transition-colors group-hover:fill-primary group-hover:text-primary'
+                }
                 strokeWidth={1.8}
               />
               {liked ? '찜 완료' : '찜하기'}

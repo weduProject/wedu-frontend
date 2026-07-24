@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
-import { useWishlist } from '../WishlistContext';
 import { Heart } from 'lucide-react';
+import { useWishlist } from '../WishlistContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface ProductCardProps {
   product: Product;
@@ -9,8 +10,17 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isWished, toggleWish } = useWishlist();
   const liked = isWished(product.id);
+
+  const handleWishClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWish(product.id);
+  };
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-white">
@@ -31,12 +41,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           type="button"
           aria-label="찜하기"
           aria-pressed={liked}
-          onClick={() => toggleWish(product.id)}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
+          onClick={handleWishClick}
+          className="group absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
           <Heart
-            className={liked ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-[#5C4840]'}
-            fill={liked ? 'currentColor' : 'none'}
+            className={
+              liked
+                ? 'h-4 w-4 text-primary fill-primary'
+                : 'h-4 w-4 text-[#5C4840] transition-colors group-hover:fill-primary group-hover:text-primary'
+            }
             strokeWidth={1.8}
           />
         </button>
