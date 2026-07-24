@@ -4,7 +4,7 @@ import clsx from 'clsx';
 const NAV_ITEMS = [
   { label: '홈', path: '/home' },
   { label: '프로포즈 편집샵', path: '/shop' },
-  { label: '나만의 프로포즈', path: '/builder' },
+  { label: '나만의 프로포즈', path: '/builder-start' },
   { label: '체크리스트', path: '/checklist' },
   { label: '캘린더/일정', path: '/calendar' },
   { label: '예산 관리', path: '/budget' },
