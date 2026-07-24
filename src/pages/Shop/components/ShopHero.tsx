@@ -25,7 +25,7 @@ export default function ShopHero() {
         <button
           type="button"
           onClick={() => navigate('/builder')}
-          className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary transition-opacity hover:opacity-90"
+          className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#FC4A4D] transition-opacity hover:opacity-90"
         >
           나만의 프로포즈 만들기
           <span aria-hidden>→</span>
