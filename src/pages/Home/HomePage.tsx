@@ -28,7 +28,9 @@ export default function HomePage() {
   return (
     <main className="flex flex-col gap-8">
       <section>
-        <h1 className="text-2xl font-bold">안녕하세요, {userName}님!</h1>
+        <h1 className="text-2xl font-bold">
+          {user ? `안녕하세요, ${userName}님!` : '안녕하세요. 당신의 최고의 순간을 함께하는 WEDU입니다.'}
+        </h1>
       </section>
 
       <section>
