@@ -32,7 +32,7 @@ const SOCIAL_BUTTONS = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // 소셜 로그인용
+  const { login } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4">
@@ -63,7 +63,7 @@ export default function LoginPage() {
           <button
             type="button"
             className="mt-8 text-sm text-text-muted hover:text-text transition-colors flex items-center gap-0.5 cursor-pointer bg-transparent border-0 p-0 w-fit"
-            onClick={() => navigate('/home')}
+            onClick={() => { login('guest'); navigate('/home'); }}
           >
             비회원으로 둘러보기 &gt;
           </button>
