@@ -1,4 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router-dom';
+import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
@@ -39,7 +40,7 @@ export default function App() {
   return (
     <ScheduleProvider>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
         <Route element={<OnboardingRoutes />}>
           <Route path="/onboarding" element={<OnboardingStartPage />} />
@@ -55,6 +56,7 @@ export default function App() {
             </CommunityProvider>
           }
         >
+          <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/dday" element={<DDayPage />} />
           <Route path="/shop" element={<ShopPage />} />
