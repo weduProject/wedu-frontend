@@ -40,8 +40,8 @@ export default function TasteFinder({ selected, onToggle }: TasteFinderProps) {
               className={clsx(
                 'flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm transition-colors',
                 active
-                  ? 'border-[#FC4A4D] bg-[#FC4A4D] text-white'
-                  : 'border-[#EAE4D8] bg-[#FAF8F4] text-[#5C4940] hover:border-[#FC4A4D]/40',
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-[#EAE4D8] bg-[#FAF8F4] text-[#5C4940] hover:border-primary/40',
               )}
             >
               <span aria-hidden>{emoji}</span>

@@ -1,4 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router-dom';
+import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
@@ -17,7 +18,10 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+import CommunityDetailPage from './pages/Community/CommunityDetailPage';
+import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
+import WishlistPage from './pages/Shop/WishlistPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
