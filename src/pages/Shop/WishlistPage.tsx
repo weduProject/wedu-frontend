@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { PRODUCTS } from './shopData';
 import ProductCard from './components/ProductCard';
-import { useWishlist } from './WishlistContext';
+import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
 

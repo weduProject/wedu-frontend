@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { PRODUCTS } from './shopData';
-import { useWishlist } from './WishlistContext';
+import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
 import { Heart } from 'lucide-react';
-import { useWishlist } from '../WishlistContext';
+import { useWishlist } from '../utils/useWishlist';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface ProductCardProps {
