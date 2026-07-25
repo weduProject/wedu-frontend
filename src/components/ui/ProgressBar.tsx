@@ -17,7 +17,7 @@ export default function ProgressBar({ value, max = 100, showLabel = false }: Pro
     >
       <div className="flex-1 h-2 bg-[#f0f0f0] rounded overflow-hidden">
         <div
-          className="h-full bg-primary rounded transition-[width] duration-300 ease-in-out"
+          className="h-full bg-[linear-gradient(to_right,#B76E79_0%,#D4A373_100%)] rounded transition-[width] duration-300 ease-in-out"
           style={{ width: `${percent}%` }}
         />
       </div>

@@ -40,7 +40,9 @@ export default function HomePage() {
             <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
           </Link>
           <BudgetCard />
-          <ChecklistSummaryCard />
+          <Link to="/checklist" className="block transition-transform hover:scale-[1.01]">
+            <ChecklistSummaryCard />
+          </Link>
         </div>
       </section>
 
