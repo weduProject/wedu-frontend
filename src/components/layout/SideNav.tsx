@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
@@ -24,6 +25,14 @@ interface SideNavProps {
 export default function SideNav({ isOpen, onClose }: SideNavProps) {
   const { user } = useAuth();
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) onClose();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [onClose]);
+
   return (
     <>
       {/* 모바일 백드롭 */}
@@ -38,7 +47,7 @@ export default function SideNav({ isOpen, onClose }: SideNavProps) {
       <nav
         aria-label="메인 메뉴"
         className={clsx(
-          'fixed inset-y-0 left-0 z-50 w-[220px] bg-primary-light border-r border-border p-6 flex flex-col transition-transform duration-300',
+          'fixed inset-y-0 left-0 z-50 w-[220px] overflow-y-auto bg-primary-light border-r border-border p-6 flex flex-col transition-transform duration-300',
           'lg:static lg:translate-x-0 lg:shrink-0 lg:h-screen lg:sticky lg:top-0',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
