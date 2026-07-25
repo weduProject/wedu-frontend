@@ -21,17 +21,12 @@ import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
 import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
-import WishlistPage from './pages/Shop/WishlistPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
-import { WishlistProvider } from './pages/Shop/WishlistContext';
-import { CartProvider } from './pages/Shop/CartContext';
-import CartPage from './pages/Shop/CartPage';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from "./pages/Builder/BuilderCartPage";
-
 
 function OnboardingRoutes() {
   return (
@@ -45,7 +40,6 @@ export default function App() {
   return (
     <ScheduleProvider>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route element={<OnboardingRoutes />}>
@@ -58,24 +52,22 @@ export default function App() {
         <Route
           element={
             <CommunityProvider>
-              <WishlistProvider>
-                <CartProvider>
-                  <PageLayout />
-                </CartProvider>
-              </WishlistProvider>
+              <PageLayout />
             </CommunityProvider>
           }
         >
+          <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/dday" element={<DDayPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/shop/:id" element={<ShopDetailPage />} />
-          <Route path="/shop/wishlist" element={<WishlistPage />} />
-          <Route path="/shop/cart" element={<CartPage />} />
           <Route path="/wedding-hall" element={<WeddingHallPage />} />
           <Route path="/seudeume" element={<SeudeuimePage />} />
           <Route path="/honeymoon" element={<HoneymoonPage />} />
-          <Route path="/builder-start" element={<BuilderStartPage />} />
+          <Route 
+            path="/builder-start" 
+            element={<BuilderStartPage />} 
+          />
           <Route
             path="/builder"
             element={
@@ -96,8 +88,14 @@ export default function App() {
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/budget" element={<BudgetPage />} />
           <Route path="/community" element={<CommunityPage />} />
-          <Route path="/community/:id" element={<CommunityDetailPage />} />
-          <Route path="/community/write" element={<CommunityWritePage />} />
+          <Route
+            path="/community/:id"
+            element={<CommunityDetailPage />}
+          />
+          <Route
+            path="/community/write"
+            element={<CommunityWritePage />}
+          />
           <Route path="/mypage" element={<MypagePage />} />
         </Route>
       </Routes>

@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
-type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill';
+type ButtonVariant = 'main' | 'secondary';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,9 +13,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantClasses: Record<ButtonVariant, string> = {
   main: 'bg-primary text-white border-0 hover:enabled:bg-[#d4436f]',
   secondary: 'bg-white text-text border border-border hover:enabled:bg-[#f9f9f9]',
-  wishlist:
-    'bg-primary text-white border-0 hover:enabled:bg-primary-light hover:enabled:text-primary transition-colors',
-  pill: 'rounded-full bg-primary text-white border-0 hover:enabled:opacity-90',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
