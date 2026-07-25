@@ -32,6 +32,7 @@ import { CartProvider } from './pages/Shop/CartContext';
 import CartPage from './pages/Shop/CartPage';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from "./pages/Builder/BuilderCartPage";
+import { BudgetProvider } from './pages/Budget/hooks/useBudget';
 
 
 function OnboardingRoutes() {
@@ -44,6 +45,7 @@ function OnboardingRoutes() {
 
 export default function App() {
   return (
+    <BudgetProvider>
     <ChecklistProvider>
       <ScheduleProvider>
         <Routes>
@@ -105,5 +107,6 @@ export default function App() {
         </Routes>
       </ScheduleProvider>
     </ChecklistProvider>
+    </BudgetProvider>
   );
 }
