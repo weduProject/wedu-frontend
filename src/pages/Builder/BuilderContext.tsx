@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import type { BuilderItem } from "./builderDummy";
 
-type BuilderState = {
+export type BuilderState = {
   step: number;
 
   weddingHall: BuilderItem | null;
