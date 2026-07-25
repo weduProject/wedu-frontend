@@ -44,7 +44,7 @@ export default function CategoryFilter({
                   'rounded-full px-4 py-2 text-sm font-medium transition-colors',
                   active
                     ? 'bg-primary text-white'
-                    : 'bg-[#F2EEE6] text-[#5C4940] hover:bg-[#EAE4D8]',
+                    : 'bg-primary-light text-[#5C4940] hover:bg-border',
                 )}
               >
                 {cat}
@@ -82,7 +82,7 @@ export default function CategoryFilter({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs font-medium text-[#968178]">스타일:</span>
+        <span className="mr-1 text-xs font-medium text-text-mutedd">스타일:</span>
         {styleTags.map((tag) => {
           const active = tag === activeStyle;
           return (
@@ -94,8 +94,8 @@ export default function CategoryFilter({
               className={clsx(
                 'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                 active
-                  ? 'bg-[#0D0A09] text-white'
-                  : 'bg-[#F2EEE6] text-[#7C6358] hover:bg-[#EAE4D8]',
+                  ? 'bg-text text-white'
+                  : 'bg-primary-light text-[#7C6358] hover:bg-border',
               )}
             >
               {tag}
