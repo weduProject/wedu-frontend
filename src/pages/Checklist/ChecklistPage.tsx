@@ -8,11 +8,19 @@ import ProgressBar from '../../components/ui/ProgressBar';
 import TextField from '../../components/ui/TextField';
 import Button from '../../components/ui/Button';
 import { useChecklist, type CategoryType } from './hooks/useChecklist';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CATEGORIES: CategoryType[] = ['기본', '예식', '촬영', '예물', '주거', '여행'];
 
 export default function ChecklistPage() {
-  const { todos, addTodo, toggleTodo } = useChecklist();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { todos:rawTodos, addTodo, toggleTodo } = useChecklist();
+  const todos = user ? rawTodos : [];
+  
+
   const [activeFilter, setActiveFilter] = useState<'전체' | CategoryType>('전체');
   
   const [inputText, setInputText] = useState('');
@@ -66,111 +74,131 @@ export default function ChecklistPage() {
         </div>
       </BaseCard>
 
-      {/* 2. 할 일 추가 폼 */}
-      <form onSubmit={handleAddTodo} className="mb-6 flex items-start gap-3">
-        <div className="flex-1">
-          {/* ✨ 공용 TextField 컴포넌트 적용 */}
-          <TextField
-            placeholder="새 할 일 추가..."
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-          />
+      {/* 비회원일 때 보여줄 빈 화면 멘트 */}
+      {!user && (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
+            <Check className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="mb-2 text-lg font-bold text-text">할 일을 등록하고 진행률을 확인하세요</h3>
+          <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별로 할 일을 관리할 수 있습니다.</p>
+          <Button onClick={() => navigate('/login')} className="px-6">
+            로그인하러 가기
+          </Button>
         </div>
-        
-        <select
-          value={inputCategory}
-          onChange={(e) => setInputCategory(e.target.value as CategoryType)}
-          className="h-[42px] rounded-lg border border-border bg-white px-3 text-sm text-text focus:border-primary focus:outline-none"
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-        
-        {/* ✨ 공용 Button 컴포넌트 적용 */}
-        <Button
-          type="submit"
-          disabled={!inputText.trim()}
-          className="h-10.5 min-w-20"
-        >
-          추가
-        </Button>
-      </form>
+      )}
 
-      {/* 3. 카테고리 필터 칩 */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveFilter('전체')}
-          className={clsx(
-            'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-            activeFilter === '전체'
-              ? 'bg-primary text-white border-0'
-              : 'border border-border bg-white text-text hover:bg-primary-light/50'
-          )}
-        >
-          전체
-        </button>
-        {CATEGORIES.map((cat) => (
+      {user && (
+        <>
+        {/* 2. 할 일 추가 폼 */}
+        <form onSubmit={handleAddTodo} className="mb-6 flex items-start gap-3">
+          <div className="flex-1">
+            {/* ✨ 공용 TextField 컴포넌트 적용 */}
+            <TextField
+              placeholder="새 할 일 추가..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+          </div>
+          
+          <select
+            value={inputCategory}
+            onChange={(e) => setInputCategory(e.target.value as CategoryType)}
+            className="h-[42px] rounded-lg border border-border bg-white px-3 text-sm text-text focus:border-primary focus:outline-none"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          
+          {/* ✨ 공용 Button 컴포넌트 적용 */}
+          <Button
+            type="submit"
+            disabled={!inputText.trim()}
+            className="h-10.5 min-w-20"
+          >
+            추가
+          </Button>
+        </form>
+
+        {/* 3. 카테고리 필터 칩 */}
+        <div className="mb-6 flex flex-wrap items-center gap-2">
           <button
-            key={cat}
             type="button"
-            onClick={() => setActiveFilter(cat)}
+            onClick={() => setActiveFilter('전체')}
             className={clsx(
               'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-              activeFilter === cat
+              activeFilter === '전체'
                 ? 'bg-primary text-white border-0'
                 : 'border border-border bg-white text-text hover:bg-primary-light/50'
             )}
           >
-            {cat}
+            전체
           </button>
-        ))}
-      </div>
-
-      {/* 4. 체크리스트 목록 영역 (BaseCard 적용) */}
-      <BaseCard className="p-6 shadow-sm">
-        <div className="flex flex-col gap-3">
-          {filteredTodos.length === 0 ? (
-            <p className="py-10 text-center text-sm text-text-muted">해당 카테고리에 등록된 할 일이 없습니다.</p>
-          ) : (
-            filteredTodos.map((todo) => (
-              <div 
-                key={todo.id}
-                onClick={() => handleToggleComplete(todo.id)}
-                className={clsx(
-                  'group flex cursor-pointer items-center gap-4 rounded-xl p-4 transition-colors',
-                  todo.isCompleted ? 'bg-primary-light/40' : 'bg-[#FAFAFA] hover:bg-primary-light/20'
-                )}
-              >
-                {/* 커스텀 체크박스 */}
-                <div 
-                  className={clsx(
-                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors',
-                    todo.isCompleted 
-                      ? 'border-primary bg-primary' 
-                      : 'border-gray-300 bg-white group-hover:border-primary'
-                  )}
-                >
-                  {todo.isCompleted && (
-                    <Check className="h-4 w-4 text-white" strokeWidth={3} />
-                  )}
-                </div>
-                
-                {/* 텍스트 영역 */}
-                <span 
-                  className={clsx(
-                    'text-sm font-medium transition-all',
-                    todo.isCompleted ? 'text-text-muted line-through' : 'text-text'
-                  )}
-                >
-                  {todo.text}
-                </span>
-              </div>
-            ))
-          )}
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setActiveFilter(cat)}
+              className={clsx(
+                'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
+                activeFilter === cat
+                  ? 'bg-primary text-white border-0'
+                  : 'border border-border bg-white text-text hover:bg-primary-light/50'
+              )}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-      </BaseCard>
+
+        {/* 4. 체크리스트 목록 영역 (BaseCard 적용) */}
+        <BaseCard className="p-6 shadow-sm">
+          <div className="flex flex-col gap-3">
+            {filteredTodos.length === 0 ? (
+              <p className="py-10 text-center text-sm text-text-muted">해당 카테고리에 등록된 할 일이 없습니다.</p>
+            ) : (
+              filteredTodos.map((todo) => (
+                <div 
+                  key={todo.id}
+                  onClick={() => handleToggleComplete(todo.id)}
+                  className={clsx(
+                    'group flex cursor-pointer items-center gap-4 rounded-xl p-4 transition-colors',
+                    todo.isCompleted ? 'bg-primary-light/40' : 'bg-[#FAFAFA] hover:bg-primary-light/20'
+                  )}
+                >
+                  {/* 커스텀 체크박스 */}
+                  <div 
+                    className={clsx(
+                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors',
+                      todo.isCompleted 
+                        ? 'border-primary bg-primary' 
+                        : 'border-gray-300 bg-white group-hover:border-primary'
+                    )}
+                  >
+                    {todo.isCompleted && (
+                      <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                    )}
+                  </div>
+                  
+                  {/* 텍스트 영역 */}
+                  <span 
+                    className={clsx(
+                      'text-sm font-medium transition-all',
+                      todo.isCompleted ? 'text-text-muted line-through' : 'text-text'
+                    )}
+                  >
+                    {todo.text}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </BaseCard>
+        </>
+      )}
+      
+      
       
     </div>
   );

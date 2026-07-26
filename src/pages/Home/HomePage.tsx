@@ -18,7 +18,8 @@ export default function HomePage() {
   const [viewSchedule, setViewSchedule] = useState<ScheduleItem | null>(null);
   const [editSchedule, setEditSchedule] = useState<ScheduleItem | null>(null);
 
-  const { schedules, deleteSchedule, updateSchedule } = useSchedules();
+  const { schedules:rawSchedules, deleteSchedule, updateSchedule } = useSchedules();
+  const schedules = user ? rawSchedules : [];
 
   // 다가오는 일정 3개만 필터링 및 정렬 (날짜가 빠른 순)
   const upcomingSchedules = schedules
