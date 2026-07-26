@@ -6,9 +6,6 @@ import ShopPage from './pages/Shop/ShopPage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
 import WishlistPage from './pages/Shop/WishlistPage';
 import CartPage from './pages/Shop/CartPage';
-import WeddingHallPage from './pages/WeddingHall/WeddingHallPage';
-import SeudeuimePage from './pages/Seudeume/SeudeuimePage';
-import HoneymoonPage from './pages/Honeymoon/HoneymoonPage';
 import BuilderPage from './pages/Builder/BuilderPage';
 import ChecklistPage from './pages/Checklist/ChecklistPage';
 import CalendarPage from './pages/Calendar/CalendarPage';
@@ -75,9 +72,6 @@ export default function App() {
               <Route path="/shop/:id" element={<ShopDetailPage />} />
               <Route path="/shop/wishlist" element={<WishlistPage />} />
               <Route path="/shop/cart" element={<CartPage />} />
-              <Route path="/wedding-hall" element={<WeddingHallPage />} />
-              <Route path="/seudeume" element={<SeudeuimePage />} />
-              <Route path="/honeymoon" element={<HoneymoonPage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
                 path="/builder"
