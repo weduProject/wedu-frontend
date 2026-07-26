@@ -2,7 +2,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import ChecklistSummaryCard from './components/ChecklistSummaryCard';
 import QuickMenu from './components/QuickMenu';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSchedules } from '../Calendar/hooks/useSchedules';
 import type { ScheduleItem } from '../Calendar/CalendarPage';
 import UpcomingList from '../Calendar/components/UpcomingList';
@@ -38,21 +38,37 @@ export default function HomePage() {
       <section>
         <h2 className="mb-3 text-base text-text-muted">이번 달 준비 현황</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div
-          onClick={() => navigate('/dday')}
-          className="block transition-transform cursor-pointer hover:scale-[1.01]">
-            <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
-          </div>
-          <div
+          {user ? (
+            <Link to="/dday" className="block transition-transform cursor-pointer hover:scale-[1.01]">
+              <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
+            </Link>
+          ) : (
+            <div onClick={() => navigate('/dday')} className="block transition-transform cursor-pointer hover:scale-[1.01]">
+              <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
+            </div>
+          )}
+          {user ? (
+            <Link to="/budget" className="block transition-transform cursor-pointer hover:scale-[1.01]">
+              <BudgetSummaryCard />
+            </Link>
+          ) : (
+            <div
           onClick={() => navigate('/budget')}
           className="block transition-transform cursor-pointer hover:scale-[1.01]">
             <BudgetSummaryCard />
           </div>
-          <div
+          )}
+          {user ? (
+            <Link to="/checklist" className="block transition-transform cursor-pointer hover:scale-[1.01]">
+              <ChecklistSummaryCard />
+            </Link>
+          ) : (
+            <div
           onClick={() => navigate('/checklist')}
           className="block transition-transform cursor-pointer hover:scale-[1.01]">
             <ChecklistSummaryCard />
           </div>
+          )}
         </div>
       </section>
 
