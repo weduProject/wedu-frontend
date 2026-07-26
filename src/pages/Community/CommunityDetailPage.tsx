@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Heart, MessageCircle } from "lucide-react";
 import { Button, CategoryBadge } from "../../components";
 import { useCommunity } from "./CommunityContext";
 
@@ -8,16 +9,19 @@ export default function CommunityDetailPage() {
   const { id } = useParams();
   const { posts } = useCommunity();
 
-  const post = posts.find(
-    (item) => item.id === Number(id)
-  );
+  const post = posts.find((item) => item.id === Number(id));
 
   const [likes, setLikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState([
     { id: 1, author: "예은", content: "축하드립니다!", date: "2026.07.23" },
-    { id: 2, author: "건우", content: "좋은 장소에서 성공하시길 바랍니다.", date: "2026.07.23" },
+    {
+      id: 2,
+      author: "건우",
+      content: "좋은 장소에서 성공하시길 바랍니다.",
+      date: "2026.07.23",
+    },
   ]);
 
   useEffect(() => {
@@ -26,10 +30,12 @@ export default function CommunityDetailPage() {
 
   if (!post) {
     return (
-      <div className="max-w-3xl mx-auto py-24 text-center text-gray-500">
+      <div className="mx-auto max-w-[1024px] py-20 text-center text-text-muted">
         게시글을 찾을 수 없습니다.
         <br />
-        <Button className="mt-4" onClick={() => navigate("/community")}>목록으로 돌아가기</Button>
+        <Button className="mt-4" onClick={() => navigate("/community")}>
+          목록으로 돌아가기
+        </Button>
       </div>
     );
   }
@@ -47,86 +53,90 @@ export default function CommunityDetailPage() {
   const handleAddComment = () => {
     if (!commentInput.trim()) return;
 
-    const newComment = {
-      id: Date.now(),
-      author: "나",
-      content: commentInput,
-      date: "방금 전",
-    };
-
-    setComments([...comments, newComment]);
+    setComments([
+      ...comments,
+      {
+        id: Date.now(),
+        author: "나",
+        content: commentInput,
+        date: "방금 전",
+      },
+    ]);
     setCommentInput("");
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="mx-auto max-w-[1024px]">
       <Button
         variant="secondary"
-        className="mb-6"
+        className="mb-6 flex items-center gap-1.5"
         onClick={() => navigate("/community")}
       >
-        ← 목록으로
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
+        목록으로
       </Button>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
-        <div className="flex justify-between items-center">
+      <div className="rounded-xl border border-border bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center justify-between">
           <CategoryBadge category={post.category} />
-
-          <span className="text-gray-400 text-sm">
-            {post.date}
-          </span>
+          <span className="text-sm text-text-muted">{post.date}</span>
         </div>
 
-        <h1 className="text-3xl font-bold mt-3">
-          {post.title}
-        </h1>
+        <h1 className="mt-3 text-3xl font-bold text-text">{post.title}</h1>
 
-        <p className="text-gray-500 mt-2 text-sm">
-          작성자 : {post.author}
-        </p>
+        <p className="mt-2 text-sm text-text-muted">작성자 : {post.author}</p>
 
-        <hr className="my-6 border-gray-100" />
+        <hr className="my-6 border-border" />
 
-        <p className="leading-8 whitespace-pre-line text-gray-700 min-h-[150px]">
+        <p className="min-h-[150px] whitespace-pre-line leading-8 text-text">
           {post.content}
         </p>
 
-        <hr className="my-6 border-gray-100" />
+        <hr className="my-6 border-border" />
 
-        <div className="flex justify-between items-center">
-          <div className="flex gap-6 text-gray-400 text-sm">
-            <span>❤️ {likes}</span>
-            <span>💬 {comments.length}</span>
+        <div className="flex items-center justify-between">
+          <div className="flex gap-6 text-sm text-text-muted">
+            <span className="flex items-center gap-1.5">
+              <Heart className="h-4 w-4" strokeWidth={1.8} />
+              {likes}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <MessageCircle className="h-4 w-4" strokeWidth={1.8} />
+              {comments.length}
+            </span>
           </div>
 
           <button
+            type="button"
             onClick={handleLike}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition shadow-sm border ${
-              hasLiked 
-                ? "bg-[#C48E96] text-white border-[#C48E96]" 
-                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+            className={`flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors ${
+              hasLiked
+                ? "border-primary bg-primary text-white"
+                : "border-border bg-white text-text hover:border-primary/40"
             }`}
           >
-            {hasLiked ? "♥" : "♡"} 좋아요
+            <Heart
+              className={hasLiked ? "h-4 w-4 fill-white" : "h-4 w-4"}
+              strokeWidth={1.8}
+            />
+            좋아요
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm mt-8">
-        <h2 className="text-xl font-bold mb-6">
-          댓글 <span className="text-[#C48E96]">{comments.length}</span>
+      <div className="mt-8 rounded-xl border border-border bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <h2 className="mb-6 text-xl font-bold text-text">
+          댓글 <span className="text-primary">{comments.length}</span>
         </h2>
 
-        <div className="space-y-4 mb-8">
+        <div className="mb-8 flex flex-col gap-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="border-b border-gray-50 pb-4">
-              <div className="flex justify-between items-center mb-1">
-                <strong className="text-sm text-gray-800">{comment.author}</strong>
-                <span className="text-xs text-gray-400">{comment.date}</span>
+            <div key={comment.id} className="border-b border-border pb-4">
+              <div className="mb-1 flex items-center justify-between">
+                <strong className="text-sm text-text">{comment.author}</strong>
+                <span className="text-xs text-text-muted">{comment.date}</span>
               </div>
-              <p className="text-gray-600 text-sm mt-1">
-                {comment.content}
-              </p>
+              <p className="mt-1 text-sm text-text-muted">{comment.content}</p>
             </div>
           ))}
         </div>
@@ -136,12 +146,12 @@ export default function CommunityDetailPage() {
             rows={3}
             value={commentInput}
             onChange={(e) => setCommentInput(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl p-4 outline-none focus:border-[#C48E96] transition bg-gray-50/50 text-sm resize-none"
+            className="w-full resize-none rounded-xl border border-border p-4 text-sm outline-none transition-colors focus:border-primary"
             placeholder="댓글을 입력하세요."
           />
 
-          <Button 
-            className="mt-3 bg-[#C48E96] hover:bg-[#b07d84] border-none px-6" 
+          <Button
+            className="mt-3 px-6"
             onClick={handleAddComment}
             disabled={!commentInput.trim()}
           >
