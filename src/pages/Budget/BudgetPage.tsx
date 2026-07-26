@@ -57,7 +57,7 @@ export default function BudgetPage() {
 
   return (
     <div className="mx-auto max-w-[1024px] pb-20">
-      <div className="mb-8 flex items-end justify-between">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-text md:text-3xl">예산 관리</h2>
           <p className="mt-2 text-sm text-text-muted">예산을 설정하고 지출을 추적하세요</p>
