@@ -1,6 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
+import { Heart } from 'lucide-react';
+import { useWishlist } from '../utils/useWishlist';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface ProductCardProps {
   product: Product;
@@ -8,12 +10,30 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
-  // TODO: 전역 상태로 교체 예정 — 찜 연동
-  const [liked, setLiked] = useState(false);
+  const { user } = useAuth();
+  const { isWished, toggleWish } = useWishlist();
+  const liked = isWished(product.id);
+
+  const handleWishClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWish(product.id);
+  };
+
+  const handleDetailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/shop/${product.id}`);
+  };
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#EAE4D8] bg-white">
-      <div className="relative h-48 w-full bg-[#F2EEE6]">
+    <article
+      onClick={() => navigate(`/shop/${product.id}`)}
+      className="flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-white transition-shadow hover:shadow-md"
+    >
+      <div className="relative h-48 w-full bg-primary-light">
         {product.image && (
           <img
             src={product.image}
@@ -28,19 +48,24 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <button
           type="button"
-          aria-label="좋아요"
+          aria-label="찜하기"
           aria-pressed={liked}
-          onClick={() => setLiked((prev) => !prev)}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
+          onClick={handleWishClick}
+          className="group absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white"
         >
-          <span className={liked ? 'text-sm text-primary' : 'text-sm text-[#5C4840]'}>
-            {liked ? '♥' : '♡'}
-          </span>
+          <Heart
+            className={
+              liked
+                ? 'h-4 w-4 text-primary fill-primary'
+                : 'h-4 w-4 text-[#5C4840] transition-colors group-hover:fill-primary group-hover:text-primary'
+            }
+            strokeWidth={1.8}
+          />
         </button>
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-2 text-base font-semibold text-[#0D0A09]">
+        <h3 className="mb-2 text-base font-semibold text-text">
           {product.title}
         </h3>
 
@@ -52,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-md bg-[#FAF8F4] px-2 py-0.5 text-xs text-[#968178]"
+              className="rounded-md bg-[#FAF8F4] px-2 py-0.5 text-xs text-text-muted"
             >
               #{tag}
             </span>
@@ -60,12 +85,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-sm font-bold text-[#0D0A09]">
+          <span className="text-sm font-bold text-text">
             {product.price}
           </span>
           <button
             type="button"
-            onClick={() => navigate(`/shop/${product.id}`)}
+            onClick={handleDetailClick}
             className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             상세보기

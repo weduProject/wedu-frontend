@@ -3,6 +3,9 @@ import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
+import ShopDetailPage from './pages/Shop/ShopDetailPage';
+import WishlistPage from './pages/Shop/WishlistPage';
+import CartPage from './pages/Shop/CartPage';
 import WeddingHallPage from './pages/WeddingHall/WeddingHallPage';
 import SeudeuimePage from './pages/Seudeume/SeudeuimePage';
 import HoneymoonPage from './pages/Honeymoon/HoneymoonPage';
@@ -20,13 +23,16 @@ import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
 import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
-import ShopDetailPage from './pages/Shop/ShopDetailPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
+import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
+import { BudgetProvider } from './pages/Budget/hooks/useBudget';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
+import { WishlistProvider } from './pages/Shop/WishlistContext';
+import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
-import BuilderCartPage from "./pages/Builder/BuilderCartPage";
+import BuilderCartPage from './pages/Builder/BuilderCartPage';
 
 function OnboardingRoutes() {
   return (
@@ -38,67 +44,68 @@ function OnboardingRoutes() {
 
 export default function App() {
   return (
-    <ScheduleProvider>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
+    <BudgetProvider>
+      <ChecklistProvider>
+        <ScheduleProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-        <Route element={<OnboardingRoutes />}>
-          <Route path="/onboarding" element={<OnboardingStartPage />} />
-          <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
-          <Route path="/onboarding/quiz" element={<QuizPage />} />
-          <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
-        </Route>
+            <Route element={<OnboardingRoutes />}>
+              <Route path="/onboarding" element={<OnboardingStartPage />} />
+              <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
+              <Route path="/onboarding/quiz" element={<QuizPage />} />
+              <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
+            </Route>
 
-        <Route
-          element={
-            <CommunityProvider>
-              <PageLayout />
-            </CommunityProvider>
-          }
-        >
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/dday" element={<DDayPage />} />
-          <Route path="/shop" element={<ShopPage />} />
-          <Route path="/shop/:id" element={<ShopDetailPage />} />
-          <Route path="/wedding-hall" element={<WeddingHallPage />} />
-          <Route path="/seudeume" element={<SeudeuimePage />} />
-          <Route path="/honeymoon" element={<HoneymoonPage />} />
-          <Route 
-            path="/builder-start" 
-            element={<BuilderStartPage />} 
-          />
-          <Route
-            path="/builder"
-            element={
-              <BuilderProvider>
-                <BuilderPage />
-              </BuilderProvider>
-            }
-          />
-          <Route
-            path="/builder/cart"
-            element={
-              <BuilderProvider>
-                <BuilderCartPage />
-              </BuilderProvider>
-            }
-          />
-          <Route path="/checklist" element={<ChecklistPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/budget" element={<BudgetPage />} />
-          <Route path="/community" element={<CommunityPage />} />
-          <Route
-            path="/community/:id"
-            element={<CommunityDetailPage />}
-          />
-          <Route
-            path="/community/write"
-            element={<CommunityWritePage />}
-          />
-          <Route path="/mypage" element={<MypagePage />} />
-        </Route>
-      </Routes>
-    </ScheduleProvider>
+            <Route
+              element={
+                <CommunityProvider>
+                  <WishlistProvider>
+                    <CartProvider>
+                      <PageLayout />
+                    </CartProvider>
+                  </WishlistProvider>
+                </CommunityProvider>
+              }
+            >
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/dday" element={<DDayPage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/shop/:id" element={<ShopDetailPage />} />
+              <Route path="/shop/wishlist" element={<WishlistPage />} />
+              <Route path="/shop/cart" element={<CartPage />} />
+              <Route path="/wedding-hall" element={<WeddingHallPage />} />
+              <Route path="/seudeume" element={<SeudeuimePage />} />
+              <Route path="/honeymoon" element={<HoneymoonPage />} />
+              <Route path="/builder-start" element={<BuilderStartPage />} />
+              <Route
+                path="/builder"
+                element={
+                  <BuilderProvider>
+                    <BuilderPage />
+                  </BuilderProvider>
+                }
+              />
+              <Route
+                path="/builder/cart"
+                element={
+                  <BuilderProvider>
+                    <BuilderCartPage />
+                  </BuilderProvider>
+                }
+              />
+              <Route path="/checklist" element={<ChecklistPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/budget" element={<BudgetPage />} />
+              <Route path="/community" element={<CommunityPage />} />
+              <Route path="/community/:id" element={<CommunityDetailPage />} />
+              <Route path="/community/write" element={<CommunityWritePage />} />
+              <Route path="/mypage" element={<MypagePage />} />
+            </Route>
+          </Routes>
+        </ScheduleProvider>
+      </ChecklistProvider>
+    </BudgetProvider>
   );
 }
