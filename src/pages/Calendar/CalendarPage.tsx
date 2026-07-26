@@ -5,6 +5,7 @@ import UpcomingList from './components/UpcomingList.tsx';
 import ScheduleModal from './components/ScheduleModal';
 import { useSchedules } from './hooks/useSchedules.tsx';
 import ScheduleDetailModal from './components/ScheduleDetailModal.tsx';
+import { Button } from '../../components/index.ts';
 
 export type CategoryType = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';
 
@@ -36,16 +37,15 @@ export default function CalendarPage() {
     <div className="mx-auto max-w-[1024px]">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-text md:text-2xl">일정 관리</h2>
-          <p className="mt-1 text-xs text-[#968178]">웨딩 준비 일정을 한눈에 확인하고 관리하세요.</p>
+          <h2 className="text-2xl font-bold text-text md:text-3xl">일정 관리</h2>
+          <p className="mt-2 text-sm text-text-muted">웨딩 준비 일정을 한눈에 확인하고 관리하세요.</p>
         </div>
-        <button
-          type="button"
+        <Button
           onClick={() => setIsAddModalOpen(true)}
           className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/95"
         >
           + 일정 추가
-        </button>
+        </Button>
       </div>
 
       <div className="mt-6">
