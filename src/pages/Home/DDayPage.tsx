@@ -26,7 +26,7 @@ export default function DDayPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-[1024px]">
       {/* 1. 상단 D-day 카드 (버튼 활성화) */}
       <DDayCard 
         targetDate="2026-11-18" 

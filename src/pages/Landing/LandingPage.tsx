@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import PopularProposalFeed from './components/PopularProposalFeed';
-import PopularPackages from './components/PopularPackages';
+import { PRODUCTS } from '../Shop/shopData';
 
 const FEATURES = [
   { emoji: '💍', label: '나만의 프로포즈', desc: '취향 맞춤 프로포즈 설계' },
@@ -24,12 +23,13 @@ const REVIEWS = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const popularProducts = PRODUCTS.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-white">
       {/* 히어로 */}
-      <section className="relative h-140 flex items-center bg-[#463730] overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/30 to-transparent" />
+      <section className="relative h-[560px] flex items-center bg-[#463730] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
         <div className="relative px-12 md:px-24 max-w-2xl">
           <p className="text-sm text-white/70 mb-3 tracking-wide">당신의 특별한 순간</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-5">
@@ -73,10 +73,49 @@ export default function LandingPage() {
       </section>
 
       {/* 인기 프로포즈 피드 */}
-      <PopularProposalFeed />
+      <section className="py-16 px-8 bg-[#FAF8F4]">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-2xl font-bold text-text">인기 프로포즈 피드</h3>
+              <p className="text-sm text-[#7C6358] mt-1">많은 커플들이 선택한 프로포즈</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/shop')}
+              className="text-sm text-primary hover:underline cursor-pointer bg-transparent border-0"
+            >
+              전체 보기 →
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {popularProducts.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                onClick={() => navigate('/login')}
+                className="flex flex-col overflow-hidden rounded-2xl border border-border bg-white text-left hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="h-40 w-full bg-primary-light flex items-center justify-center">
+                  {product.image ? (
+                    <img src={product.image} alt={product.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-4xl">💍</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-text-muted mb-1">{product.category}</p>
+                  <p className="text-sm font-semibold text-text mb-1">{product.title}</p>
+                  <p className="text-sm font-bold text-primary">{product.price}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* 통계 */}
-      <section className="py-16 px-8 bg-linear-to-r from-[#C36978] to-[#DDA06B]">
+      <section className="py-16 px-8 bg-gradient-to-r from-[#C36978] to-[#DDA06B]">
         <div className="max-w-5xl mx-auto text-center">
           <h3 className="text-2xl font-bold text-white mb-2">수많은 커플이 WEDU를 통해<br />특별한 순간을 만들었습니다</h3>
           <p className="text-white/80 text-sm mb-10">당신도 WEDU와 함께 잊지 못할 순간을 만들어보세요</p>
@@ -90,9 +129,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* 인기 프로포즈 페키지 */}
-      <PopularPackages />
 
       {/* 실제 후기 */}
       <section className="py-16 px-8 max-w-5xl mx-auto">
@@ -112,7 +148,7 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="relative py-20 px-8 bg-[#463730] text-center overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-r from-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20" />
         <div className="relative max-w-lg mx-auto">
           <h3 className="text-3xl font-bold text-white mb-3">지금 시작하는<br />당신만의 프로포즈</h3>
           <p className="text-white/80 text-sm mb-8">WEDU와 함께 잊지 못할 순간을 만들어보세요</p>

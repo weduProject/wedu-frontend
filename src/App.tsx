@@ -21,19 +21,14 @@ import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
 import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
-import WishlistPage from './pages/Shop/WishlistPage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
-import { WishlistProvider } from './pages/Shop/WishlistContext';
-import { CartProvider } from './pages/Shop/CartContext';
-import CartPage from './pages/Shop/CartPage';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from "./pages/Builder/BuilderCartPage";
 import { BudgetProvider } from './pages/Budget/hooks/useBudget';
-
 
 function OnboardingRoutes() {
   return (
@@ -51,6 +46,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+    <ScheduleProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
           <Route element={<OnboardingRoutes />}>
             <Route path="/onboarding" element={<OnboardingStartPage />} />
@@ -59,6 +57,25 @@ export default function App() {
             <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
           </Route>
 
+        <Route
+          element={
+            <CommunityProvider>
+              <PageLayout />
+            </CommunityProvider>
+          }
+        >
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/dday" element={<DDayPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/shop/:id" element={<ShopDetailPage />} />
+          <Route path="/wedding-hall" element={<WeddingHallPage />} />
+          <Route path="/seudeume" element={<SeudeuimePage />} />
+          <Route path="/honeymoon" element={<HoneymoonPage />} />
+          <Route 
+            path="/builder-start" 
+            element={<BuilderStartPage />} 
+          />
           <Route
             element={
               <CommunityProvider>
@@ -108,5 +125,30 @@ export default function App() {
       </ScheduleProvider>
     </ChecklistProvider>
     </BudgetProvider>
+          />
+          <Route
+            path="/builder/cart"
+            element={
+              <BuilderProvider>
+                <BuilderCartPage />
+              </BuilderProvider>
+            }
+          />
+          <Route path="/checklist" element={<ChecklistPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/budget" element={<BudgetPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route
+            path="/community/:id"
+            element={<CommunityDetailPage />}
+          />
+          <Route
+            path="/community/write"
+            element={<CommunityWritePage />}
+          />
+          <Route path="/mypage" element={<MypagePage />} />
+        </Route>
+      </Routes>
+    </ScheduleProvider>
   );
 }
