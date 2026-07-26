@@ -55,9 +55,6 @@ WEDU는 프로포즈 상품 탐색부터 나만의 프로포즈 빌더, 웨딩�
     - `Onboarding` — 온보딩 퀴즈 (심리테스트 기반 맞춤 추천)
     - `Home` — 홈 대시보드 (D-Day, 예산/체크리스트 요약, 다가오는 일정)
     - `Shop` — 프로포즈 편집샵 (상품 목록/상세, 찜, 장바구니)
-    - `WeddingHall` — 웨딩홀
-    - `Seudeume` — 스드메
-    - `Honeymoon` — 허니문
     - `Builder` — 나만의 프로포즈 빌더
     - `Checklist` — 체크리스트
     - `Calendar` — 캘린더 일정 관리
@@ -80,6 +77,7 @@ WEDU는 프로포즈 상품 탐색부터 나만의 프로포즈 빌더, 웨딩�
 | `feature/schedules` | 기능 개발 브랜치 |
 | `feature/budget` | 기능 개발 브랜치 |
 | `feature/seojin` | 기능 개발 브랜치 |
+| `feature/yen` | 기능 개발 브랜치 |
 
 ---
 
@@ -125,9 +123,6 @@ pnpm run build
 | `/shop/:id` | 상품 상세 |
 | `/shop/wishlist` | 찜한 상품 |
 | `/shop/cart` | 장바구니 |
-| `/wedding-hall` | 웨딩홀 |
-| `/seudeume` | 스드메 |
-| `/honeymoon` | 허니문 |
 | `/builder-start` | 나만의 프로포즈 시작 |
 | `/builder` | 프로포즈 빌더 |
 | `/checklist` | 체크리스트 |
@@ -147,7 +142,7 @@ pnpm run build
 2. 로그인
 3. 온보딩 (맞춤 프로포즈 퀴즈)
 4. 홈 대시보드 (D-Day / 예산 / 체크리스트 요약)
-5. 프로포즈 편집샵 · 나만의 프로포즈 빌더 · 웨딩홀 · 스드메 · 허니문
+5. 프로포즈 편집샵 · 나만의 프로포즈 빌더
 6. 캘린더 일정 관리 / 체크리스트 / 예산 관리
 7. 커뮤니티
 8. 마이페이지
