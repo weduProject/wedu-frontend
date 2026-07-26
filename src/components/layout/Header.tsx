@@ -10,7 +10,7 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
-export default function Header({ avatarUrl, onNotificationClick, onMenuClick }: HeaderProps) {
+export default function Header({ avatarUrl, onNotificationClick: _onNotificationClick, onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
