@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../components"; 
+import { Search, MessageCircle } from "lucide-react";
+import { Button } from "../../components";
 import CommunityCard from "./CommunityCard";
 import { useCommunity } from "./CommunityContext";
 
@@ -27,7 +28,7 @@ export default function CommunityPage() {
     .filter((post) => {
       const matchCategory =
         selectedCategory === "전체" ||
-        post.category.includes(selectedCategory) || 
+        post.category.includes(selectedCategory) ||
         selectedCategory.includes(post.category);
 
       const matchKeyword =
@@ -44,11 +45,11 @@ export default function CommunityPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4">
-      <div className="flex justify-between items-center mb-8">
+    <div className="mx-auto max-w-[1024px]">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">커뮤니티</h1>
-          <p className="text-gray-500 mt-2">
+          <h1 className="text-3xl font-bold text-text">커뮤니티</h1>
+          <p className="mt-2 text-text-muted">
             예비 신랑신부들과 경험과 정보를 나눠보세요
           </p>
         </div>
@@ -58,10 +59,10 @@ export default function CommunityPage() {
         </Button>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      <div className="mb-6 flex gap-2">
         <div className="relative flex-1">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            🔍
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+            <Search className="h-4 w-4" strokeWidth={1.8} />
           </span>
           <input
             value={keyword}
@@ -70,47 +71,44 @@ export default function CommunityPage() {
               setCurrentPage(1);
             }}
             placeholder="검색어를 입력하세요"
-            className="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:border-primary transition shadow-sm"
+            className="w-full rounded-xl border border-border py-3 pl-11 pr-4 text-sm outline-none transition-colors focus:border-primary"
           />
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="mb-8 flex flex-wrap gap-2">
         {categories.map((category) => (
           <button
             key={category}
+            type="button"
             onClick={() => {
               setSelectedCategory(category);
               setCurrentPage(1);
             }}
-            className={`
-              rounded-full px-5 py-2 text-sm font-medium transition
-              ${
-                selectedCategory === category
-                  ? "bg-[#C48E96] text-white shadow-md"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
-              }
-            `}
+            className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+              selectedCategory === category
+                ? "bg-primary text-white"
+                : "border border-border bg-white text-text hover:border-primary/40"
+            }`}
           >
             {category}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {pagedPosts.length > 0 ? (
-          pagedPosts.map((post) => (
-            <CommunityCard key={post.id} post={post} />
-          ))
+          pagedPosts.map((post) => <CommunityCard key={post.id} post={post} />)
         ) : (
-          <div className="col-span-1 md:col-span-2 bg-white border border-gray-100 rounded-3xl py-24 flex flex-col items-center justify-center text-center shadow-sm mt-4">
-            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 text-3xl mb-4 border border-gray-100">
-              💬
+          <div className="col-span-1 mt-4 flex flex-col items-center justify-center rounded-xl border border-border bg-white py-24 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] md:col-span-2">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-primary-light/50 text-text-muted">
+              <MessageCircle className="h-6 w-6" strokeWidth={1.8} />
             </div>
-            <p className="text-gray-400 mb-6 text-sm">아직 게시글이 없어요</p>
+            <p className="mb-6 text-sm text-text-muted">아직 게시글이 없어요</p>
             <button
+              type="button"
               onClick={() => navigate("/community/write")}
-              className="text-[#C48E96] font-bold text-sm hover:underline"
+              className="cursor-pointer text-sm font-semibold text-primary hover:opacity-80 transition-opacity"
             >
               첫 게시글 작성하기
             </button>
@@ -119,7 +117,7 @@ export default function CommunityPage() {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-12">
+        <div className="mt-12 flex justify-center gap-2">
           {Array.from({ length: totalPages }, (_, index) => (
             <Button
               key={index}
