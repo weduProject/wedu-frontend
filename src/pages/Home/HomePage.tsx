@@ -2,7 +2,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import ChecklistSummaryCard from './components/ChecklistSummaryCard';
 import QuickMenu from './components/QuickMenu';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSchedules } from '../Calendar/hooks/useSchedules';
 import type { ScheduleItem } from '../Calendar/CalendarPage';
 import UpcomingList from '../Calendar/components/UpcomingList';

@@ -79,7 +79,7 @@ export default function CalendarPage() {
           onScheduleClick={(schedule) => setViewSchedule(schedule)}
            />
         </div>
-        <div className='mb-10'>
+        <div className='h-full'>
           <UpcomingList
           schedules={filteredSchedules}
           onDelete={deleteSchedule}
@@ -90,7 +90,7 @@ export default function CalendarPage() {
 
       {/* 비회원일 때 보여줄 빈 화면 멘트 */}
         {!user && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border mt-10 py-20 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
               <Calendar className="h-8 w-8 text-primary" />
             </div>

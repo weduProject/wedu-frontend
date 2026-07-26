@@ -4,7 +4,7 @@ import BaseCard from '../../../components/ui/BaseCard';
 import ProgressBar from '../../../components/ui/ProgressBar';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useChecklist } from '../../Checklist/hooks/useChecklist';
-import { Check, CheckCheck, CheckLine } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export default function ChecklistSummaryCard() {
   const { todos } = useChecklist();
