@@ -64,7 +64,6 @@ src
 │ ├── Community # 커뮤니티
 │ └── Mypage # 마이페이지
 └── App.tsx # 라우팅 및 전역 Provider 설정
-
 ---
 
 # 🌱 브랜치 전략
@@ -81,7 +80,6 @@ main
 | main       | 배포 브랜치    |
 | dev        | 개발 통합 브랜치 |
 | feature/\* | 기능 개발 브랜치 |
-
 ---
 
 # 📝 Commit Convention
@@ -94,7 +92,6 @@ main
 | style    | 코드 스타일 수정   |
 | docs     | 문서 수정       |
 | chore    | 기타 설정 변경    |
-
 ---
 
 # 💻 실행 방법
@@ -109,7 +106,6 @@ pnpm run dev
 ```bash
 pnpm run build
 ```
-
 ---
 
 # 🖥 화면 목록
@@ -137,7 +133,6 @@ pnpm run build
 | `/community`         | 커뮤니티            |
 | `/community/:id`     | 커뮤니티 상세         |
 | `/mypage`            | 마이페이지           |
-
 ---
 
 # 🔄 사용자 플로우
@@ -159,7 +154,6 @@ pnpm run build
 커뮤니티
 ↓
 마이페이지
-
 ---
 
 # 📌 프로젝트 진행 현황
@@ -170,7 +164,6 @@ pnpm run build
 - ✅ Vercel 배포
 - ⏳ 백엔드 API 연동
 - ⏳ 상태 관리 고도화
-
 ---
 
 # 📄 License
