@@ -20,6 +20,8 @@ import { useBudget } from './hooks/useBudget';
 import type { BudgetCategory, BudgetItem } from './hooks/useBudget';
 import BudgetModal from './components/BudgetModal';
 import BudgetEditModal from './components/BudgetEditModal';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CATEGORIES: BudgetCategory[] = ['웨딩홀/예식장', '스튜디오/드레스', '허니문', '예물/예단', '기타'];
 const CATEGORY_ICONS = {
@@ -31,10 +33,16 @@ const CATEGORY_ICONS = {
 };
 
 export default function BudgetPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const {
-    items, targetBudget, updateTargetBudget, addBudgetItem, togglePaidStatus, updateBudgetItem, deleteBudgetItem
+    items:rawItems, targetBudget:rawTargetBudget, updateTargetBudget, addBudgetItem, togglePaidStatus, updateBudgetItem, deleteBudgetItem
   } = useBudget();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  const items = user ? rawItems : [];
+  const targetBudget = user ? rawTargetBudget : 0;
   
   const [isEditBudgetModalOpen, setIsEditBudgetModalOpen] = useState(false);
   const [editBudgetValue, setEditBudgetValue] = useState(targetBudget.toString());
@@ -49,11 +57,28 @@ export default function BudgetPage() {
   const overallProgress = targetBudget === 0 ? 0 : Math.round((totalPaid / targetBudget) * 100);
   const remainingBudget = targetBudget - totalPaid;
 
+  const handleAddClick = () => {
+        if (!user) {
+          navigate('/login');
+          return;
+        }
+        setIsAddModalOpen(true);
+      };
+
   // 모달에서 예산 저장
   const handleSaveBudget = () => {
     updateTargetBudget(Number(editBudgetValue));
     setIsEditBudgetModalOpen(false);
   };
+
+  const handleEditBudgetValue = () => {
+          if (!user) {
+            navigate('/login');
+            return;
+          }
+          setEditBudgetValue(targetBudget.toString());
+          setIsEditBudgetModalOpen(true);
+        };
 
   return (
     <div className="mx-auto max-w-[1024px] pb-20">
@@ -62,7 +87,7 @@ export default function BudgetPage() {
           <h2 className="text-2xl font-bold text-text md:text-3xl">예산 관리</h2>
           <p className="mt-2 text-sm text-text-muted">예산을 설정하고 지출을 추적하세요</p>
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)} className="px-5 py-2.5 text-sm">
+        <Button onClick={handleAddClick} className="px-5 py-2.5 text-sm">
           + 항목 추가
         </Button>
       </div>
@@ -83,10 +108,7 @@ export default function BudgetPage() {
             </div>
             
             <button 
-              onClick={() => {
-                setEditBudgetValue(targetBudget.toString());
-                setIsEditBudgetModalOpen(true);
-              }}
+              onClick={handleEditBudgetValue}
               className="text-xs leading-none text-text-muted underline decoration-text-muted/40 underline-offset-2 hover:text-text"
             >
               예산 변경하기
@@ -139,6 +161,20 @@ export default function BudgetPage() {
 
       {/* 3. 카테고리별 리스트 */}
       <div className="flex flex-col gap-6">
+        {/* 비회원일 때 보여줄 빈 화면 멘트 */}
+        {!user && (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
+              <Wallet className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="mb-2 text-lg font-bold text-text">나만의 예산을 계획해보세요</h3>
+            <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별 예산을 관리하고 결제 내역을 기록할 수 있습니다.</p>
+            <Button onClick={() => navigate('/login')} className="px-6">
+              로그인하러 가기
+            </Button>
+          </div>
+        )}
+
         {CATEGORIES.map(category => {
           const categoryItems = items.filter(item => item.category === category);
           if (categoryItems.length === 0) return null;
@@ -235,7 +271,6 @@ export default function BudgetPage() {
         <BudgetModal 
           onClose={() => setIsAddModalOpen(false)} 
           onSubmit={(newItem) => {
-            // 전역 상태의 addBudgetItem 함수 호출
             addBudgetItem(newItem);
             setIsAddModalOpen(false); // 저장 후 모달 닫기
           }} 
