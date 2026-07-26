@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import BaseCard from '../../../components/ui/BaseCard';
 import { useBudget } from '../../Budget/hooks/useBudget';
 import { Wallet, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export default function BudgetSummaryCard() {
   const { items, targetBudget } = useBudget();
@@ -9,6 +11,31 @@ export default function BudgetSummaryCard() {
   const totalPaid = items.reduce((acc, item) => acc + item.paidAmount, 0);
   const paidCount = items.filter((item) => item.isPaid).length;
   const totalCount = items.length;
+
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <BaseCard className="flex h-full flex-col p-6">
+        <h3 className="mb-4 text-base font-bold text-text">예산 관리</h3>
+        <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
+            <Wallet className="h-6 w-6 text-primary" />
+          </div>
+          <p className="text-sm text-text-muted">예산을 등록하면<br />지출 현황을 한눈에</p>
+        </div>
+        {/* 하단 구분선 및 로그인 유도 버튼 */}
+        <div className="mt-4 border-t border-border pt-4 text-center">
+          <button onClick={(e) => {
+            e.stopPropagation();
+            navigate('/login')}} className="text-sm font-semibold text-primary hover:underline">
+            로그인하고 시작하기
+          </button>
+        </div>
+      </BaseCard>
+    );
+  }
 
   return (
     <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm transition-transform hover:scale-[1.01]">
