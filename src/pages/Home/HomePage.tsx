@@ -1,4 +1,5 @@
 import { useAuth } from '../../contexts/AuthContext';
+import BudgetCard from './components/BudgetCard';
 import ChecklistSummaryCard from './components/ChecklistSummaryCard';
 import QuickMenu from './components/QuickMenu';
 import { useState } from 'react';
@@ -9,7 +10,6 @@ import UpcomingList from '../Calendar/components/UpcomingList';
 import ScheduleDetailModal from '../Calendar/components/ScheduleDetailModal';
 import DDayCard from './components/DDayCard';
 import ScheduleModal from '../Calendar/components/ScheduleModal';
-import BudgetSummaryCard from './components/BudgetSummaryCard';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -39,25 +39,24 @@ export default function HomePage() {
           <Link to="/dday" className="block transition-transform hover:scale-[1.01]">
             <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
           </Link>
-          <Link to="/budget" className="block outline-none">
-            <BudgetSummaryCard />
-          </Link>
-          <Link to="/checklist" className="block transition-transform hover:scale-[1.01]">
-            <ChecklistSummaryCard />
-          </Link>
+          <BudgetCard />
+          <ChecklistSummaryCard />
         </div>
       </section>
 
       {/* 하단 다가오는 일정 & 빠른 메뉴 영역 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-1 flex flex-col">
-          <UpcomingList
-            schedules={upcomingSchedules}
+      <div className="grid grid-cols-3 gap-4">
+        
+        <div className="col-span-1 flex flex-col">
+          <UpcomingList 
+            schedules={upcomingSchedules} 
             onDelete={deleteSchedule}
-            onScheduleClick={(schedule) => setViewSchedule(schedule)}
+            onScheduleClick={(schedule) => setViewSchedule(schedule)} 
           />
+          
         </div>
-        <div className="md:col-span-2">
+
+        <div className="col-span-2">
           <QuickMenu />
         </div>
       </div>
