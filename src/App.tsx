@@ -25,13 +25,14 @@ import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
 import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
+import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
+import { BudgetProvider } from './pages/Budget/hooks/useBudget';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
 import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
-import { BudgetProvider } from './pages/Budget/hooks/useBudget';
 
 function OnboardingRoutes() {
   return (

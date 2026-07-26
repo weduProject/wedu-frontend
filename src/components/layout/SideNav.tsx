@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { useEffect } from 'react';
+import { NavLink, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 
 const NAV_ITEMS = [
@@ -13,12 +15,26 @@ const NAV_ITEMS = [
 ] as const;
 
 const navLinkBase =
-  'block px-2 py-2 text-[13px] text-center rounded-lg no-underline transition-colors hover:bg-primary/[.08] md:px-3 md:py-2.5 md:text-sm md:text-left';
+  'block px-3 py-2.5 text-sm text-left rounded-lg no-underline transition-colors hover:bg-primary/[.08]';
 
-export default function SideNav() {
+interface SideNavProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function SideNav({ isOpen, onClose }: SideNavProps) {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) onClose();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [onClose]);
+
   return (
     <>
-      {/* 모바일 백드롭 */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -26,7 +42,6 @@ export default function SideNav() {
         />
       )}
 
-      {/* 사이드바 본체 */}
       <nav
         aria-label="메인 메뉴"
         className={clsx(

@@ -7,6 +7,7 @@ import { useCart } from '../../pages/Shop/CartContext';
 interface HeaderProps {
   avatarUrl?: string;
   onNotificationClick?: () => void;
+  onMenuClick?: () => void;
 }
 
 export default function Header({ avatarUrl, onMenuClick }: HeaderProps) {
@@ -20,7 +21,6 @@ export default function Header({ avatarUrl, onMenuClick }: HeaderProps) {
 
   return (
     <header className="flex justify-between items-center gap-4 px-4 py-3 border-b border-border bg-white sticky top-0 z-10 md:px-8 md:py-4">
-      {/* 모바일 메뉴 버튼: 모바일에서만 표시 */}
       <button
         type="button"
         className="lg:hidden bg-transparent border-0 cursor-pointer text-text text-xl leading-none"
@@ -61,18 +61,10 @@ export default function Header({ avatarUrl, onMenuClick }: HeaderProps) {
             className="bg-transparent border-0 cursor-pointer text-sm text-primary font-semibold hover:opacity-80 transition-opacity"
             onClick={() => navigate('/login')}
           >
-            로그아웃
+            로그인
           </button>
-        </>
-      ) : (
-        <button
-          type="button"
-          className="bg-transparent border-0 cursor-pointer text-sm text-primary font-semibold hover:opacity-80 transition-opacity"
-          onClick={() => navigate('/login')}
-        >
-          로그인
-        </button>
-      )}
+        )}
+      </div>
     </header>
   );
 }
