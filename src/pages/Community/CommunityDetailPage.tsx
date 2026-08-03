@@ -30,7 +30,7 @@ export default function CommunityDetailPage() {
 
   if (!post) {
     return (
-      <div className="mx-auto max-w-[1024px] py-20 text-center text-text-muted">
+      <div className="mx-auto max-w-5xl py-20 text-center text-text-muted">
         게시글을 찾을 수 없습니다.
         <br />
         <Button className="mt-4" onClick={() => navigate("/community")}>
@@ -66,7 +66,7 @@ export default function CommunityDetailPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1024px]">
+    <div className="mx-auto max-w-5xl">
       <Button
         variant="secondary"
         className="mb-6 flex items-center gap-1.5"
@@ -88,7 +88,7 @@ export default function CommunityDetailPage() {
 
         <hr className="my-6 border-border" />
 
-        <p className="min-h-[150px] whitespace-pre-line leading-8 text-text">
+        <p className="min-h-37.5 whitespace-pre-line leading-8 text-text">
           {post.content}
         </p>
 

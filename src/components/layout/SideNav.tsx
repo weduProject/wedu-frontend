@@ -6,6 +6,7 @@ import clsx from 'clsx';
 const NAV_ITEMS = [
   { label: '홈', path: '/home' },
   { label: '프로포즈 편집샵', path: '/shop' },
+  { label: '웨딩 견적', path: '/wedding' },
   { label: '나만의 프로포즈', path: '/builder-start' },
   { label: '체크리스트', path: '/checklist' },
   { label: '캘린더 일정', path: '/calendar' },
@@ -45,7 +46,7 @@ export default function SideNav({ isOpen, onClose }: SideNavProps) {
       <nav
         aria-label="메인 메뉴"
         className={clsx(
-          'fixed inset-y-0 left-0 z-50 w-[220px] overflow-y-auto bg-primary-light border-r border-border p-6 flex flex-col transition-transform duration-300',
+          'fixed inset-y-0 left-0 z-50 w-55 overflow-y-auto bg-primary-light border-r border-border p-6 flex flex-col transition-transform duration-300',
           'lg:static lg:translate-x-0 lg:shrink-0 lg:h-screen lg:sticky lg:top-0',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
@@ -68,7 +69,7 @@ export default function SideNav({ isOpen, onClose }: SideNavProps) {
                 to={item.path}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  clsx(navLinkBase, isActive ? 'bg-primary/[.15] text-primary font-semibold' : 'text-text')
+                  clsx(navLinkBase, isActive ? 'bg-primary/15 text-primary font-semibold' : 'text-text')
                 }
               >
                 {item.label}

@@ -6,15 +6,16 @@ export interface Product {
   tastes: string[];
   title: string;
   description: string;
-  detailDescription: string;
-  includes: string[];
+  detailDescription: string;  
+  includes: string[];        
   tags: string[];
   price: string;
   image?: string;
-  styleTag?: string;     // 상품 속성 태그 1 (예: 스위트룸, 야외촬영, 코스요리 등) — 다이닝 전용 아님, 전 카테고리 공통
-  moodTag?: string;      // 상품 속성 태그 2 (예: 럭셔리, 로맨틱 등)
-  locationTag?: string;  // 상품 속성 태그 3 (예: 호텔, 제주해변, 한강뷰 등)
-  instagramUrl?: string; // 인스타그램 계정 mock URL
+  styleTag?: string;
+  moodTag?: string;
+  locationTag?: string;
+  instagramUrl?: string;
+  weddingCategory?: '예식장' | '예물' | '신혼여행'; // 추가
 }
 
 export const PRODUCTS: Product[] = [

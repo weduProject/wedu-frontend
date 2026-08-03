@@ -9,7 +9,7 @@ export default function PageLayout() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <SideNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-      <div className="flex flex-col flex-1 min-w-0 order-1 md:order-none">
+      <div className="flex flex-col flex-1 min-w-0 order-1 md:order-0">
         <Header onMenuClick={() => setIsNavOpen(true)} />
         <main className="flex-1 overflow-y-auto p-5 md:p-8">
           <Outlet />

@@ -1,9 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS } from './shopData';
+import { ALL_PRODUCTS } from './allProducts';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { parsePriceToNumber, formatWon } from './utils/price';
 import { Button, BaseCard, CategoryBadge } from '../../components';
+
+// 웨딩 견적 항목은 "예식장 견적" 식으로, 편집샵 항목은 categoryType 그대로 표시
+function getGroupLabel(product: (typeof ALL_PRODUCTS)[number]) {
+  return product.weddingCategory ? `${product.weddingCategory} 견적` : product.categoryType;
+}
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -25,10 +30,19 @@ export default function CartPage() {
     );
   }
 
-  const cartProducts = PRODUCTS.filter((product) => cartIds.includes(product.id));
+  const cartProducts = ALL_PRODUCTS.filter((product) => cartIds.includes(product.id));
   const totalPrice = cartProducts.reduce(
     (sum, product) => sum + parsePriceToNumber(product.price),
     0,
+  );
+
+  const groupedProducts = cartProducts.reduce<Record<string, typeof cartProducts>>(
+    (acc, product) => {
+      const label = getGroupLabel(product);
+      (acc[label] ??= []).push(product);
+      return acc;
+    },
+    {},
   );
 
   return (
@@ -47,42 +61,51 @@ export default function CartPage() {
 
       {cartProducts.length > 0 ? (
         <>
-          <div className="flex flex-col gap-4">
-            {cartProducts.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-primary-light">
-                    {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <CategoryBadge category={product.category} />
-                    <h3 className="text-sm font-semibold text-text mt-0.5">
-                      {product.title}
-                    </h3>
-                  </div>
-                </div>
+          <div className="flex flex-col gap-8">
+            {Object.entries(groupedProducts).map(([label, products]) => (
+              <section key={label}>
+                <h2 className="mb-3 text-sm font-semibold text-text-muted">
+                  {label} · {products.length}개
+                </h2>
+                <div className="flex flex-col gap-4">
+                  {products.map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="h-16 w-16 overflow-hidden rounded-xl bg-primary-light">
+                          {product.image && (
+                            <img
+                              src={product.image}
+                              alt={product.title}
+                              className="h-full w-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div>
+                          <CategoryBadge category={product.category} />
+                          <h3 className="text-sm font-semibold text-text mt-0.5">
+                            {product.title}
+                          </h3>
+                        </div>
+                      </div>
 
-                <div className="flex items-center gap-5">
-                  <span className="text-sm font-bold text-text">{product.price}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFromCart(product.id)}
-                    aria-label="삭제"
-                    className="text-text-muted transition-colors hover:text-primary"
-                  >
-                    ✕
-                  </button>
+                      <div className="flex items-center gap-5">
+                        <span className="text-sm font-bold text-text">{product.price}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFromCart(product.id)}
+                          aria-label="삭제"
+                          className="text-text-muted transition-colors hover:text-primary"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              </section>
             ))}
           </div>
 

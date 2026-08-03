@@ -1,9 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS } from './shopData';
+import { ALL_PRODUCTS } from './allProducts';
 import ProductCard from './components/ProductCard';
 import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
+
+// 웨딩 견적 항목은 "예식장 견적" 식으로, 편집샵 항목은 categoryType 그대로 표시
+function getGroupLabel(product: (typeof ALL_PRODUCTS)[number]) {
+  return product.weddingCategory ? `${product.weddingCategory} 견적` : product.categoryType;
+}
 
 export default function WishlistPage() {
   const navigate = useNavigate();
@@ -25,8 +30,17 @@ export default function WishlistPage() {
     );
   }
 
-  const wishedProducts = PRODUCTS.filter((product) =>
+  const wishedProducts = ALL_PRODUCTS.filter((product) =>
     wishedIds.includes(product.id),
+  );
+
+  const groupedProducts = wishedProducts.reduce<Record<string, typeof wishedProducts>>(
+    (acc, product) => {
+      const label = getGroupLabel(product);
+      (acc[label] ??= []).push(product);
+      return acc;
+    },
+    {},
   );
 
   return (
@@ -48,9 +62,18 @@ export default function WishlistPage() {
       <p className="mb-3 text-sm text-text-muted">총 {wishedProducts.length}개</p>
 
       {wishedProducts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {wishedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <div className="flex flex-col gap-8">
+          {Object.entries(groupedProducts).map(([label, products]) => (
+            <section key={label}>
+              <h2 className="mb-3 text-sm font-semibold text-text-muted">
+                {label} · {products.length}개
+              </h2>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       ) : (
