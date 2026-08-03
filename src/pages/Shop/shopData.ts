@@ -6,8 +6,8 @@ export interface Product {
   tastes: string[];
   title: string;
   description: string;
-  detailDescription: string;  
-  includes: string[];        
+  detailDescription: string;
+  includes: string[];
   tags: string[];
   price: string;
   image?: string;
@@ -15,7 +15,7 @@ export interface Product {
   moodTag?: string;
   locationTag?: string;
   instagramUrl?: string;
-  weddingCategory?: '예식장' | '예물' | '신혼여행'; // 추가
+  weddingCategory?: '예식장' | '예물' | '신혼여행';
 }
 
 export const PRODUCTS: Product[] = [
@@ -88,7 +88,6 @@ export const PRODUCTS: Product[] = [
     price: '30만원~',
     styleTag: '생화 장미 데코',
     moodTag: '로맨틱',
-    // 고객 공간에 맞춰 진행되므로 locationTag는 생략 (태그 자동으로 안 뜸)
     instagramUrl: 'https://www.instagram.com/wedu_flower_deco',
   },
   {
@@ -158,7 +157,128 @@ export const PRODUCTS: Product[] = [
     price: '200만원~',
     styleTag: '맞춤 제작',
     moodTag: '럭셔리',
-    // 선물류라 장소 개념이 없어 locationTag 생략
     instagramUrl: 'https://www.instagram.com/wedu_custom_ring',
+  },
+  {
+    id: 9,
+    category: '🌿 장소',
+    categoryType: '장소',
+    styles: ['로맨틱', '아늑한'],
+    tastes: ['꽃과 장미', '자연 속에서'],
+    title: '시크릿 가든 프로포즈',
+    description: '도심 속 숨겨진 비밀 정원에서 꽃향기 가득한 로맨틱 무대',
+    detailDescription:
+      '도심 한복판, 아는 사람만 아는 프라이빗 정원에서 진행하는 프로포즈입니다. 계절 꽃으로 가득 채운 아치와 조명으로 은밀하면서도 로맨틱한 분위기를 연출합니다.',
+    includes: ['정원 대관 2시간', '플라워 아치 데코', '조명 세팅', '스냅 촬영'],
+    tags: ['가든', '플라워', '프라이빗'],
+    price: '60만원~',
+    styleTag: '가든 데코',
+    moodTag: '로맨틱',
+    locationTag: '도심 비밀정원',
+    instagramUrl: 'https://www.instagram.com/wedu_secret_garden',
+  },
+  {
+    id: 10,
+    category: '🎬 장소',
+    categoryType: '장소',
+    styles: ['감성적', '아늑한'],
+    tastes: ['영상 편지', '단둘이'],
+    title: '프라이빗 시네마 프로포즈',
+    description: '둘만의 영화관에서 직접 만든 영상과 함께 감동의 순간을',
+    detailDescription:
+      '단둘이 통째로 대관하는 프라이빗 상영관에서, 두 사람만의 추억 영상을 스크린으로 함께 보며 프로포즈하는 이벤트입니다. 영상 편집까지 함께 지원합니다.',
+    includes: ['상영관 대관 1시간', '추억 영상 편집', '스낵 & 음료', '스냅 촬영'],
+    tags: ['시네마', '영상', '프라이빗'],
+    price: '45만원~',
+    styleTag: '프라이빗 상영',
+    moodTag: '감성적',
+    locationTag: '프라이빗 영화관',
+    instagramUrl: 'https://www.instagram.com/wedu_private_cinema',
+  },
+  {
+    id: 11,
+    category: '💄 서비스',
+    categoryType: '서비스',
+    styles: ['우아한', '화려한'],
+    tastes: ['메이크업', '스타일링'],
+    title: '프로포즈 메이크업 & 스타일링',
+    description: '프로포즈 당일, 가장 아름다운 모습으로 빛날 수 있도록',
+    detailDescription:
+      '프로포즈 당일 가장 빛나는 모습을 위한 전문 메이크업 & 헤어 스타일링 서비스입니다. 컨셉 상담 후 원하는 장소로 출장도 가능합니다.',
+    includes: ['메이크업 & 헤어', '컨셉 상담', '출장 서비스', '리터치 키트'],
+    tags: ['메이크업', '헤어', '스타일링'],
+    price: '25만원~',
+    styleTag: '출장 메이크업',
+    moodTag: '우아한',
+    instagramUrl: 'https://www.instagram.com/wedu_makeup_styling',
+  },
+  {
+    id: 12,
+    category: '🚗 서비스',
+    categoryType: '서비스',
+    styles: ['럭셔리', '로맨틱'],
+    tastes: ['럭셔리 패키지', '와인&샴페인'],
+    title: '리무진 픽업 서비스',
+    description: '프로포즈 장소까지의 이동마저 특별하게, 럭셔리 리무진과 함께',
+    detailDescription:
+      '프로포즈 장소까지 이동하는 순간부터 특별하게 만들어주는 리무진 픽업 서비스입니다. 차 안에서 즐기는 샴페인 한 잔으로 설렘을 더합니다.',
+    includes: ['리무진 픽업/샌딩', '샴페인 서비스', '전담 기사', '차량 데코'],
+    tags: ['리무진', '픽업', '샴페인'],
+    price: '35만원~',
+    styleTag: '리무진 픽업',
+    moodTag: '럭셔리',
+    instagramUrl: 'https://www.instagram.com/wedu_limousine',
+  },
+  {
+    id: 13,
+    category: '🚁 경험',
+    categoryType: '경험',
+    styles: ['모험적', '드라마틱'],
+    tastes: ['자연 속에서', '깜짝 이벤트'],
+    title: '헬리콥터 나이트 투어',
+    description: '반짝이는 도시 야경 위를 날며 특별한 순간을 연출하세요',
+    detailDescription:
+      '도심의 야경을 한눈에 담을 수 있는 헬리콥터 투어입니다. 비행 중 특별한 순간을 연출할 수 있도록 전담 크루가 함께합니다.',
+    includes: ['헬리콥터 탑승 20분', '전담 크루 동승', '기념 촬영', '탑승 전 브리핑'],
+    tags: ['헬리콥터', '야경', '투어'],
+    price: '250만원~',
+    styleTag: '야간 비행 투어',
+    moodTag: '드라마틱',
+    locationTag: '도심 야경',
+    instagramUrl: 'https://www.instagram.com/wedu_heli_night_tour',
+  },
+  {
+    id: 14,
+    category: '🍷 경험',
+    categoryType: '경험',
+    styles: ['우아한', '감성적'],
+    tastes: ['와인&샴페인', '미식'],
+    title: '와이너리 프라이빗 테이스팅',
+    description: '전문 소믈리에와 함께하는 프라이빗 와인 테이스팅 후 깜짝 프로포즈',
+    detailDescription:
+      '전문 소믈리에가 진행하는 프라이빗 와인 테이스팅 클래스입니다. 마지막 잔을 비우는 순간에 맞춰 깜짝 프로포즈를 연출할 수 있습니다.',
+    includes: ['소믈리에 테이스팅 클래스', '와인 4종', '치즈 플래터', '프로포즈 타이밍 연출'],
+    tags: ['와인', '테이스팅', '소믈리에'],
+    price: '40만원~',
+    styleTag: '와인 테이스팅',
+    moodTag: '우아한',
+    instagramUrl: 'https://www.instagram.com/wedu_winery_tasting',
+  },
+  {
+    id: 15,
+    category: '⌚ 선물',
+    categoryType: '선물',
+    styles: ['모던', '심플'],
+    tastes: ['시계', '커플'],
+    title: '커플 커스텀 워치',
+    description: '두 사람의 이니셜과 날짜가 각인된 특별한 커플 시계',
+    detailDescription:
+      '두 사람의 이니셜과 기념일을 각인한 커스텀 커플 시계입니다. 데일리로 착용하기 좋은 미니멀한 디자인으로 제작됩니다.',
+    includes: ['커플 시계 세트', '각인 서비스', '전용 케이스', '평생 A/S'],
+    tags: ['시계', '커플', '각인'],
+    price: '80만원~',
+    styleTag: '커스텀 각인',
+    moodTag: '모던',
+    instagramUrl: 'https://www.instagram.com/wedu_custom_watch',
   },
 ];

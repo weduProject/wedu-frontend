@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -23,6 +24,7 @@ export default function CategoryFilter({
   onKeywordChange,
 }: CategoryFilterProps) {
   const [inputValue, setInputValue] = useState(keyword);
+  const navigate = useNavigate();
 
   const handleSearch = () => {
     onKeywordChange(inputValue.trim());
@@ -31,7 +33,7 @@ export default function CategoryFilter({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {categories.map((cat) => {
             const active = cat === activeCategory;
             return (
@@ -51,6 +53,18 @@ export default function CategoryFilter({
               </button>
             );
           })}
+
+          {/* 웨딩 견적 페이지 진입 탭 — 필터가 아니라 /wedding으로 이동하는 링크 */}
+          <button
+            type="button"
+            onClick={() => navigate('/wedding')}
+            className="flex items-center gap-1.5 rounded-full bg-primary-light px-4 py-2 text-sm font-medium text-[#5C4940] transition-colors hover:bg-border"
+          >
+            웨딩
+            <span className="rounded-full bg-[#FEF3C7] px-1.5 py-0.5 text-[10px] font-bold leading-none text-[#B45309]">
+              준비중
+            </span>
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
