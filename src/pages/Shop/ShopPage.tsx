@@ -2,12 +2,15 @@ import { useState, useRef } from 'react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
+import ComingSoonCard from './components/ComingSoonCard';
 import TasteFinder from './components/TasteFinder';
 import ShopCTA from './components/ShopCTA';
 import { PRODUCTS } from './shopData';
+import { WEDDING_COMING_SOON } from './weddingComingSoonData';
 
-const CATEGORIES = ['전체', '장소', '서비스', '경험', '선물'];
+const CATEGORIES = ['전체', '장소', '서비스', '경험', '선물', '웨딩'];
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '모험적', '아늑한', '깜짝', '감성적'];
+const WEDDING_SUBCATEGORIES = ['전체', '웨딩홀', '스튜디오', '드레스', '메이크업', '허니문', '웨딩카', '플래너'];
 
 // 부드러운 스크롤 (duration 밀리초 동안, ease-in-out 곡선으로 이동)
 function smoothScrollTo(target: HTMLElement | null, duration: number) {
@@ -42,6 +45,7 @@ export default function ShopPage() {
   const [filters, setFilters] = useState({
     category: '전체',
     styleTag: '전체 스타일',
+    weddingSubCategory: '전체',
   });
 
   // 취향 다중 선택 상태 (TasteFinder에서 끌어올림)
@@ -53,6 +57,8 @@ export default function ShopPage() {
   // 검색어 (편집샵 내부 검색창)
   const [keyword, setKeyword] = useState('');
 
+  const isWedding = filters.category === '웨딩';
+
   // 취향 토글 (다중 선택)
   const toggleTaste = (label: string) => {
     setSelectedTastes((prev) =>
@@ -61,10 +67,15 @@ export default function ShopPage() {
         : [...prev, label],
     );
 
+  // 웨딩 탭에서 취향 선택 시 프로포즈 편집실 '전체' 탭으로 전환
+    if (isWedding) {
+      setFilters((prev) => ({ ...prev, category: '전체' }));
+    }
+
     // 상품 그리드로 부드럽게 스크롤 (속도 직접 제어)
     smoothScrollTo(gridRef.current, 800); // 800ms 동안 이동
   };
-  
+
   // 클라이언트 사이드 필터링 (임시)
   // TODO: 백엔드 검색/필터 API 나오면 API 호출로 교체
   const products = PRODUCTS.filter((product) => {
@@ -90,6 +101,13 @@ export default function ShopPage() {
     return categoryMatch && styleMatch && tasteMatch && keywordMatch;
   });
 
+  // 웨딩 카테고리 하위 필터링 (준비중 mock 데이터)
+  const weddingItems = WEDDING_COMING_SOON.filter(
+    (item) =>
+      filters.weddingSubCategory === '전체' ||
+      item.subCategory === filters.weddingSubCategory,
+  );
+
   return (
     <div className="mx-auto max-w-[1024px]">
       <ShopHero />
@@ -98,13 +116,18 @@ export default function ShopPage() {
         <CategoryFilter
           categories={CATEGORIES}
           styleTags={STYLE_TAGS}
+          weddingSubCategories={WEDDING_SUBCATEGORIES}
           activeCategory={filters.category}
           activeStyle={filters.styleTag}
+          activeWeddingSubCategory={filters.weddingSubCategory}
           onCategoryChange={(category) =>
             setFilters((prev) => ({ ...prev, category }))
           }
           onStyleChange={(styleTag) =>
             setFilters((prev) => ({ ...prev, styleTag }))
+          }
+          onWeddingSubCategoryChange={(weddingSubCategory) =>
+            setFilters((prev) => ({ ...prev, weddingSubCategory }))
           }
           keyword={keyword}
           onKeywordChange={setKeyword}
@@ -113,21 +136,44 @@ export default function ShopPage() {
 
       {/* 취향 선택 시 상품 목록으로 스크롤 */}
       <div ref={gridRef} className="scroll-mt-6">
-        <p className="mt-6 text-sm text-[#968178]">총 {products.length}개</p>
+        {isWedding ? (
+          <>
+            <p className="mt-6 text-sm text-[#968178]">총 {weddingItems.length}개</p>
 
-        <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
-        </div>
+            <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {weddingItems.map((item) => (
+                <ComingSoonCard key={item.id} item={item} />
+              ))}
+            </div>
 
-        {products.length === 0 && (
-          <p className="mt-10 text-center text-sm text-[#968178]">
-            조건에 맞는 상품이 없어요.
-          </p>
+            <div className="mt-8 flex flex-col items-center rounded-2xl border border-[#FBEFC0] bg-[#FEF9E7] px-8 py-10 text-center">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FDECC8] text-xl">
+                🛠️
+              </div>
+              <h3 className="mb-2 text-lg font-bold text-text">웨딩 서비스 준비 중입니다</h3>
+              <p className="text-sm leading-6 text-[#8D8060]">
+                현재 웨딩홀, 스튜디오, 드레스, 메이크업 등 웨딩 관련 서비스 업체들을 엄선
+                <br />
+                하여 준비하고 있어요. 곧 더 많은 선택지로 찾아뵙겠습니다!
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="mt-6 text-sm text-[#968178]">총 {products.length}개</p>
+
+            <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {products.length === 0 && (
+              <p className="mt-10 text-center text-sm text-[#968178]">
+                조건에 맞는 상품이 없어요.
+              </p>
+            )}
+          </>
         )}
       </div>
 

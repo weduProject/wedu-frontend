@@ -30,7 +30,6 @@ import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
-import WeddingEstimatePage from './pages/Wedding/WeddingEstimatePage';
 
 function OnboardingRoutes() {
   return (
@@ -73,7 +72,6 @@ export default function App() {
               <Route path="/shop/:id" element={<ShopDetailPage />} />
               <Route path="/shop/wishlist" element={<WishlistPage />} />
               <Route path="/shop/cart" element={<CartPage />} />
-              <Route path="/wedding" element={<WeddingEstimatePage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
                 path="/builder"

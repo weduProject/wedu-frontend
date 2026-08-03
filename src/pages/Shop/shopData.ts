@@ -15,7 +15,6 @@ export interface Product {
   moodTag?: string;
   locationTag?: string;
   instagramUrl?: string;
-  weddingCategory?: '예식장' | '예물' | '신혼여행';
 }
 
 export const PRODUCTS: Product[] = [

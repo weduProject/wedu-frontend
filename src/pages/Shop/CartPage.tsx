@@ -1,14 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { ALL_PRODUCTS } from './allProducts';
+import { PRODUCTS } from './shopData';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { parsePriceToNumber, formatWon } from './utils/price';
 import { Button, BaseCard, CategoryBadge } from '../../components';
-
-// 웨딩 견적 항목은 "예식장 견적" 식으로, 편집샵 항목은 categoryType 그대로 표시
-function getGroupLabel(product: (typeof ALL_PRODUCTS)[number]) {
-  return product.weddingCategory ? `${product.weddingCategory} 견적` : product.categoryType;
-}
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -30,7 +25,7 @@ export default function CartPage() {
     );
   }
 
-  const cartProducts = ALL_PRODUCTS.filter((product) => cartIds.includes(product.id));
+  const cartProducts = PRODUCTS.filter((product) => cartIds.includes(product.id));
   const totalPrice = cartProducts.reduce(
     (sum, product) => sum + parsePriceToNumber(product.price),
     0,
@@ -38,8 +33,7 @@ export default function CartPage() {
 
   const groupedProducts = cartProducts.reduce<Record<string, typeof cartProducts>>(
     (acc, product) => {
-      const label = getGroupLabel(product);
-      (acc[label] ??= []).push(product);
+      (acc[product.categoryType] ??= []).push(product);
       return acc;
     },
     {},

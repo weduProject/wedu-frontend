@@ -1,14 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { ALL_PRODUCTS } from './allProducts';
+import { PRODUCTS } from './shopData';
 import ProductCard from './components/ProductCard';
 import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
-
-// 웨딩 견적 항목은 "예식장 견적" 식으로, 편집샵 항목은 categoryType 그대로 표시
-function getGroupLabel(product: (typeof ALL_PRODUCTS)[number]) {
-  return product.weddingCategory ? `${product.weddingCategory} 견적` : product.categoryType;
-}
 
 export default function WishlistPage() {
   const navigate = useNavigate();
@@ -30,14 +25,13 @@ export default function WishlistPage() {
     );
   }
 
-  const wishedProducts = ALL_PRODUCTS.filter((product) =>
+  const wishedProducts = PRODUCTS.filter((product) =>
     wishedIds.includes(product.id),
   );
 
   const groupedProducts = wishedProducts.reduce<Record<string, typeof wishedProducts>>(
     (acc, product) => {
-      const label = getGroupLabel(product);
-      (acc[label] ??= []).push(product);
+      (acc[product.categoryType] ??= []).push(product);
       return acc;
     },
     {},

@@ -1,14 +1,16 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface CategoryFilterProps {
   categories: string[];
   styleTags: string[];
+  weddingSubCategories: string[];
   activeCategory: string;
   activeStyle: string;
+  activeWeddingSubCategory: string;
   onCategoryChange: (category: string) => void;
   onStyleChange: (styleTag: string) => void;
+  onWeddingSubCategoryChange: (subCategory: string) => void;
   keyword: string;
   onKeywordChange: (keyword: string) => void;
 }
@@ -16,15 +18,18 @@ interface CategoryFilterProps {
 export default function CategoryFilter({
   categories,
   styleTags,
+  weddingSubCategories,
   activeCategory,
   activeStyle,
+  activeWeddingSubCategory,
   onCategoryChange,
   onStyleChange,
+  onWeddingSubCategoryChange,
   keyword,
   onKeywordChange,
 }: CategoryFilterProps) {
   const [inputValue, setInputValue] = useState(keyword);
-  const navigate = useNavigate();
+  const isWedding = activeCategory === '웨딩';
 
   const handleSearch = () => {
     onKeywordChange(inputValue.trim());
@@ -43,28 +48,21 @@ export default function CategoryFilter({
                 onClick={() => onCategoryChange(cat)}
                 aria-pressed={active}
                 className={clsx(
-                  'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors',
                   active
                     ? 'bg-primary text-white'
                     : 'bg-primary-light text-[#5C4940] hover:bg-border',
                 )}
               >
                 {cat}
+                {cat === '웨딩' && (
+                  <span className="rounded-full bg-[#FEF3C7] px-1.5 py-0.5 text-[10px] font-bold leading-none text-[#B45309]">
+                    준비중
+                  </span>
+                )}
               </button>
             );
           })}
-
-          {/* 웨딩 견적 페이지 진입 탭 — 필터가 아니라 /wedding으로 이동하는 링크 */}
-          <button
-            type="button"
-            onClick={() => navigate('/wedding')}
-            className="flex items-center gap-1.5 rounded-full bg-primary-light px-4 py-2 text-sm font-medium text-[#5C4940] transition-colors hover:bg-border"
-          >
-            웨딩
-            <span className="rounded-full bg-[#FEF3C7] px-1.5 py-0.5 text-[10px] font-bold leading-none text-[#B45309]">
-              준비중
-            </span>
-          </button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -95,28 +93,53 @@ export default function CategoryFilter({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs font-medium text-text-mutedd">스타일:</span>
-        {styleTags.map((tag) => {
-          const active = tag === activeStyle;
-          return (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => onStyleChange(tag)}
-              aria-pressed={active}
-              className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                active
-                  ? 'bg-text text-white'
-                  : 'bg-primary-light text-[#7C6358] hover:bg-border',
-              )}
-            >
-              {tag}
-            </button>
-          );
-        })}
-      </div>
+      {isWedding ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-medium text-text-muted">카테고리:</span>
+          {weddingSubCategories.map((sub) => {
+            const active = sub === activeWeddingSubCategory;
+            return (
+              <button
+                key={sub}
+                type="button"
+                onClick={() => onWeddingSubCategoryChange(sub)}
+                aria-pressed={active}
+                className={clsx(
+                  'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                  active
+                    ? 'bg-text text-white'
+                    : 'bg-primary-light text-[#7C6358] hover:bg-border',
+                )}
+              >
+                {sub}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-medium text-text-muted">스타일:</span>
+          {styleTags.map((tag) => {
+            const active = tag === activeStyle;
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => onStyleChange(tag)}
+                aria-pressed={active}
+                className={clsx(
+                  'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                  active
+                    ? 'bg-text text-white'
+                    : 'bg-primary-light text-[#7C6358] hover:bg-border',
+                )}
+              >
+                {tag}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
