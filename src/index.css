@@ -12,4 +12,13 @@
 body {
   font-family: sans-serif;
   color: #333;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* hover 시 텍스트 재렌더링으로 인한 깜빡임 방지 */
+a, button {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
