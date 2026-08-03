@@ -43,7 +43,7 @@ export default function ShopDetailPage() {
         <button
           type="button"
           onClick={() => navigate('/shop')}
-          className="mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white"
+          className="mt-4 rounded-full bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] px-5 py-2.5 text-sm font-semibold text-white"
         >
           편집샵으로 돌아가기
         </button>
@@ -107,7 +107,7 @@ export default function ShopDetailPage() {
             {product.styles.map((style) => (
               <span
                 key={style}
-                className="rounded-full bg-[#FDF2F6] px-2.5 py-1 text-xs font-medium text-primary"
+                className="rounded-full bg-primary-light px-2.5 py-1 text-xs font-medium text-primary"
               >
                 {style}
               </span>
@@ -184,7 +184,7 @@ export default function ShopDetailPage() {
               type="button"
               onClick={handleCartClick}
               disabled={inCart}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
               {inCart ? '담았어요' : '장바구니에 담기'}

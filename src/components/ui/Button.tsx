@@ -10,12 +10,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
+const PRIMARY_GRADIENT =
+  'bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)]';
+
 const variantClasses: Record<ButtonVariant, string> = {
-  main: 'bg-primary text-white border-0 hover:enabled:bg-[#d4436f]',
-  secondary: 'bg-white text-text border border-border hover:enabled:bg-[#f9f9f9]',
+  main: `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
+  secondary: 'bg-white text-text border border-border hover:enabled:bg-primary-light/40',
   wishlist:
-    'bg-primary text-white border-0 hover:enabled:bg-primary-light hover:enabled:text-primary transition-colors',
-  pill: 'rounded-full bg-primary text-white border-0 hover:enabled:opacity-90',
+    `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
+  pill: `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

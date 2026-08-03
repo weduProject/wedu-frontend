@@ -1,6 +1,6 @@
 export { default as PageLayout } from './layout/PageLayout';
 export { default as Header } from './layout/Header';
-export { default as SideNav } from './layout/SideNav';
+export { default as Footer } from './layout/Footer';
 
 export { default as Button } from './ui/Button';
 export { default as TextField } from './ui/TextField';

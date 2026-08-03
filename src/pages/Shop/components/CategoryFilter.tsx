@@ -48,10 +48,10 @@ export default function CategoryFilter({
                 onClick={() => onCategoryChange(cat)}
                 aria-pressed={active}
                 className={clsx(
-                  'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all',
                   active
                     ? 'bg-primary text-white'
-                    : 'bg-primary-light text-[#5C4940] hover:bg-border',
+                    : 'bg-[#F0EEED] text-[#5C4940] hover:bg-primary hover:text-white',
                 )}
               >
                 {cat}
@@ -108,7 +108,7 @@ export default function CategoryFilter({
                   'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                   active
                     ? 'bg-text text-white'
-                    : 'bg-primary-light text-[#7C6358] hover:bg-border',
+                    : 'bg-[#F0EEED] text-[#7C6358] hover:bg-[#E7E4E3]',
                 )}
               >
                 {sub}
@@ -131,7 +131,7 @@ export default function CategoryFilter({
                   'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                   active
                     ? 'bg-text text-white'
-                    : 'bg-primary-light text-[#7C6358] hover:bg-border',
+                    : 'bg-[#F0EEED] text-[#7C6358] hover:bg-[#E7E4E3]',
                 )}
               >
                 {tag}

@@ -1,24 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #B76E79;
-  --color-primary-light: #F2EEE6;
+  --color-primary: #E8796C;
+  --color-primary-light: #FDF2F6;
   --color-border: #EAE4D8;
-  --color-text: #0D0A09;
-  --color-text-muted: #968178;
+  --color-text: #221A18;
+  --color-text-muted: #8D8482;
   --color-error: #e53935;
 }
 
 body {
   font-family: sans-serif;
   color: #333;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* hover 시 텍스트 재렌더링으로 인한 깜빡임 방지 */
-a, button {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }

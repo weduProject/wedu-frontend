@@ -46,7 +46,7 @@ export default function WishlistPage() {
           <button
             type="button"
             onClick={clearWishlist}
-            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-full bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             전체 삭제
           </button>
