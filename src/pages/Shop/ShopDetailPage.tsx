@@ -6,6 +6,23 @@ import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export default function ShopDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,6 +71,13 @@ export default function ShopDetailPage() {
     addToCart(product.id);
   };
 
+  // 상품 속성 태그 (스타일 / 분위기 / 장소) — 다이닝 전용 아님, 전 카테고리 공통
+  const attributeTags = [
+    { icon: '🍽️', label: '스타일', value: product.styleTag },
+    { icon: '🕯️', label: '분위기', value: product.moodTag },
+    { icon: '📍', label: '장소', value: product.locationTag },
+  ].filter((attr) => Boolean(attr.value));
+
   return (
     <div className="mx-auto max-w-5xl">
       <nav className="mb-6 flex items-center gap-2 text-sm text-text-muted">
@@ -90,9 +114,36 @@ export default function ShopDetailPage() {
             ))}
           </div>
 
-          <h1 className="mb-3 text-3xl font-bold text-text">
-            {product.title}
-          </h1>
+          {/* 상품 속성 태그: 포함 사항 아이콘(#FEF3E7 / #C69356)과 동일한 톤 재사용 */}
+          {attributeTags.length > 0 && (
+            <div className="mb-5 flex flex-nowrap gap-1.5 overflow-x-auto">
+              {attributeTags.map((attr) => (
+                <span
+                  key={attr.label}
+                  className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#FEF3E7] px-2.5 py-1 text-xs font-medium text-[#8A5E2C]"
+                >
+                  <span className="text-xs leading-none">{attr.icon}</span>
+                  {attr.label} · {attr.value}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* 제목 + 인스타그램 로고 아이콘 (원형 배경 없이 아이콘만, 브랜드 코랄 컬러) */}
+          <div className="mb-3 flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-text">{product.title}</h1>
+            {product.instagramUrl && (
+              <a
+                href={product.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="인스타그램에서 보기"
+                className="translate-y-1 text-primary transition-opacity hover:opacity-70"
+              >
+                <InstagramIcon className="h-6 w-6" />
+              </a>
+            )}
+          </div>
 
           <p className="mb-5 text-sm leading-6 text-[#7C6358]">
             {product.detailDescription}

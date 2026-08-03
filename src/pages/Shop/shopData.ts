@@ -6,11 +6,15 @@ export interface Product {
   tastes: string[];
   title: string;
   description: string;
-  detailDescription: string;  
-  includes: string[];        
+  detailDescription: string;
+  includes: string[];
   tags: string[];
   price: string;
   image?: string;
+  styleTag?: string;     // 상품 속성 태그 1 (예: 스위트룸, 야외촬영, 코스요리 등) — 다이닝 전용 아님, 전 카테고리 공통
+  moodTag?: string;      // 상품 속성 태그 2 (예: 럭셔리, 로맨틱 등)
+  locationTag?: string;  // 상품 속성 태그 3 (예: 호텔, 제주해변, 한강뷰 등)
+  instagramUrl?: string; // 인스타그램 계정 mock URL
 }
 
 export const PRODUCTS: Product[] = [
@@ -27,6 +31,10 @@ export const PRODUCTS: Product[] = [
     includes: ['7코스 맞춤 메뉴', '와인 페어링', '전담 플로리스트', '현악 3중주', '포토그래퍼'],
     tags: ['한강뷰', '프라이빗', '코스요리'],
     price: '80만원~',
+    styleTag: '코스요리',
+    moodTag: '로맨틱',
+    locationTag: '한강뷰',
+    instagramUrl: 'https://www.instagram.com/wedu_official',
   },
   {
     id: 2,
@@ -41,6 +49,10 @@ export const PRODUCTS: Product[] = [
     includes: ['스위트룸 1박', '샴페인 & 케이크', '룸 데코레이션', '조식 서비스'],
     tags: ['럭셔리', '스위트룸', '호캉스'],
     price: '150만원~',
+    styleTag: '스위트룸',
+    moodTag: '럭셔리',
+    locationTag: '5성급 호텔',
+    instagramUrl: 'https://www.instagram.com/wedu_hotel_suite',
   },
   {
     id: 3,
@@ -55,6 +67,10 @@ export const PRODUCTS: Product[] = [
     includes: ['해변 세팅', '석양 타임 예약', '스냅 촬영', '플라워 데코'],
     tags: ['제주도', '석양', '해변'],
     price: '50만원~',
+    styleTag: '야외 촬영',
+    moodTag: '감성적',
+    locationTag: '제주 해변',
+    instagramUrl: 'https://www.instagram.com/wedu_jeju_sunset',
   },
   {
     id: 4,
@@ -69,6 +85,10 @@ export const PRODUCTS: Product[] = [
     includes: ['생화 장미 데코', '캔들 세팅', '현장 설치/철거', '맞춤 디자인'],
     tags: ['플라워', '데코', '장미'],
     price: '30만원~',
+    styleTag: '생화 장미 데코',
+    moodTag: '로맨틱',
+    // 고객 공간에 맞춰 진행되므로 locationTag는 생략 (태그 자동으로 안 뜸)
+    instagramUrl: 'https://www.instagram.com/wedu_flower_deco',
   },
   {
     id: 5,
@@ -83,6 +103,9 @@ export const PRODUCTS: Product[] = [
     includes: ['스냅 촬영 2시간', '보정본 30장', '원본 전체 제공', '영상 클립'],
     tags: ['사진', '화보', '스냅'],
     price: '40만원~',
+    styleTag: '스냅 촬영',
+    moodTag: '감성적',
+    instagramUrl: 'https://www.instagram.com/wedu_proposal_photo',
   },
   {
     id: 6,
@@ -97,6 +120,9 @@ export const PRODUCTS: Product[] = [
     includes: ['4인 연주팀', '곡 선곡 상담', '30분 공연', '음향 장비'],
     tags: ['현악', '라이브', '클래식'],
     price: '60만원~',
+    styleTag: '라이브 연주',
+    moodTag: '우아한',
+    instagramUrl: 'https://www.instagram.com/wedu_string_quartet',
   },
   {
     id: 7,
@@ -111,6 +137,10 @@ export const PRODUCTS: Product[] = [
     includes: ['불꽃 연출', '안전 관리 인력', '허가 대행', '현장 세팅'],
     tags: ['불꽃놀이', '야간', '스페셜'],
     price: '120만원~',
+    styleTag: '불꽃 연출',
+    moodTag: '드라마틱',
+    locationTag: '야외 공간',
+    instagramUrl: 'https://www.instagram.com/wedu_fireworks',
   },
   {
     id: 8,
@@ -125,5 +155,9 @@ export const PRODUCTS: Product[] = [
     includes: ['디자인 상담', '맞춤 제작', '각인 서비스', '고급 케이스'],
     tags: ['반지', '커스텀', '주얼리'],
     price: '200만원~',
+    styleTag: '맞춤 제작',
+    moodTag: '럭셔리',
+    // 선물류라 장소 개념이 없어 locationTag 생략
+    instagramUrl: 'https://www.instagram.com/wedu_custom_ring',
   },
 ];
