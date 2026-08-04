@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Receipt } from 'lucide-react';
 import { PRODUCTS } from './shopData';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -103,23 +104,32 @@ export default function CartPage() {
             ))}
           </div>
 
-          <BaseCard className="mt-8" title="예상 금액">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <span className="text-text-muted">총 항목</span>
-              <span className="font-bold text-text">{cartProducts.length}개</span>
+          <div className="mt-8 rounded-2xl border border-[rgba(255,199,190,0.6)] bg-[rgba(255,240,238,0.4)] p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFDED9]">
+                <Receipt className="h-4 w-4 text-primary" strokeWidth={2} />
+              </div>
+              <h2 className="text-lg font-semibold text-[#0C0B0A]">예상 금액</h2>
             </div>
 
-            <div className="flex items-center justify-between pt-4">
-              <span className="text-text-muted">예상 총 비용</span>
-              <span className="text-2xl font-bold text-text">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6F6765]">총 항목</span>
+              <span className="text-sm font-semibold text-[#0C0B0A]">{cartProducts.length}개</span>
+            </div>
+
+            <div className="my-3 h-px bg-[rgba(255,199,190,0.4)]" />
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6F6765]">예상 총 비용</span>
+              <span className="text-xl font-bold text-[#0C0B0A]">
                 {formatWon(totalPrice)}~
               </span>
             </div>
 
-            <p className="mt-4 text-xs text-text-muted">
+            <p className="mt-3 text-xs text-[#8D8482]">
               실제 비용은 상세 옵션에 따라 변동될 수 있어요
             </p>
-          </BaseCard>
+          </div>
         </>
       ) : (
         <BaseCard className="flex flex-col items-center justify-center py-20 text-center">
