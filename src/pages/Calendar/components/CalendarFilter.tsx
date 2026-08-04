@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../../styles/categoryTab';
 
 interface CalendarFilterProps {
   activeCategory: string;
@@ -17,9 +18,7 @@ export default function CalendarFilter({ activeCategory, onCategoryChange }: Cal
           onClick={() => onCategoryChange(tab)}
           className={clsx(
             'shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-            activeCategory === tab
-              ? 'bg-primary text-white'
-              : 'bg-primary-light text-primary hover:bg-primary/[.15]'
+            activeCategory === tab ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
           )}
         >
           {tab}
