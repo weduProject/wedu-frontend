@@ -67,7 +67,7 @@ export default function ShopPage() {
         : [...prev, label],
     );
 
-  // 웨딩 탭에서 취향 선택 시 프로포즈 편집실 '전체' 탭으로 전환
+    // 웨딩 탭에서 취향 선택 시 프로포즈 편집실 '전체' 탭으로 전환
     if (isWedding) {
       setFilters((prev) => ({ ...prev, category: '전체' }));
     }
@@ -109,7 +109,17 @@ export default function ShopPage() {
   );
 
   return (
-    <div className="mx-auto max-w-[1024px]">
+    <div className="relative mx-auto max-w-5xl">
+      {/* 피그마 원본의 페이지 전체 배경 텍스처 (opacity 3%, 장식용) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-6 -top-8 -z-10 h-full w-[calc(100%+3rem)] opacity-[0.03]"
+        style={{
+          background:
+            'radial-gradient(70.71% 113.14% at 50% 80%, rgba(197,136,176,0.15) 0%, rgba(0,0,0,0) 50%), radial-gradient(113.14% 113.14% at 80% 20%, rgba(198,147,86,0.2) 0%, rgba(0,0,0,0) 50%), radial-gradient(113.14% 70.71% at 20% 50%, rgba(232,121,108,0.3) 0%, rgba(0,0,0,0) 50%)',
+        }}
+      />
+
       <ShopHero />
 
       <div className="mt-8">

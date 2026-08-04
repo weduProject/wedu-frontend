@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const PRIMARY_GRADIENT =
-  'bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)]';
+  'bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)]';
 
 const variantClasses: Record<ButtonVariant, string> = {
   main: `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
@@ -40,7 +40,7 @@ export default function Button({
     <button
       type={type}
       className={clsx(
-        'rounded-lg cursor-pointer font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed',
+        'rounded-full cursor-pointer font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed',
         variantClasses[variant],
         sizeClasses[size],
         className,

@@ -24,8 +24,8 @@ const TOOL_LINKS = [
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
-    'text-sm no-underline transition-colors',
-    isActive ? 'font-semibold text-primary' : 'text-text hover:text-primary',
+    'text-sm font-medium no-underline transition-colors',
+    isActive ? 'font-semibold text-primary' : 'text-[#3E3939] hover:text-primary',
   );
 
 export default function Header() {
@@ -52,30 +52,30 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/40 bg-white/40 backdrop-blur-lg transition-all duration-500">
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-6 px-4 md:h-20 md:px-16">
+    <header className="fixed inset-x-0 top-0 z-50 bg-white/40 shadow-[0px_1px_0px_rgba(232,121,108,0.18)] backdrop-blur transition-all duration-500">
+      <div className="relative mx-auto flex h-16 max-w-360 items-center gap-6 px-4 md:h-20 md:px-8">
         <Link
           to={user ? '/home' : '/'}
-          className="shrink-0 bg-[linear-gradient(90deg,#F79689_0%,#C4675D_100%)] bg-clip-text text-xl font-bold text-transparent no-underline"
+          className="shrink-0 bg-[linear-gradient(90deg,#F79689_0%,#C4675D_100%)] bg-clip-text text-[30px] font-bold leading-9 tracking-[-0.75px] text-transparent no-underline"
         >
           WEDU
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="주 메뉴">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex" aria-label="주 메뉴">
           {PRIMARY_LINKS.map((item) => (
             <NavLink key={item.path} to={item.path} className={navLinkClass}>
               {item.label}
             </NavLink>
           ))}
 
-          <span className="h-4 w-px bg-border" aria-hidden />
+          <span className="h-5 w-px bg-[rgba(171,162,161,0.4)]" aria-hidden />
 
           <div ref={toolsRef} className="relative">
             <button
               type="button"
               onClick={() => setIsToolsOpen((prev) => !prev)}
               aria-expanded={isToolsOpen}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-text transition-colors hover:text-primary"
+              className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
             >
               관리도구
               <ChevronDown
@@ -113,11 +113,11 @@ export default function Header() {
           {user ? (
             <>
               <HeaderIconButtons />
-              <span className="hidden text-sm text-text sm:inline">{user.name}님</span>
+              <span className="hidden text-sm font-medium text-[#3E3939] sm:inline">{user.name}님</span>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="hidden rounded-full bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:inline"
+                className="hidden rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-5 py-2 text-sm font-medium text-white shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)] transition-opacity hover:opacity-90 sm:inline"
               >
                 로그아웃
               </button>

@@ -43,7 +43,7 @@ export default function ShopDetailPage() {
         <button
           type="button"
           onClick={() => navigate('/shop')}
-          className="mt-4 rounded-full bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] px-5 py-2.5 text-sm font-semibold text-white"
+          className="mt-4 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-5 py-2.5 text-sm font-semibold text-white"
         >
           편집샵으로 돌아가기
         </button>
@@ -184,7 +184,7 @@ export default function ShopDetailPage() {
               type="button"
               onClick={handleCartClick}
               disabled={inCart}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(90deg,#F79689_0%,#E8796C_33%,#FEABA0_67%,#E8796C_100%)] py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] py-3.5 text-sm font-semibold text-white shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)] transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
               {inCart ? '담았어요' : '장바구니에 담기'}
@@ -193,7 +193,7 @@ export default function ShopDetailPage() {
               type="button"
               aria-pressed={liked}
               onClick={handleWishClick}
-              className="group flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
+              className="group flex items-center justify-center gap-1.5 rounded-full border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
             >
               <Heart
                 className={

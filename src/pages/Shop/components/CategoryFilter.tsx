@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../../styles/categoryTab';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -49,9 +50,7 @@ export default function CategoryFilter({
                 aria-pressed={active}
                 className={clsx(
                   'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all',
-                  active
-                    ? 'bg-primary text-white'
-                    : 'bg-[#F0EEED] text-[#5C4940] hover:bg-primary hover:text-white',
+                  active ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
                 )}
               >
                 {cat}
@@ -86,7 +85,7 @@ export default function CategoryFilter({
           <button
             type="button"
             onClick={handleSearch}
-            className="rounded-xl border border-[#DDD7C9] bg-white px-5 py-2.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
+            className="rounded-full border border-[#DDD7C9] bg-white px-5 py-2.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
           >
             검색
           </button>

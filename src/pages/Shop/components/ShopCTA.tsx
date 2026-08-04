@@ -4,7 +4,7 @@ export default function ShopCTA() {
   const navigate = useNavigate();
 
   return (
-    <section className="flex flex-col items-center rounded-3xl bg-linear-to-r from-[#C36978] to-[#DDA06B] px-12 py-12 text-center">
+    <section className="flex flex-col items-center rounded-3xl bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-12 py-12 text-center">
       <h2 className="mb-3 text-3xl font-bold text-white">
         원하는 게 없으신가요?
       </h2>

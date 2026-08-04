@@ -68,19 +68,29 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-[#F7F5F0]">
+    <footer className="relative bg-[#F0EEED]">
+      {/* 상단 은은한 코랄 라인 */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(254,171,160,0.3) 50%, rgba(0,0,0,0) 100%)',
+        }}
+      />
+
       <div className="mx-auto max-w-360 px-4 py-16 md:px-16 lg:py-20">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           {FOOTER_COLUMNS.map((column) => (
             <div key={column.title}>
-              <h4 className="mb-2 text-base font-semibold text-text">{column.title}</h4>
-              <span className="mb-5 block h-0.5 w-6 bg-primary" aria-hidden />
-              <ul className="flex flex-col gap-3">
+              <h4 className="mb-2 text-base font-semibold text-[#0C0B0A]">{column.title}</h4>
+              <span className="mb-5 block h-px w-8 bg-[#FEABA0]" aria-hidden />
+              <ul className="flex flex-col gap-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.path}
-                      className="text-sm text-text-muted no-underline transition-colors hover:text-primary"
+                      className="text-sm font-normal text-[#514C4A] no-underline transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -91,28 +101,28 @@ export default function Footer() {
           ))}
 
           <div>
-            <h4 className="mb-2 text-base font-semibold text-text">고객센터</h4>
-            <span className="mb-5 block h-0.5 w-6 bg-primary" aria-hidden />
-            <ul className="flex flex-col gap-3">
+            <h4 className="mb-2 text-base font-semibold text-[#0C0B0A]">고객센터</h4>
+            <span className="mb-5 block h-px w-8 bg-[#FEABA0]" aria-hidden />
+            <ul className="flex flex-col gap-2">
               {CUSTOMER_SERVICE_ITEMS.map((label) => (
                 <li key={label}>
-                  <span className="text-sm text-text-muted">{label}</span>
+                  <span className="text-sm font-normal text-[#514C4A]">{label}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-[#E4DFD5] pt-8 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-14 flex flex-col gap-6 border-t border-[rgba(231,228,227,0.6)] pt-8.25m:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="font-serif text-3xl font-bold tracking-tight bg-[linear-gradient(90deg,#F79689_0%,#C4675D_100%)] bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(90deg,#E8796C_0%,#C588B0_100%)] bg-clip-text text-[48px] font-bold leading-12 text-transparent">
               WEDU
             </span>
-            <p className="mt-2 text-sm text-text-muted">당신의 특별한 순간을 함께 준비합니다.</p>
+            <p className="mt-2 text-sm text-[#6F6765]">당신의 특별한 순간을 함께 준비합니다.</p>
           </div>
 
           <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-3">
-            <span className="text-xs text-[#ABA2A1]">© 2025 WEDU. All rights reserved.</span>
+            <span className="text-xs text-text-muted">© 2025 WEDU. All rights reserved.</span>
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ label, Icon, href }) => (
                 <a

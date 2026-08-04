@@ -13,7 +13,7 @@ export default function BaseCard({ title, extra, shadow = true, children, classN
   return (
     <article
       className={clsx(
-        'bg-white border border-border rounded-xl p-5 min-w-[180px]',
+        'bg-white border border-border rounded-xl p-5 min-w-45',
         shadow && 'shadow-[0_2px_8px_rgba(0,0,0,0.04)]',
         className,
       )}

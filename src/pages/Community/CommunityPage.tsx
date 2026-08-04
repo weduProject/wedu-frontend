@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MessageCircle } from "lucide-react";
+import clsx from "clsx";
 import { Button } from "../../components";
 import CommunityCard from "./CommunityCard";
 import { useCommunity } from "./CommunityContext";
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from "../../styles/categoryTab";
 
 const categories = [
   "전체",
@@ -45,7 +47,7 @@ export default function CommunityPage() {
   );
 
   return (
-    <div className="mx-auto max-w-[1024px]">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-text">커뮤니티</h1>
@@ -85,11 +87,10 @@ export default function CommunityPage() {
               setSelectedCategory(category);
               setCurrentPage(1);
             }}
-            className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-              selectedCategory === category
-                ? "bg-primary text-white"
-                : "border border-border bg-white text-text hover:border-primary/40"
-            }`}
+            className={clsx(
+              'rounded-full px-5 py-2 text-sm font-medium transition-colors',
+              selectedCategory === category ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+            )}
           >
             {category}
           </button>
