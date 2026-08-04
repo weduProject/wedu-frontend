@@ -16,10 +16,25 @@ const ANNIVERSARIES = [
 
 export default function DDayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetDate, setTargetDate] = useState("2026-11-18");
+  const [targetDate, setTargetDate] = useState(() => {
+    return localStorage.getItem('weddingDate') || "2026-11-18";
+  });
+
+  const [tempDate, setTempDate] = useState(targetDate);
 
   const { todos, toggleTodo } = useChecklist();
   const previewTodos = todos.slice(0, 5);
+
+  const handleOpenModal = () => {
+    setTempDate(targetDate);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveDate = () => {
+    setTargetDate(tempDate);
+    localStorage.setItem('weddingDate', tempDate);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="mx-auto max-w-[1024px] pb-20">
@@ -27,7 +42,7 @@ export default function DDayPage() {
       <DDayCard 
         targetDate={targetDate}
         showEditButton={true} 
-        onEditClick={() => setIsModalOpen(true)}
+        onEditClick={handleOpenModal}
       />
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -123,8 +138,8 @@ export default function DDayPage() {
               <label className="mb-2 block text-xs font-semibold text-text-muted">결혼 날짜 선택</label>
               <input 
                 type="date"
-                defaultValue={targetDate}
-                onChange={(e) => setTargetDate(e.target.value)}
+                value={tempDate}
+                onChange={(e) => setTempDate(e.target.value)}
                 className="w-full rounded-xl border border-border bg-gray-50 p-3 text-sm text-text outline-none transition-colors focus:border-primary focus:bg-white"
               />
             </div>
@@ -137,7 +152,7 @@ export default function DDayPage() {
                 취소
               </button>
               <button 
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleSaveDate}
                 className="flex-1 rounded-xl bg-linear-to-r from-[#F4A4A4] to-[#E58080] py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90 shadow-sm shadow-primary/30"
               >
                 저장하기
