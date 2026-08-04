@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import BaseCard from '../../../components/ui/BaseCard';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import { Calendar } from 'lucide-react';
 
 interface DDayCardProps {
@@ -9,6 +11,9 @@ interface DDayCardProps {
 }
 
 export default function DDayCard({targetDate, showEditButton, onEditClick }: DDayCardProps) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -44,6 +49,26 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
 
   // "2026. 11. 18" 타겟 날짜 포맷팅
   const formattedTargetDate = targetDate.replace(/-/g, '. ');
+
+  if (!user) {
+    return (
+      <BaseCard className="flex h-full w-full text-white flex-col items-center justify-center rounded-2xl bg-[linear-gradient(to_right,#B76E79_0%,#D4A373_50%,#E8C4A2_100%)] p-6 md:p-8 border-0 text-center shadow-md">
+        <Calendar className="mx-auto mb-3 h-10 w-10 opacity-90" />
+        <h3 className="mb-2 text-2xl font-bold">D-Day</h3>
+        <p className="mb-4 text-sm font-medium opacity-90">
+          결혼 날짜를 등록하고<br />남은 날을 확인해보세요
+        </p>
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate('/login')}}
+          className="rounded-full bg-white/20 px-6 py-2 text-sm font-bold backdrop-blur-sm transition-colors hover:bg-white/30"
+        >
+          날짜 등록하기
+        </button>
+      </BaseCard>
+    );
+  }
 
 return (
     <div className="relative flex h-[400px] w-full flex-col items-center justify-center overflow-hidden rounded-[32px] bg-gray-900 text-white shadow-xl md:h-[480px]">
