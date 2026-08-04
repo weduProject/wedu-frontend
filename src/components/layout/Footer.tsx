@@ -79,7 +79,7 @@ export default function Footer() {
         }}
       />
 
-      <div className="mx-auto max-w-360 px-4 py-16 md:px-16 lg:py-20">
+      <div className="mx-auto max-w-[1440px] px-4 py-16 md:px-16 lg:py-20">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           {FOOTER_COLUMNS.map((column) => (
             <div key={column.title}>
@@ -113,16 +113,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-[rgba(231,228,227,0.6)] pt-8.25m:flex-row sm:items-end sm:justify-between">
+        <div className="mt-14 flex flex-col gap-6 border-t border-[rgba(231,228,227,0.6)] pt-[33px] sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="bg-[linear-gradient(90deg,#E8796C_0%,#C588B0_100%)] bg-clip-text text-[48px] font-bold leading-12 text-transparent">
+            <span className="bg-[linear-gradient(90deg,#E8796C_0%,#C588B0_100%)] bg-clip-text text-[48px] font-bold leading-[48px] text-transparent">
               WEDU
             </span>
             <p className="mt-2 text-sm text-[#6F6765]">당신의 특별한 순간을 함께 준비합니다.</p>
           </div>
 
           <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-3">
-            <span className="text-xs text-text-muted">© 2025 WEDU. All rights reserved.</span>
+            <span className="text-xs text-[#8D8482]">© 2025 WEDU. All rights reserved.</span>
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ label, Icon, href }) => (
                 <a
@@ -131,9 +131,9 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:text-primary"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#8D8482] transition-colors hover:text-primary"
                 >
-                  <Icon className="h-4.5 w-4.5" />
+                  <Icon className="h-[18px] w-[18px]" />
                 </a>
               ))}
             </div>
