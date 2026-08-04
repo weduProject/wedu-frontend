@@ -1,6 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
+import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
+
 type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -9,9 +11,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
   children: ReactNode;
 }
-
-// After
-import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
 
 const PRIMARY_GRADIENT = `${PRIMARY_GRADIENT_BG} ${PRIMARY_GLOW_SHADOW}`;
 

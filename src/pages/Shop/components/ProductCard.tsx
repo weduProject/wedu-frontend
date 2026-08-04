@@ -1,4 +1,3 @@
-// After
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../shopData';
 import { Heart } from 'lucide-react';
