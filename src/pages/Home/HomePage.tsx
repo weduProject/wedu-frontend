@@ -40,11 +40,11 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {user ? (
             <Link to="/dday" className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
+              <DDayCard targetDate="2026-11-18" />
             </Link>
           ) : (
             <div onClick={() => navigate('/dday')} className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18" weddingDateText="2026년 11월 18일" />
+              <DDayCard targetDate="2026-11-18"/>
             </div>
           )}
           {user ? (
