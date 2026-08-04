@@ -6,6 +6,7 @@ import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
+import clsx from 'clsx';
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -177,15 +178,20 @@ export default function ShopDetailPage() {
           </div>
 
           <div className="mt-auto flex flex-col gap-3">
-            <Button
-              variant="pill"
+            <button
+              type="button"
               onClick={handleCartClick}
               disabled={inCart}
-              className="w-full py-3.5"
+              className={clsx(
+                'flex items-center justify-center gap-1.5 rounded-full py-3.5 text-sm font-semibold transition-opacity',
+                inCart
+                  ? 'bg-[#F0EEED] text-[#6F6765] cursor-not-allowed'
+                  : 'bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] text-white shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)] hover:opacity-90',
+              )}
             >
               <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
               {inCart ? '담았어요' : '장바구니에 담기'}
-            </Button>
+            </button>
             <button
               type="button"
               aria-pressed={liked}
