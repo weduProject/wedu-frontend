@@ -3,6 +3,7 @@ import type { Product } from '../shopData';
 import { Heart } from 'lucide-react';
 import { useWishlist } from '../utils/useWishlist';
 import { useAuth } from '../../../contexts/AuthContext';
+import Button from '../../../components/ui/Button';
 
 interface ProductCardProps {
   product: Product;
@@ -88,13 +89,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-sm font-bold text-text">
             {product.price}
           </span>
-          <button
-            type="button"
-            onClick={handleDetailClick}
-            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-          >
+          <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={handleDetailClick}>
             상세보기
-          </button>
+          </Button>
         </div>
       </div>
     </article>

@@ -30,6 +30,7 @@ import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
+import ScrollToTop from './components/ScrollToTop';
 
 function OnboardingRoutes() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
     <BudgetProvider>
       <ChecklistProvider>
         <ScheduleProvider>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />

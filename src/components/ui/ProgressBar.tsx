@@ -15,14 +15,14 @@ export default function ProgressBar({ value, max = 100, showLabel = false }: Pro
       aria-valuemin={0}
       aria-valuemax={max}
     >
-      <div className="flex-1 h-2 bg-[#f0f0f0] rounded overflow-hidden">
+      <div className="flex-1 h-2 bg-[#F0EEED]/60 rounded overflow-hidden">
         <div
-          className="h-full bg-[linear-gradient(to_right,#B76E79_0%,#D4A373_100%)] rounded transition-[width] duration-300 ease-in-out"
+          className="h-full bg-[linear-gradient(to_right,#E8796C_0%,#C69356_100%)] rounded transition-[width] duration-300 ease-in-out"
           style={{ width: `${percent}%` }}
         />
       </div>
       {showLabel && (
-        <span className="text-xs text-text-muted min-w-[36px]">{Math.round(percent)}%</span>
+        <span className="text-xs text-text-muted min-w-9">{Math.round(percent)}%</span>
       )}
     </div>
   );
