@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+// import { useNavigate } from 'react-router-dom';
+// import { useAuth } from '../../../contexts/AuthContext';
 import { Calendar } from 'lucide-react';
 
 interface DDayCardProps {
@@ -10,8 +10,8 @@ interface DDayCardProps {
 }
 
 export default function DDayCard({targetDate, showEditButton, onEditClick }: DDayCardProps) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+  // const navigate = useNavigate();
+  // const { user } = useAuth();
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
