@@ -1,5 +1,8 @@
 import DDayCard from "./components/DDayCard";
 import BaseCard from "../../components/ui/BaseCard";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X } from 'lucide-react';
 
 
 // 더미 데이터 배열
@@ -20,59 +23,127 @@ const CHECKLIST = [
 ];
 
 export default function DDayPage() {
-  const handleEditDate = () => {
-    // TODO: 날짜 변경 모달 띄우기 로직 (추후 구현)
-    alert('날짜 변경 모달을 띄웁니다');
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetDate, setTargetDate] = useState("2026-11-18");
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-[1024px] pb-20">
       {/* 1. 상단 D-day 카드 (버튼 활성화) */}
       <DDayCard 
-        targetDate="2026-11-18" 
-        weddingDateText="2026년 11월 18일" 
+        targetDate={targetDate}
         showEditButton={true} 
-        onEditClick={handleEditDate}
+        onEditClick={() => setIsModalOpen(true)}
       />
 
-      {/* 2. 특별한 기념일 섹션 */}
-      <section className="mt-10">
-        <h2 className="mb-4 text-lg font-bold text-text">특별한 기념일</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {ANNIVERSARIES.map((item) => (
-            <BaseCard key={item.id} className="p-5 shadow-sm transition-transform">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary-light/50 text-lg text-primary">
-                {item.icon}
-              </div>
-              <h3 className="mb-1 text-sm font-bold text-text">{item.title}</h3>
-              <p className="text-xs text-text-muted leading-relaxed">{item.desc}</p>
-            </BaseCard>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. D-DAY 체크리스트 섹션 */}
-      <section className="mt-8">
-        <BaseCard className="p-6 md:p-8 shadow-sm">
-          <div className="mb-6 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-orange-400">
-              💡
+      {/* 2단 그리드 레이아웃 (소중한 기억들 & 웨딩 체크리스트) */}
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        
+        {/* 2-1. 소중한 기억들 섹션 */}
+        <BaseCard className="flex h-full flex-col p-6 md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <Heart className="h-6 w-6 text-primary" strokeWidth={2.5} />
+            <div>
+              <h2 className="text-lg font-bold text-text">소중한 기억들</h2>
+              <p className="text-xs text-text-muted mt-0.5">함께 걸어온 특별한 순간들</p>
             </div>
-            <h2 className="text-lg font-bold text-text">D-DAY 체크리스트</h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-2">
-            {CHECKLIST.map((item) => (
-              <div key={item.id} className="flex items-center gap-4">
-                <span className="flex w-14 shrink-0 items-center justify-center rounded-full bg-primary-light/50 px-2 py-1 text-xs font-bold text-primary">
-                  {item.dDay}
-                </span>
-                <p className="text-sm font-medium text-text">{item.task}</p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {ANNIVERSARIES.map((item) => (
+              <div key={item.id} className="flex flex-col rounded-2xl border border-gray-100 bg-[#FAFAFA] p-5 transition-colors hover:border-primary-light">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-pink-50 text-base text-primary">
+                  {item.icon}
+                </div>
+                <h3 className="mb-1.5 text-sm font-bold text-text">{item.title}</h3>
+                <p className="text-[11px] leading-relaxed text-text-muted">{item.desc}</p>
               </div>
             ))}
           </div>
         </BaseCard>
-      </section>
+
+        {/* 2-2. 웨딩 체크리스트 섹션 */}
+        <BaseCard className="flex h-full flex-col p-6 md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <ClipboardList className="h-6 w-6 text-orange-400" strokeWidth={2.5} />
+            <div>
+              <h2 className="text-lg font-bold text-text">웨딩 체크리스트</h2>
+              <p className="text-xs text-text-muted mt-0.5">준비해야 할 핵심 일정</p>
+            </div>
+          </div>
+
+          <div className="flex flex-1 flex-col gap-5">
+            {CHECKLIST.map((item) => (
+              <div key={item.id} className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0">
+                <div className="flex items-center gap-4">
+                  <span className="flex w-14 shrink-0 items-center justify-center rounded-full bg-red-50 py-1 text-[11px] font-bold text-primary">
+                    {item.dDay}
+                  </span>
+                  <p className={`text-sm ${item.isCompleted ? 'text-gray-400 line-through' : 'text-text font-medium'}`}>
+                    {item.task}
+                  </p>
+                </div>
+                {/* 체크박스 상태 렌더링 */}
+                {item.isCompleted ? (
+                  <CheckCircle2 className="h-5 w-5 text-primary" fill="currentColor" color="white" />
+                ) : (
+                  <Circle className="h-5 w-5 text-gray-300" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* 전체 체크리스트 보기 하단 링크 */}
+          <div className="mt-8 border-t border-gray-100 pt-5">
+            <Link to= "/checklist" className="flex items-center gap-1 text-sm font-semibold text-primary transition-opacity hover:opacity-80">
+              전체 체크리스트 보기 <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </BaseCard>
+
+      </div>
+
+      {/* 3. 날짜 설정 모달 */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+          <div className="w-[90%] max-w-sm rounded-[24px] bg-white p-6 shadow-2xl md:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-text">날짜 설정</h3>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 transition-colors hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="mb-8">
+              <label className="mb-2 block text-xs font-semibold text-text-muted">결혼 날짜 선택</label>
+              <input 
+                type="date"
+                defaultValue={targetDate}
+                onChange={(e) => setTargetDate(e.target.value)}
+                className="w-full rounded-xl border border-border bg-gray-50 p-3 text-sm text-text outline-none transition-colors focus:border-primary focus:bg-white"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-semibold text-text transition-colors hover:bg-gray-200"
+              >
+                취소
+              </button>
+              <button 
+                onClick={() => setIsModalOpen(false)} // 실제로는 저장 로직(API 호출 등)이 들어갑니다.
+                className="flex-1 rounded-xl bg-gradient-to-r from-[#F4A4A4] to-[#E58080] py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90 shadow-sm shadow-primary/30"
+              >
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
