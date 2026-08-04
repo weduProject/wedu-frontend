@@ -4,6 +4,7 @@ import ProductCard from './components/ProductCard';
 import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
+import { groupByCategory } from './utils/groupByCategory';
 
 export default function WishlistPage() {
   const navigate = useNavigate();
@@ -29,13 +30,7 @@ export default function WishlistPage() {
     wishedIds.includes(product.id),
   );
 
-  const groupedProducts = wishedProducts.reduce<Record<string, typeof wishedProducts>>(
-    (acc, product) => {
-      (acc[product.categoryType] ??= []).push(product);
-      return acc;
-    },
-    {},
-  );
+  const groupedProducts = groupByCategory(wishedProducts);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -43,13 +38,9 @@ export default function WishlistPage() {
         <h1 className="text-2xl font-bold text-text">찜한 상품</h1>
 
         {wishedProducts.length > 0 && (
-          <button
-            type="button"
-            onClick={clearWishlist}
-            className="rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)]"
-          >
+          <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={clearWishlist}>
             전체 삭제
-          </button>
+          </Button>
         )}
       </div>
 

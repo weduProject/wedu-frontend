@@ -10,8 +10,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const PRIMARY_GRADIENT =
-  'bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)]';
+// After
+import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
+
+const PRIMARY_GRADIENT = `${PRIMARY_GRADIENT_BG} ${PRIMARY_GLOW_SHADOW}`;
 
 const variantClasses: Record<ButtonVariant, string> = {
   main: `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,

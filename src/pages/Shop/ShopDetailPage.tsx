@@ -5,6 +5,7 @@ import { PRODUCTS } from './shopData';
 import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -40,13 +41,9 @@ export default function ShopDetailPage() {
     return (
       <div className="mx-auto max-w-5xl py-20 text-center">
         <p className="text-[#7C6358]">상품을 찾을 수 없어요.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/shop')}
-          className="mt-4 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-5 py-2.5 text-sm font-semibold text-white"
-        >
+        <Button variant="pill" onClick={() => navigate('/shop')} className="mt-4">
           편집샵으로 돌아가기
-        </button>
+        </Button> 
       </div>
     );
   }
@@ -180,15 +177,15 @@ export default function ShopDetailPage() {
           </div>
 
           <div className="mt-auto flex flex-col gap-3">
-            <button
-              type="button"
+            <Button
+              variant="pill"
               onClick={handleCartClick}
               disabled={inCart}
-              className="flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] py-3.5 text-sm font-semibold text-white shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)] transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3.5"
             >
               <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
               {inCart ? '담았어요' : '장바구니에 담기'}
-            </button>
+            </Button>
             <button
               type="button"
               aria-pressed={liked}

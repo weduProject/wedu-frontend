@@ -7,18 +7,26 @@ import TasteFinder from './components/TasteFinder';
 import ShopCTA from './components/ShopCTA';
 import { PRODUCTS } from './shopData';
 import { WEDDING_COMING_SOON } from './weddingComingSoonData';
+import type { WeddingComingSoonItem } from './weddingComingSoonData';
 
 const CATEGORIES = ['전체', '장소', '서비스', '경험', '선물', '웨딩'];
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '모험적', '아늑한', '깜짝', '감성적'];
-const WEDDING_SUBCATEGORIES = ['전체', '웨딩홀', '스튜디오', '드레스', '메이크업', '허니문', '웨딩카', '플래너'];
+const WEDDING_SUBCATEGORIES: ('전체' | WeddingComingSoonItem['subCategory'])[] = [
+  '전체', '웨딩홀', '스튜디오', '드레스', '메이크업', '허니문', '웨딩카', '플래너',
+];
 
 // 부드러운 스크롤 (duration 밀리초 동안, ease-in-out 곡선으로 이동)
 function smoothScrollTo(target: HTMLElement | null, duration: number) {
   if (!target) return;
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    return;
+  }
+
   const startY = window.scrollY;
-  const targetY =
-    target.getBoundingClientRect().top + window.scrollY - 40; // 위 여백 
+  const targetY = target.getBoundingClientRect().top + window.scrollY - 40;
   const distance = targetY - startY;
   let startTime: number | null = null;
 

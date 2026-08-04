@@ -5,6 +5,7 @@ import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { parsePriceToNumber, formatWon } from './utils/price';
 import { Button, BaseCard, CategoryBadge } from '../../components';
+import { groupByCategory } from './utils/groupByCategory';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -32,13 +33,7 @@ export default function CartPage() {
     0,
   );
 
-  const groupedProducts = cartProducts.reduce<Record<string, typeof cartProducts>>(
-    (acc, product) => {
-      (acc[product.categoryType] ??= []).push(product);
-      return acc;
-    },
-    {},
-  );
+  const groupedProducts = groupByCategory(cartProducts);
 
   return (
     <div className="mx-auto max-w-5xl">
