@@ -105,23 +105,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 소셜 로그인: 카카오/구글에서 받은 일회용 코드를 백엔드에 보내
   // JWT accessToken으로 교환한다. 이 응답에 프로필 정보도 같이 오기 때문에
   // /api/users/me를 별도로 다시 호출할 필요는 없음.
-  async function loginWithOAuth(provider: Provider, code: string): Promise<User> {
-    const response = await apiFetch('/api/auth/oauth/token', {
-      method: 'POST',
-      body: JSON.stringify({ provider, code }),
-    });
+async function loginWithOAuth(provider: Provider, code: string): Promise<User> {
+  const response = await apiFetch('/api/auth/oauth/token', {
+    method: 'POST',
+    body: JSON.stringify({ provider, code }),
+  });
 
-    const body: ApiEnvelope<AuthTokenData> = await response.json();
+  const body: ApiEnvelope<AuthTokenData> = await response.json();
+  console.log('[loginWithOAuth] response:', response.status, body); // 추가
 
-    if (!response.ok || !body.success || !body.data) {
-      throw new Error(body.error?.message ?? '소셜 로그인에 실패했어요. 다시 시도해주세요.');
-    }
-
-    setToken(body.data.accessToken);
-    const nextUser = fromAuthToken(body.data, provider);
-    setUser(nextUser);
-    return nextUser;
+  if (!response.ok || !body.success || !body.data) {
+    throw new Error(body.error?.message ?? '소셜 로그인에 실패했어요. 다시 시도해주세요.');
   }
+
+  setToken(body.data.accessToken);
+  console.log('[loginWithOAuth] token set, check:', localStorage.getItem('wedu_access_token')); // 추가
+
+  const nextUser = fromAuthToken(body.data, provider);
+  setUser(nextUser);
+  return nextUser;
+}
+
 
   // 개발/테스트 전용: 소셜 SDK 연동 전까지, 로그인 필요한 화면을 테스트하기 위한 임시 경로.
   // 백엔드 응답 구조가 loginWithOAuth와 동일해서 로직 그대로 재사용.

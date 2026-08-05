@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { redirectToKakaoLogin } from '../../lib/kakao';
-import { redirectToGoogleLogin } from '../../lib/google';
+import { redirectToOAuthLogin } from '../../lib/oauth';
 
 function KakaoIcon() {
   return (
@@ -46,13 +45,7 @@ export default function LoginPage() {
 
   function handleSocialLogin(provider: 'kakao' | 'google') {
     setError(null);
-
-    if (provider === 'kakao') {
-      redirectToKakaoLogin(`${window.location.origin}/oauth/kakao`);
-      return;
-    }
-
-    redirectToGoogleLogin(`${window.location.origin}/oauth/google`);
+    redirectToOAuthLogin(provider);
   }
 
   // 개발 중 로그인 필요한 화면 테스트용. 소셜 SDK 연동 끝나면 이 블록 전체 삭제하면 됨.
