@@ -25,6 +25,7 @@ export default function CommunityPage() {
   const [keyword, setKeyword] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortType, setSortType] = useState<"latest" | "popular">("latest");
 
   const filteredPosts = posts
     .filter((post) => {
@@ -38,7 +39,32 @@ export default function CommunityPage() {
 
       return matchCategory && matchKeyword;
     })
-    .sort((a, b) => b.id - a.id);
+    .sort((a, b) => {
+      if (sortType === "popular") {
+        return b.likes - a.likes;
+      }
+      
+      const parseDate = (dateStr: string) => {
+        if (!dateStr || dateStr === "방금 전") return Number.MAX_SAFE_INTEGER;
+        
+        let str = dateStr.replace(/\./g, "/").trim();
+        if (str.endsWith("/")) str = str.slice(0, -1);
+        if (str.split("/")[0].trim().length === 2) {
+          str = "20" + str;
+        }
+        
+        const time = new Date(str).getTime();
+        return isNaN(time) ? 0 : time;
+      };
+
+      const timeA = parseDate(a.date);
+      const timeB = parseDate(b.date);
+
+      if (timeA !== timeB) {
+        return timeB - timeA;
+      }
+      return b.id - a.id;
+    });
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const pagedPosts = filteredPosts.slice(
@@ -78,23 +104,47 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      <div className="mb-8 flex flex-wrap gap-2">
-        {categories.map((category) => (
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => {
+                setSelectedCategory(category);
+                setCurrentPage(1);
+              }}
+              className={clsx(
+                "rounded-full px-5 py-2 text-sm font-medium transition-colors",
+                selectedCategory === category ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              )}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
           <button
-            key={category}
-            type="button"
-            onClick={() => {
-              setSelectedCategory(category);
-              setCurrentPage(1);
-            }}
+            onClick={() => { setSortType("latest"); setCurrentPage(1); }}
             className={clsx(
-              'rounded-full px-5 py-2 text-sm font-medium transition-colors',
-              selectedCategory === category ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              "rounded-full px-3 py-1.5 text-sm font-bold transition-colors",
+              sortType === "latest" ? "bg-primary/10 text-primary" : "text-text-muted hover:text-text"
             )}
           >
-            {category}
+            최신순
           </button>
-        ))}
+          <span className="text-xs text-border">|</span>
+          <button
+            onClick={() => { setSortType("popular"); setCurrentPage(1); }}
+            className={clsx(
+              "rounded-full px-3 py-1.5 text-sm font-bold transition-colors",
+              sortType === "popular" ? "bg-primary/10 text-primary" : "text-text-muted hover:text-text"
+            )}
+          >
+            인기순
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

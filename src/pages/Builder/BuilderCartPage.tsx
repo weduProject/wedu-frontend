@@ -8,7 +8,7 @@ export default function BuilderCartPage() {
   const navigate = useNavigate();
   const { builder, reset } = useBuilder();
 
-  // 💡 공통 유틸 함수를 통해 장바구니 상품 목록 생성
+ 
   const [cartItems, setCartItems] = useState<RecommendedItem[]>(() => {
     return getRecommendedProducts(builder);
   });

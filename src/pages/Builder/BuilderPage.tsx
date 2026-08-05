@@ -8,7 +8,7 @@ import {
   honeymoonList,
   budgetList,
 } from "./builderDummy";
-import { getRecommendedProducts } from "./builderUtils"; // 💡 유틸 함수 임포트
+import { getRecommendedProducts } from "./builderUtils"; 
 
 const steps = ["1", "2", "3", "4"];
 
@@ -41,7 +41,6 @@ export default function BuilderPage() {
     (currentStep === 3 && builder.honeymoon !== null) ||
     (currentStep === 4 && builder.budget !== null);
 
-  // 💡 공통 유틸 함수 호출 (장바구니와 100% 일치하는 상품 리스트 반환)
   const recommendedProducts = getRecommendedProducts(builder);
 
   return (
