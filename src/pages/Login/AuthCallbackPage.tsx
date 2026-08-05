@@ -17,9 +17,9 @@ export default function AuthCallbackPage() {
     const provider = searchParams.get('provider'); // 백엔드 확인 필요: 실제로 내려오는지
     const errorParam = searchParams.get('error');
 
-    if (errorParam || !code) {
-      navigate('/login', { replace: true });
-      return;
+    if (errorParam || !code || !provider) {
+    navigate('/login', { replace: true });
+    return;
     }
 
     loginWithOAuth(provider as 'kakao' | 'google', code)
@@ -27,7 +27,6 @@ export default function AuthCallbackPage() {
         navigate(onboardingCompleted ? '/home' : '/onboarding', { replace: true });
       })
     .catch((err) => {
-    console.error('[AuthCallbackPage] loginWithOAuth 실패:', err); // 추가
     const message = err instanceof Error ? err.message : '로그인에 실패했어요.';
     navigate('/login', { replace: true, state: { error: message } });
     });
