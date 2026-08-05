@@ -1,5 +1,13 @@
 const TOKEN_KEY = 'wedu_access_token';
 
+// 이 백엔드는 모든 응답을 { success, data, error } 형태로 감싸서 내려줌.
+// 다른 API 연동할 때도 이 타입 재사용하면 됨.
+export interface ApiEnvelope<T> {
+  success: boolean;
+  data: T | null;
+  error: { code: string; message: string } | null;
+}
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
