@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { redirectToKakaoLogin } from '../../lib/kakao';
 
 function KakaoIcon() {
   return (
@@ -32,27 +33,51 @@ const SOCIAL_BUTTONS = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { loginWithOAuth } = useAuth();
+  const location = useLocation();
+  const { loginWithOAuth, loginWithEmail } = useAuth();
   const [loadingProvider, setLoadingProvider] = useState<'kakao' | 'google' | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    (location.state as { error?: string } | null)?.error ?? null
+  );
+
+  const [testEmail, setTestEmail] = useState('');
+  const [testPassword, setTestPassword] = useState('');
+  const [isTestLoading, setIsTestLoading] = useState(false);
 
   async function handleSocialLogin(provider: 'kakao' | 'google') {
     setError(null);
+
+    if (provider === 'kakao') {
+      // 페이지 자체가 카카오 로그인 화면으로 이동함 (리다이렉트).
+      // 로그인 끝나면 /oauth/kakao로 돌아와서 KakaoCallbackPage가 나머지를 처리함.
+      redirectToKakaoLogin(`${window.location.origin}/oauth/kakao`);
+      return;
+    }
+
+    // TODO: 구글 로그인 SDK 연동 필요 (Google Identity Services)
     setLoadingProvider(provider);
-
     try {
-      // TODO: 실제 카카오/구글 SDK 연동 필요.
-      // 카카오: Kakao.Auth.authorize({ redirectUri: ... }) 호출 후 리다이렉트로 code 전달받음
-      // 구글: Google Identity Services(OAuth 2.0) 팝업으로 code 전달받음
-      // 지금은 SDK가 프로젝트에 없어서 code를 실제로 받아올 방법이 없음 — 여기가 그 자리.
       const code = await getAuthorizationCode(provider);
-
       const { onboardingCompleted } = await loginWithOAuth(provider, code);
       navigate(onboardingCompleted ? '/home' : '/onboarding');
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했어요. 다시 시도해주세요.');
     } finally {
       setLoadingProvider(null);
+    }
+  }
+
+  // 개발 중 로그인 필요한 화면 테스트용. 소셜 SDK 연동 끝나면 이 블록 전체 삭제하면 됨.
+  async function handleTestLogin() {
+    setError(null);
+    setIsTestLoading(true);
+    try {
+      const { onboardingCompleted } = await loginWithEmail(testEmail, testPassword);
+      navigate(onboardingCompleted ? '/home' : '/onboarding');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했어요.');
+    } finally {
+      setIsTestLoading(false);
     }
   }
 
@@ -94,11 +119,45 @@ export default function LoginPage() {
           >
             비회원으로 둘러보기 &gt;
           </button>
+
+          {/* 개발 환경 전용: 소셜 SDK 연동 전까지 로그인 필요 화면 테스트용.
+              프로덕션 빌드(npm run build)에는 이 블록이 아예 포함되지 않음. */}
+          {import.meta.env.DEV && (
+            <div className="mt-8 rounded-xl border border-dashed border-border p-4">
+              <p className="mb-3 text-xs font-semibold text-text-muted">
+                🧪 개발용 테스트 로그인 (소셜 SDK 연동 전 임시)
+              </p>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="email"
+                  placeholder="테스트 계정 이메일"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+                <input
+                  type="password"
+                  placeholder="비밀번호"
+                  value={testPassword}
+                  onChange={(e) => setTestPassword(e.target.value)}
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+                <button
+                  type="button"
+                  disabled={isTestLoading || !testEmail || !testPassword}
+                  onClick={handleTestLogin}
+                  className="w-full rounded-lg bg-text py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {isTestLoading ? '로그인 중...' : '테스트 로그인'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Hero Image */}
         <div
-          className="hidden md:block w-1/2 bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200"
+          className="hidden md:block w-1/2 bg-linear-to-br from-pink-100 via-rose-50 to-pink-200"
           style={{
             backgroundImage: `url('/hero.png')`,
             backgroundSize: 'cover',
@@ -110,8 +169,8 @@ export default function LoginPage() {
   );
 }
 
-// TODO: Kakao/Google SDK 연동 후 실제 구현으로 교체.
-// 지금은 SDK가 없어서 실제 인가 코드를 받아올 수 없음 — 연동 전까지는 호출 시 에러 발생.
-async function getAuthorizationCode(_provider: 'kakao' | 'google'): Promise<string> {
-  throw new Error('소셜 로그인 SDK가 아직 연동되지 않았어요.');
+// TODO: Google Identity Services 연동 후 실제 구현으로 교체.
+// (카카오는 위에서 리다이렉트 방식으로 이미 실제 연동 완료)
+async function getAuthorizationCode(_provider: 'google'): Promise<string> {
+  throw new Error('구글 로그인 SDK가 아직 연동되지 않았어요.');
 }

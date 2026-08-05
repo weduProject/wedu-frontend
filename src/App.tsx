@@ -1,6 +1,9 @@
 import { Routes, Route, Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { initKakao } from './lib/kakao';
 import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
+import KakaoCallbackPage from './pages/Login/KakaoCallbackPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
@@ -41,6 +44,10 @@ function OnboardingRoutes() {
 }
 
 export default function App() {
+  useEffect(() => {
+    initKakao();
+  }, []);
+
   return (
     <BudgetProvider>
       <ChecklistProvider>
@@ -49,6 +56,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/oauth/kakao" element={<KakaoCallbackPage />} />
 
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
