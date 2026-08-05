@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { initKakao } from './lib/kakao';
 import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
-import KakaoCallbackPage from './pages/Login/KakaoCallbackPage';
 import HomePage from './pages/Home/HomePage';
 import ShopPage from './pages/Shop/ShopPage';
 import ShopDetailPage from './pages/Shop/ShopDetailPage';
@@ -34,6 +33,8 @@ import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
+import KakaoCallbackPage from './pages/Login/KakaoCallbackPage';
+import GoogleCallbackPage from './pages/Login/GoogleCallbackPage';
 
 function OnboardingRoutes() {
   return (
@@ -57,7 +58,7 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/oauth/kakao" element={<KakaoCallbackPage />} />
-
+            <Route path="/oauth/google" element={<GoogleCallbackPage />} />
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
               <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />

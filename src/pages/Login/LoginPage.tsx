@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { redirectToKakaoLogin } from '../../lib/kakao';
+import { redirectToGoogleLogin } from '../../lib/google';
 
 function KakaoIcon() {
   return (
@@ -34,8 +35,7 @@ const SOCIAL_BUTTONS = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { loginWithOAuth, loginWithEmail } = useAuth();
-  const [loadingProvider, setLoadingProvider] = useState<'kakao' | 'google' | null>(null);
+  const { loginWithEmail } = useAuth();
   const [error, setError] = useState<string | null>(
     (location.state as { error?: string } | null)?.error ?? null
   );
@@ -44,27 +44,15 @@ export default function LoginPage() {
   const [testPassword, setTestPassword] = useState('');
   const [isTestLoading, setIsTestLoading] = useState(false);
 
-  async function handleSocialLogin(provider: 'kakao' | 'google') {
+  function handleSocialLogin(provider: 'kakao' | 'google') {
     setError(null);
 
     if (provider === 'kakao') {
-      // 페이지 자체가 카카오 로그인 화면으로 이동함 (리다이렉트).
-      // 로그인 끝나면 /oauth/kakao로 돌아와서 KakaoCallbackPage가 나머지를 처리함.
       redirectToKakaoLogin(`${window.location.origin}/oauth/kakao`);
       return;
     }
 
-    // TODO: 구글 로그인 SDK 연동 필요 (Google Identity Services)
-    setLoadingProvider(provider);
-    try {
-      const code = await getAuthorizationCode(provider);
-      const { onboardingCompleted } = await loginWithOAuth(provider, code);
-      navigate(onboardingCompleted ? '/home' : '/onboarding');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했어요. 다시 시도해주세요.');
-    } finally {
-      setLoadingProvider(null);
-    }
+    redirectToGoogleLogin(`${window.location.origin}/oauth/google`);
   }
 
   // 개발 중 로그인 필요한 화면 테스트용. 소셜 SDK 연동 끝나면 이 블록 전체 삭제하면 됨.
@@ -85,7 +73,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4">
       <div className="flex w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
 
-        {/* Left: Login Form */}
         <div className="flex flex-col justify-center px-10 py-14 w-full md:w-1/2">
           <h1 className="text-4xl font-bold text-primary mb-3">WEDU</h1>
           <p className="text-text text-sm leading-relaxed mb-10">
@@ -102,12 +89,11 @@ export default function LoginPage() {
               <button
                 key={id}
                 type="button"
-                disabled={loadingProvider !== null}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white"
                 onClick={() => handleSocialLogin(id)}
               >
                 {icon}
-                {loadingProvider === id ? '로그인 중...' : label}
+                {label}
               </button>
             ))}
           </div>
@@ -120,8 +106,6 @@ export default function LoginPage() {
             비회원으로 둘러보기 &gt;
           </button>
 
-          {/* 개발 환경 전용: 소셜 SDK 연동 전까지 로그인 필요 화면 테스트용.
-              프로덕션 빌드(npm run build)에는 이 블록이 아예 포함되지 않음. */}
           {import.meta.env.DEV && (
             <div className="mt-8 rounded-xl border border-dashed border-border p-4">
               <p className="mb-3 text-xs font-semibold text-text-muted">
@@ -155,9 +139,8 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Right: Hero Image */}
         <div
-          className="hidden md:block w-1/2 bg-linear-to-br from-pink-100 via-rose-50 to-pink-200"
+          className="hidden md:block w-1/2 bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200"
           style={{
             backgroundImage: `url('/hero.png')`,
             backgroundSize: 'cover',
@@ -167,10 +150,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
-
-// TODO: Google Identity Services 연동 후 실제 구현으로 교체.
-// (카카오는 위에서 리다이렉트 방식으로 이미 실제 연동 완료)
-async function getAuthorizationCode(_provider: 'google'): Promise<string> {
-  throw new Error('구글 로그인 SDK가 아직 연동되지 않았어요.');
 }
