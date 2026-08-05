@@ -34,32 +34,13 @@ const SOCIAL_BUTTONS = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { loginWithEmail } = useAuth();
   const [error, setError] = useState<string | null>(
     (location.state as { error?: string } | null)?.error ?? null
   );
 
-  const [testEmail, setTestEmail] = useState('');
-  const [testPassword, setTestPassword] = useState('');
-  const [isTestLoading, setIsTestLoading] = useState(false);
-
   function handleSocialLogin(provider: 'kakao' | 'google') {
     setError(null);
     redirectToOAuthLogin(provider);
-  }
-
-  // 개발 중 로그인 필요한 화면 테스트용. 소셜 SDK 연동 끝나면 이 블록 전체 삭제하면 됨.
-  async function handleTestLogin() {
-    setError(null);
-    setIsTestLoading(true);
-    try {
-      const { onboardingCompleted } = await loginWithEmail(testEmail, testPassword);
-      navigate(onboardingCompleted ? '/home' : '/onboarding');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했어요.');
-    } finally {
-      setIsTestLoading(false);
-    }
   }
 
   return (
@@ -98,38 +79,6 @@ export default function LoginPage() {
           >
             비회원으로 둘러보기 &gt;
           </button>
-
-          {import.meta.env.DEV && (
-            <div className="mt-8 rounded-xl border border-dashed border-border p-4">
-              <p className="mb-3 text-xs font-semibold text-text-muted">
-                🧪 개발용 테스트 로그인 (소셜 SDK 연동 전 임시)
-              </p>
-              <div className="flex flex-col gap-2">
-                <input
-                  type="email"
-                  placeholder="테스트 계정 이메일"
-                  value={testEmail}
-                  onChange={(e) => setTestEmail(e.target.value)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
-                />
-                <input
-                  type="password"
-                  placeholder="비밀번호"
-                  value={testPassword}
-                  onChange={(e) => setTestPassword(e.target.value)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
-                />
-                <button
-                  type="button"
-                  disabled={isTestLoading || !testEmail || !testPassword}
-                  onClick={handleTestLogin}
-                  className="w-full rounded-lg bg-text py-2 text-sm font-medium text-white disabled:opacity-50"
-                >
-                  {isTestLoading ? '로그인 중...' : '테스트 로그인'}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         <div

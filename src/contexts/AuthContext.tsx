@@ -61,7 +61,6 @@ interface AuthContextValue {
   user: User | null;
   isLoading: boolean; // 앱 첫 로드 시 "토큰 유효한지 확인 중" 상태
   loginWithOAuth: (provider: Provider, code: string) => Promise<User>;
-  loginWithEmail: (email: string, password: string) => Promise<User>; // 개발/테스트용, 소셜 SDK 연동 전까지 임시 사용
   logout: () => void;
 }
 
@@ -112,46 +111,17 @@ async function loginWithOAuth(provider: Provider, code: string): Promise<User> {
   });
 
   const body: ApiEnvelope<AuthTokenData> = await response.json();
-  console.log('[loginWithOAuth] response:', response.status, body); // 추가
 
   if (!response.ok || !body.success || !body.data) {
     throw new Error(body.error?.message ?? '소셜 로그인에 실패했어요. 다시 시도해주세요.');
   }
 
   setToken(body.data.accessToken);
-  console.log('[loginWithOAuth] token set, check:', localStorage.getItem('wedu_access_token')); // 추가
 
   const nextUser = fromAuthToken(body.data, provider);
   setUser(nextUser);
   return nextUser;
 }
-
-
-  // 개발/테스트 전용: 소셜 SDK 연동 전까지, 로그인 필요한 화면을 테스트하기 위한 임시 경로.
-  // 백엔드 응답 구조가 loginWithOAuth와 동일해서 로직 그대로 재사용.
-  async function loginWithEmail(email: string, password: string): Promise<User> {
-    const response = await apiFetch('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-
-    const body: ApiEnvelope<AuthTokenData> = await response.json();
-
-    if (!response.ok || !body.success || !body.data) {
-      throw new Error(body.error?.message ?? '로그인에 실패했어요.');
-    }
-
-    setToken(body.data.accessToken);
-    // 이메일 로그인은 provider 정보가 없으니 undefined로 둠 (마이페이지에 로그인 방식 표시 안 됨, 테스트용이라 무방)
-    const nextUser: User = {
-      id: body.data.userId,
-      name: body.data.nickname,
-      email: body.data.email,
-      onboardingCompleted: body.data.onboardingCompleted,
-    };
-    setUser(nextUser);
-    return nextUser;
-  }
 
   function logout() {
     clearToken();
@@ -159,7 +129,7 @@ async function loginWithOAuth(provider: Provider, code: string): Promise<User> {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, loginWithOAuth, loginWithEmail, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, loginWithOAuth,logout }}>
       {children}
     </AuthContext.Provider>
   );
