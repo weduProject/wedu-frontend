@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { redirectToOAuthLogin } from '../../lib/oauth';
 
 function KakaoIcon() {
   return (
@@ -12,7 +13,6 @@ function KakaoIcon() {
     </svg>
   );
 }
-
 
 function GoogleIcon() {
   return (
@@ -32,13 +32,20 @@ const SOCIAL_BUTTONS = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // 소셜 로그인용
+  const location = useLocation();
+  const [error, setError] = useState<string | null>(
+    (location.state as { error?: string } | null)?.error ?? null
+  );
+
+  function handleSocialLogin(provider: 'kakao' | 'google') {
+    setError(null);
+    redirectToOAuthLogin(provider);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4">
       <div className="flex w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
 
-        {/* Left: Login Form */}
         <div className="flex flex-col justify-center px-10 py-14 w-full md:w-1/2">
           <h1 className="text-4xl font-bold text-primary mb-3">WEDU</h1>
           <p className="text-text text-sm leading-relaxed mb-10">
@@ -46,13 +53,17 @@ export default function LoginPage() {
             WEDU와 함께 준비하세요.
           </p>
 
+          {error && (
+            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-error">{error}</p>
+          )}
+
           <div className="flex flex-col gap-3">
             {SOCIAL_BUTTONS.map(({ id, icon, label }) => (
               <button
                 key={id}
                 type="button"
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white"
-                onClick={() => { login(id); navigate('/onboarding'); }}
+                onClick={() => handleSocialLogin(id)}
               >
                 {icon}
                 {label}
@@ -69,7 +80,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* Right: Hero Image */}
         <div
           className="hidden md:block w-1/2 bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200"
           style={{

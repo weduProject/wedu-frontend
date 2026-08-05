@@ -31,6 +31,7 @@ import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
+import AuthCallbackPage from './pages/Login/AuthCallbackPage';
 
 function OnboardingRoutes() {
   return (
@@ -41,6 +42,7 @@ function OnboardingRoutes() {
 }
 
 export default function App() {
+
   return (
     <BudgetProvider>
       <ChecklistProvider>
@@ -49,7 +51,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
               <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
