@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -12,7 +13,6 @@ function KakaoIcon() {
     </svg>
   );
 }
-
 
 function GoogleIcon() {
   return (
@@ -32,7 +32,29 @@ const SOCIAL_BUTTONS = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // 소셜 로그인용
+  const { loginWithOAuth } = useAuth();
+  const [loadingProvider, setLoadingProvider] = useState<'kakao' | 'google' | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSocialLogin(provider: 'kakao' | 'google') {
+    setError(null);
+    setLoadingProvider(provider);
+
+    try {
+      // TODO: 실제 카카오/구글 SDK 연동 필요.
+      // 카카오: Kakao.Auth.authorize({ redirectUri: ... }) 호출 후 리다이렉트로 code 전달받음
+      // 구글: Google Identity Services(OAuth 2.0) 팝업으로 code 전달받음
+      // 지금은 SDK가 프로젝트에 없어서 code를 실제로 받아올 방법이 없음 — 여기가 그 자리.
+      const code = await getAuthorizationCode(provider);
+
+      const { onboardingCompleted } = await loginWithOAuth(provider, code);
+      navigate(onboardingCompleted ? '/home' : '/onboarding');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setLoadingProvider(null);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4">
@@ -46,16 +68,21 @@ export default function LoginPage() {
             WEDU와 함께 준비하세요.
           </p>
 
+          {error && (
+            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-error">{error}</p>
+          )}
+
           <div className="flex flex-col gap-3">
             {SOCIAL_BUTTONS.map(({ id, icon, label }) => (
               <button
                 key={id}
                 type="button"
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white"
-                onClick={() => { login(id); navigate('/onboarding'); }}
+                disabled={loadingProvider !== null}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white disabled:opacity-60 disabled:cursor-not-allowed"
+                onClick={() => handleSocialLogin(id)}
               >
                 {icon}
-                {label}
+                {loadingProvider === id ? '로그인 중...' : label}
               </button>
             ))}
           </div>
@@ -81,4 +108,10 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+// TODO: Kakao/Google SDK 연동 후 실제 구현으로 교체.
+// 지금은 SDK가 없어서 실제 인가 코드를 받아올 수 없음 — 연동 전까지는 호출 시 에러 발생.
+async function getAuthorizationCode(_provider: 'kakao' | 'google'): Promise<string> {
+  throw new Error('소셜 로그인 SDK가 아직 연동되지 않았어요.');
 }

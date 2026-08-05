@@ -9,10 +9,11 @@ function getDday(targetDate: string) {
   return diff > 0 ? Math.floor(diff / (1000 * 60 * 60 * 24)) : 0;
 }
 
-const PROVIDER_LABEL: Record<string, string> = {
-  kakao: '카카오 로그인',
-  google: '구글 로그인',
-};
+// TODO: /api/users/me 응답에 provider 필드 포함되면 아래 라벨과 함께 복원
+// const PROVIDER_LABEL: Record<string, string> = {
+//   kakao: '카카오 로그인',
+//   google: '구글 로그인',
+// };
 
 export default function MypagePage() {
   const { user, logout } = useAuth();
@@ -37,9 +38,11 @@ export default function MypagePage() {
         <div className="flex flex-col gap-0.5">
           <p className="font-semibold text-text">{user ? `${user.name}님` : '비회원'}</p>
           {user?.email && <p className="text-sm text-text-muted">{user.email}</p>}
+          {/* TODO: /api/users/me 응답에 provider(로그인 방식) 필드가 포함되는지 백엔드 확인 후 복원
           {user?.provider && (
             <p className="text-xs text-text-muted">{PROVIDER_LABEL[user.provider] ?? user.provider}</p>
           )}
+          */}
         </div>
       </section>
 
