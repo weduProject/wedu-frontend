@@ -25,7 +25,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      const res = await apiFetch('/api/schedules');
+      const res = await apiFetch('/api/calendar-event');
       if (!res.ok) throw new Error('데이터 로드 실패');
       const data = await res.json();
       setSchedules(data);
@@ -50,7 +50,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setSchedules((prev) => [...prev, addedItem]);
 
     try {
-      await apiFetch('/api/schedules', {
+      await apiFetch('/api/calendar-event', {
         method: 'POST',
         body: JSON.stringify(newSchedule),
       });
@@ -63,7 +63,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setSchedules((prev) => prev.filter((item) => item.id !== id));
 
     try {
-      await apiFetch(`/api/schedules/${id}`, { method: 'DELETE' });
+      await apiFetch(`/api/calendar-event/${id}`, { method: 'DELETE' });
     } catch (error) {
       console.error('일정 삭제 에러:', error);
     }
@@ -76,7 +76,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
 
     try {
       // TODO: 백엔드 API 연동 시 주석 해제
-      // await apiFetch(`/api/schedules/${id}`, {
+      // await apiFetch(`/api/calendar-event/${id}`, {
       //   method: 'PATCH',
       //   body: JSON.stringify(updatedData),
       // });
