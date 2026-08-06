@@ -41,7 +41,7 @@ export default function CalendarPage() {
         setIsAddModalOpen(true)
       }
 
-  const { schedules:rawSchedules, addSchedule, deleteSchedule, updateSchedule } = useSchedules();
+  const { schedules: rawSchedules, addSchedule, deleteSchedule, updateSchedule, year, month, goToPrevMonth, goToNextMonth } = useSchedules();
 
   const schedules = user ? rawSchedules : [];
 
@@ -75,9 +75,13 @@ export default function CalendarPage() {
       <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <CalendarGrid
-          schedules={filteredSchedules}
-          onScheduleClick={(schedule) => setViewSchedule(schedule)}
-           />
+            schedules={filteredSchedules}
+            onScheduleClick={(schedule) => setViewSchedule(schedule)}
+            year={year}
+            month={month}
+            onPrevMonth={goToPrevMonth}
+            onNextMonth={goToNextMonth}
+          />
         </div>
         <div className='h-full'>
           <UpcomingList
