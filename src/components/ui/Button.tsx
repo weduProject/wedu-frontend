@@ -1,6 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
+import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
+
 type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -10,12 +12,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
+const PRIMARY_GRADIENT = `${PRIMARY_GRADIENT_BG} ${PRIMARY_GLOW_SHADOW}`;
+
 const variantClasses: Record<ButtonVariant, string> = {
-  main: 'bg-primary text-white border-0 hover:enabled:bg-[#d4436f]',
-  secondary: 'bg-white text-text border border-border hover:enabled:bg-[#f9f9f9]',
+  main: `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
+  secondary: 'bg-white text-text border border-border hover:enabled:bg-primary-light/40',
   wishlist:
-    'bg-primary text-white border-0 hover:enabled:bg-primary-light hover:enabled:text-primary transition-colors',
-  pill: 'rounded-full bg-primary text-white border-0 hover:enabled:opacity-90',
+    `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
+  pill: `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -37,7 +41,7 @@ export default function Button({
     <button
       type={type}
       className={clsx(
-        'rounded-lg cursor-pointer font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed',
+        'rounded-full cursor-pointer font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed',
         variantClasses[variant],
         sizeClasses[size],
         className,

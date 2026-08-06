@@ -5,6 +5,25 @@ import { PRODUCTS } from './shopData';
 import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
+import clsx from 'clsx';
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 
 export default function ShopDetailPage() {
   const { id } = useParams();
@@ -23,13 +42,9 @@ export default function ShopDetailPage() {
     return (
       <div className="mx-auto max-w-5xl py-20 text-center">
         <p className="text-[#7C6358]">상품을 찾을 수 없어요.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/shop')}
-          className="mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white"
-        >
+        <Button variant="pill" onClick={() => navigate('/shop')} className="mt-4">
           편집샵으로 돌아가기
-        </button>
+        </Button> 
       </div>
     );
   }
@@ -53,6 +68,13 @@ export default function ShopDetailPage() {
     }
     addToCart(product.id);
   };
+
+  // 상품 속성 태그 (스타일 / 분위기 / 장소) — 다이닝 전용 아님, 전 카테고리 공통
+  const attributeTags = [
+    { icon: '🍽️', label: '스타일', value: product.styleTag },
+    { icon: '🕯️', label: '분위기', value: product.moodTag },
+    { icon: '📍', label: '장소', value: product.locationTag },
+  ].filter((attr) => Boolean(attr.value));
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -83,16 +105,43 @@ export default function ShopDetailPage() {
             {product.styles.map((style) => (
               <span
                 key={style}
-                className="rounded-full bg-[#FDF2F6] px-2.5 py-1 text-xs font-medium text-primary"
+                className="rounded-full bg-primary-light px-2.5 py-1 text-xs font-medium text-primary"
               >
                 {style}
               </span>
             ))}
           </div>
 
-          <h1 className="mb-3 text-3xl font-bold text-text">
-            {product.title}
-          </h1>
+          {/* 상품 속성 태그: 포함 사항 아이콘(#FEF3E7 / #C69356)과 동일한 톤 재사용 */}
+          {attributeTags.length > 0 && (
+            <div className="mb-5 flex flex-nowrap gap-1.5 overflow-x-auto">
+              {attributeTags.map((attr) => (
+                <span
+                  key={attr.label}
+                  className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#FEF3E7] px-2.5 py-1 text-xs font-medium text-[#8A5E2C]"
+                >
+                  <span className="text-xs leading-none">{attr.icon}</span>
+                  {attr.label} · {attr.value}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* 제목 + 인스타그램 로고 아이콘 (원형 배경 없이 아이콘만, 브랜드 코랄 컬러) */}
+          <div className="mb-3 flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-text">{product.title}</h1>
+            {product.instagramUrl && (
+              <a
+                href={product.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="인스타그램에서 보기"
+                className="translate-y-1 text-primary transition-opacity hover:opacity-70"
+              >
+                <InstagramIcon className="h-6 w-6" />
+              </a>
+            )}
+          </div>
 
           <p className="mb-5 text-sm leading-6 text-[#7C6358]">
             {product.detailDescription}
@@ -133,7 +182,12 @@ export default function ShopDetailPage() {
               type="button"
               onClick={handleCartClick}
               disabled={inCart}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className={clsx(
+                'flex items-center justify-center gap-1.5 rounded-full py-3.5 text-sm font-semibold transition-opacity',
+                inCart
+                  ? 'bg-[#F0EEED] text-[#6F6765] cursor-not-allowed'
+                  : 'bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] text-white shadow-[0px_4px_14px_rgba(161,86,77,0.18),0px_0px_24px_rgba(232,121,108,0.28),inset_0px_1px_0px_rgba(255,255,255,0.2)] hover:opacity-90',
+              )}
             >
               <ShoppingBag className="h-4 w-4" strokeWidth={1.8} />
               {inCart ? '담았어요' : '장바구니에 담기'}
@@ -142,7 +196,7 @@ export default function ShopDetailPage() {
               type="button"
               aria-pressed={liked}
               onClick={handleWishClick}
-              className="group flex items-center justify-center gap-1.5 rounded-xl border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
+              className="group flex items-center justify-center gap-1.5 rounded-full border border-border py-3.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
             >
               <Heart
                 className={

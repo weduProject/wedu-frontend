@@ -10,6 +10,7 @@ import Button from '../../components/ui/Button';
 import { useChecklist, type CategoryType } from './hooks/useChecklist';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../styles/categoryTab';
 
 const CATEGORIES: CategoryType[] = ['기본', '예식', '촬영', '예물', '주거', '여행'];
 
@@ -49,7 +50,7 @@ export default function ChecklistPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1024px]">
+    <div className="mx-auto max-w-5xl">
       {/* 헤더 영역 */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-text md:text-3xl">체크리스트</h2>
@@ -104,7 +105,7 @@ export default function ChecklistPage() {
           <select
             value={inputCategory}
             onChange={(e) => setInputCategory(e.target.value as CategoryType)}
-            className="h-[42px] rounded-lg border border-border bg-white px-3 text-sm text-text focus:border-primary focus:outline-none"
+            className="h-10.5 rounded-lg border border-border bg-white px-3 text-sm text-text focus:border-primary focus:outline-none"
           >
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
@@ -128,9 +129,7 @@ export default function ChecklistPage() {
             onClick={() => setActiveFilter('전체')}
             className={clsx(
               'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-              activeFilter === '전체'
-                ? 'bg-primary text-white border-0'
-                : 'border border-border bg-white text-text hover:bg-primary-light/50'
+              activeFilter === '전체' ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
             )}
           >
             전체
@@ -142,9 +141,7 @@ export default function ChecklistPage() {
               onClick={() => setActiveFilter(cat)}
               className={clsx(
                 'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-                activeFilter === cat
-                  ? 'bg-primary text-white border-0'
-                  : 'border border-border bg-white text-text hover:bg-primary-light/50'
+                activeFilter === cat ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
               )}
             >
               {cat}

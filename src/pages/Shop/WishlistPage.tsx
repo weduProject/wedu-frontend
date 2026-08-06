@@ -4,6 +4,7 @@ import ProductCard from './components/ProductCard';
 import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
+import { groupByCategory } from './utils/groupByCategory';
 
 export default function WishlistPage() {
   const navigate = useNavigate();
@@ -29,28 +30,35 @@ export default function WishlistPage() {
     wishedIds.includes(product.id),
   );
 
+  const groupedProducts = groupByCategory(wishedProducts);
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text">찜한 상품</h1>
 
         {wishedProducts.length > 0 && (
-          <button
-            type="button"
-            onClick={clearWishlist}
-            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-          >
+          <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={clearWishlist}>
             전체 삭제
-          </button>
+          </Button>
         )}
       </div>
 
       <p className="mb-3 text-sm text-text-muted">총 {wishedProducts.length}개</p>
 
       {wishedProducts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {wishedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <div className="flex flex-col gap-8">
+          {Object.entries(groupedProducts).map(([label, products]) => (
+            <section key={label}>
+              <h2 className="mb-3 text-sm font-semibold text-text-muted">
+                {label} · {products.length}개
+              </h2>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       ) : (

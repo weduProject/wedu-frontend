@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { Receipt } from 'lucide-react';
 import { PRODUCTS } from './shopData';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { parsePriceToNumber, formatWon } from './utils/price';
 import { Button, BaseCard, CategoryBadge } from '../../components';
+import { groupByCategory } from './utils/groupByCategory';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -31,6 +33,8 @@ export default function CartPage() {
     0,
   );
 
+  const groupedProducts = groupByCategory(cartProducts);
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
@@ -47,62 +51,80 @@ export default function CartPage() {
 
       {cartProducts.length > 0 ? (
         <>
-          <div className="flex flex-col gap-4">
-            {cartProducts.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-primary-light">
-                    {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <CategoryBadge category={product.category} />
-                    <h3 className="text-sm font-semibold text-text mt-0.5">
-                      {product.title}
-                    </h3>
-                  </div>
-                </div>
+          <div className="flex flex-col gap-8">
+            {Object.entries(groupedProducts).map(([label, products]) => (
+              <section key={label}>
+                <h2 className="mb-3 text-sm font-semibold text-text-muted">
+                  {label} · {products.length}개
+                </h2>
+                <div className="flex flex-col gap-4">
+                  {products.map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="h-16 w-16 overflow-hidden rounded-xl bg-primary-light">
+                          {product.image && (
+                            <img
+                              src={product.image}
+                              alt={product.title}
+                              className="h-full w-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div>
+                          <CategoryBadge category={product.category} />
+                          <h3 className="text-sm font-semibold text-text mt-0.5">
+                            {product.title}
+                          </h3>
+                        </div>
+                      </div>
 
-                <div className="flex items-center gap-5">
-                  <span className="text-sm font-bold text-text">{product.price}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFromCart(product.id)}
-                    aria-label="삭제"
-                    className="text-text-muted transition-colors hover:text-primary"
-                  >
-                    ✕
-                  </button>
+                      <div className="flex items-center gap-5">
+                        <span className="text-sm font-bold text-text">{product.price}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFromCart(product.id)}
+                          aria-label="삭제"
+                          className="text-text-muted transition-colors hover:text-primary"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              </section>
             ))}
           </div>
 
-          <BaseCard className="mt-8" title="예상 금액">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <span className="text-text-muted">총 항목</span>
-              <span className="font-bold text-text">{cartProducts.length}개</span>
+          <div className="mt-8 rounded-2xl border border-[rgba(255,199,190,0.6)] bg-[rgba(255,240,238,0.4)] p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFDED9]">
+                <Receipt className="h-4 w-4 text-primary" strokeWidth={2} />
+              </div>
+              <h2 className="text-lg font-semibold text-[#0C0B0A]">예상 금액</h2>
             </div>
 
-            <div className="flex items-center justify-between pt-4">
-              <span className="text-text-muted">예상 총 비용</span>
-              <span className="text-2xl font-bold text-text">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6F6765]">총 항목</span>
+              <span className="text-sm font-semibold text-[#0C0B0A]">{cartProducts.length}개</span>
+            </div>
+
+            <div className="my-3 h-px bg-[rgba(255,199,190,0.4)]" />
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6F6765]">예상 총 비용</span>
+              <span className="text-xl font-bold text-[#0C0B0A]">
                 {formatWon(totalPrice)}~
               </span>
             </div>
 
-            <p className="mt-4 text-xs text-text-muted">
+            <p className="mt-3 text-xs text-[#8D8482]">
               실제 비용은 상세 옵션에 따라 변동될 수 있어요
             </p>
-          </BaseCard>
+          </div>
         </>
       ) : (
         <BaseCard className="flex flex-col items-center justify-center py-20 text-center">
