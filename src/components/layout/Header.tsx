@@ -31,9 +31,21 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [scrolled, setScrolled] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(true);
   const toolsRef = useRef<HTMLDivElement>(null);
+
+  // 스크롤 시 헤더 배경 진하게 (Navbar.tsx 패턴 반영)
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 50);
+    }
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -45,6 +57,14 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 모바일 메뉴 열려있을 때 배경 스크롤 잠금 (Navbar.tsx 패턴 반영)
+  useEffect(() => {
+    document.body.style.overflow = isMobileOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
   function handleLogout() {
     logout();
     setIsMobileOpen(false);
@@ -52,7 +72,12 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-white/40 shadow-[0px_1px_0px_rgba(232,121,108,0.18)] backdrop-blur transition-all duration-500">
+    <header
+      className={clsx(
+        'fixed inset-x-0 top-0 z-50 shadow-[0px_1px_0px_rgba(232,121,108,0.18)] backdrop-blur transition-all duration-500',
+        scrolled ? 'bg-white/80 backdrop-blur-xl' : 'bg-white/40',
+      )}
+    >
       <div className="relative mx-auto flex h-16 max-w-360 items-center gap-6 px-4 md:h-20 md:px-8">
         <Link
           to={user ? '/home' : '/'}
@@ -68,52 +93,66 @@ export default function Header() {
             </NavLink>
           ))}
 
-          <span className="h-5 w-px bg-[rgba(171,162,161,0.4)]" aria-hidden />
+          {user && (
+            <>
+              <span className="h-5 w-px bg-[rgba(171,162,161,0.4)]" aria-hidden />
 
-          <div ref={toolsRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setIsToolsOpen((prev) => !prev)}
-              aria-expanded={isToolsOpen}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
-            >
-              관리도구
-              <ChevronDown
-                className={clsx('h-4 w-4 transition-transform', isToolsOpen && 'rotate-180')}
-                strokeWidth={1.8}
-              />
-            </button>
+              <div
+                ref={toolsRef}
+                className="relative"
+                onMouseEnter={() => setIsToolsOpen(true)}
+                onMouseLeave={() => setIsToolsOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsToolsOpen((prev) => !prev)}
+                  aria-expanded={isToolsOpen}
+                  className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
+                >
+                  관리도구
+                  <ChevronDown
+                    className={clsx('h-4 w-4 transition-transform duration-200', isToolsOpen && 'rotate-180')}
+                    strokeWidth={1.8}
+                  />
+                </button>
 
-            {isToolsOpen && (
-              <div className="absolute left-0 top-full mt-2 w-52 rounded-xl border border-border bg-white p-1.5 shadow-lg">
-                {TOOL_LINKS.map(({ label, path, Icon }) => (
-                  <NavLink
-                    key={path}
-                    to={path}
-                    onClick={() => setIsToolsOpen(false)}
-                    className={({ isActive }) =>
-                      clsx(
-                        'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
-                        isActive
-                          ? 'bg-primary-light font-semibold text-primary'
-                          : 'text-text hover:bg-primary-light hover:text-primary',
-                      )
-                    }
-                  >
-                    <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
-                    {label}
-                  </NavLink>
-                ))}
+                {isToolsOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-52 rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                    {TOOL_LINKS.map(({ label, path, Icon }) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        onClick={() => setIsToolsOpen(false)}
+                        className={({ isActive }) =>
+                          clsx(
+                            'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
+                            isActive
+                              ? 'bg-primary-light font-semibold text-primary'
+                              : 'text-text hover:bg-primary-light hover:text-primary',
+                          )
+                        }
+                      >
+                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                        {label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-4">
           {user ? (
             <>
               <HeaderIconButtons />
-              <span className="hidden text-sm font-medium text-[#3E3939] sm:inline">{user.name}님</span>
+              <Link
+                to="/mypage"
+                className="hidden text-sm font-medium text-[#3E3939] transition-colors hover:text-primary sm:inline"
+              >
+                {user.name}님
+              </Link>
               <button
                 type="button"
                 onClick={handleLogout}
@@ -134,7 +173,8 @@ export default function Header() {
 
           <button
             type="button"
-            className="bg-transparent text-xl leading-none text-text lg:hidden"
+            className="bg-transparent text-xl leading-none text-text transition-transform duration-300 lg:hidden"
+            style={{ transform: isMobileOpen ? 'rotate(90deg)' : 'none' }}
             onClick={() => setIsMobileOpen((prev) => !prev)}
             aria-label="메뉴 열기"
             aria-expanded={isMobileOpen}
@@ -144,53 +184,101 @@ export default function Header() {
         </div>
       </div>
 
-      {/* 모바일 메뉴 */}
+      {/* 모바일 메뉴 — Navbar.tsx의 오버레이 + 아코디언 패턴 반영 */}
       {isMobileOpen && (
-        <nav
-          className="max-h-[calc(100vh-80px)] overflow-y-auto border-t border-border bg-white px-4 py-3 lg:hidden"
-          aria-label="모바일 메뉴"
-        >
-          <ul className="flex flex-col gap-1">
-            {[...PRIMARY_LINKS, ...TOOL_LINKS].map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  onClick={() => setIsMobileOpen(false)}
-                  className={({ isActive }) =>
-                    clsx(
-                      'block rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
-                      isActive ? 'bg-primary-light font-semibold text-primary' : 'text-text hover:bg-primary-light',
-                    )
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-2 border-t border-border pt-3">
-            {user ? (
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full bg-transparent px-3 py-2 text-left text-sm text-text-muted"
-              >
-                로그아웃
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileOpen(false);
-                  navigate('/login');
-                }}
-                className="w-full bg-transparent px-3 py-2 text-left text-sm font-semibold text-primary"
-              >
-                로그인
-              </button>
-            )}
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            onClick={() => setIsMobileOpen(false)}
+          />
+          <div className="fixed inset-x-0 top-16 z-40 h-[calc(100dvh-4rem)] overflow-hidden border-t border-border bg-white shadow-xl md:top-20 lg:hidden">
+            <div className="flex h-full flex-col">
+              <div className="flex-1 overflow-y-auto px-4 pb-2 pt-4">
+                {PRIMARY_LINKS.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={({ isActive }) =>
+                      clsx(
+                        'block py-3 text-base font-medium no-underline transition-colors',
+                        isActive ? 'text-primary' : 'text-text',
+                      )
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+
+                {user && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setMobileToolsOpen((prev) => !prev)}
+                      className="flex w-full items-center justify-between bg-transparent py-3 text-left text-base font-medium text-text"
+                    >
+                      <span>관리도구</span>
+                      <ChevronDown
+                        className={clsx('h-5 w-5 transition-transform duration-300', mobileToolsOpen && 'rotate-180')}
+                        strokeWidth={1.8}
+                      />
+                    </button>
+                    <div
+                      className={clsx(
+                        'grid transition-[grid-template-rows] duration-300 ease-out',
+                        mobileToolsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                      )}
+                    >
+                      <div className="min-h-0 overflow-hidden">
+                        <div className="flex flex-col">
+                          {TOOL_LINKS.map(({ label, path, Icon }) => (
+                            <NavLink
+                              key={path}
+                              to={path}
+                              onClick={() => setIsMobileOpen(false)}
+                              className={({ isActive }) =>
+                                clsx(
+                                  'flex items-center gap-2.5 py-2.5 pl-4 text-sm no-underline transition-colors',
+                                  isActive ? 'font-semibold text-primary' : 'text-text',
+                                )
+                              }
+                            >
+                              <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                              {label}
+                            </NavLink>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="shrink-0 border-t border-border px-4 pb-6 pt-4">
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] py-3.5 text-center text-base font-medium text-white"
+                  >
+                    로그아웃
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileOpen(false);
+                      navigate('/login');
+                    }}
+                    className="w-full rounded-full border border-primary py-3.5 text-center text-base font-medium text-primary"
+                  >
+                    로그인
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </nav>
+        </>
       )}
     </header>
   );
@@ -208,7 +296,7 @@ function HeaderIconButton({ icon, label, count, onClick }: HeaderIconButtonProps
     <div className="group relative">
       <button
         type="button"
-        className="relative flex items-center justify-center bg-transparent border-0 cursor-pointer text-text-muted hover:text-primary transition-colors"
+        className="relative flex items-center justify-center border-0 bg-transparent text-text-muted transition-colors hover:text-primary"
         onClick={onClick}
         aria-label={label}
       >
