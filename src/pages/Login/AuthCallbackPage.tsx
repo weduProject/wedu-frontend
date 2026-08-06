@@ -14,22 +14,22 @@ export default function AuthCallbackPage() {
     hasRun.current = true;
 
     const code = searchParams.get('code');
-    const provider = searchParams.get('provider'); // 백엔드 확인 필요: 실제로 내려오는지
+    const provider = searchParams.get('provider'); // 백엔드가 아직 안 내려줌 — 임시로 kakao 기본값 처리
     const errorParam = searchParams.get('error');
 
-    if (errorParam || !code || !provider) {
-    navigate('/login', { replace: true });
-    return;
+    if (errorParam || !code) {
+      navigate('/login', { replace: true });
+      return;
     }
 
-    loginWithOAuth(provider as 'kakao' | 'google', code)
+    loginWithOAuth((provider as 'kakao' | 'google') ?? 'kakao', code)
       .then(({ onboardingCompleted }) => {
         navigate(onboardingCompleted ? '/home' : '/onboarding', { replace: true });
       })
-    .catch((err) => {
-    const message = err instanceof Error ? err.message : '로그인에 실패했어요.';
-    navigate('/login', { replace: true, state: { error: message } });
-    });
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : '로그인에 실패했어요.';
+        navigate('/login', { replace: true, state: { error: message } });
+      });
   }, [searchParams, loginWithOAuth, navigate]);
 
   return (
