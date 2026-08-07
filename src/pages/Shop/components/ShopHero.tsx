@@ -5,8 +5,13 @@ export default function ShopHero() {
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-[#463730]">
-      {/* TODO: 배경 이미지 들어오면 여기 교체 */}
-      <div className="absolute inset-0 bg-[#463730]" />
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://readdy.ai/api/search-image?query=Romantic%20proposal%20planning%20workspace%20with%20soft%20warm%20cream%20and%20blush%20tones%2C%20elegant%20stationery%20and%20flower%20arrangement%20on%20marble%20desk%2C%20rose%20gold%20accessories%2C%20editorial%20flat%20lay%20photography%20with%20diffused%20natural%20light%2C%20sophisticated%20feminine%20aesthetic%2C%20minimal%20composition&width=1600&height=600&seq=propose-hero-v3&orientation=landscape')",
+        }}
+      />
 
       <div className="absolute inset-0 bg-linear-to-r from-black/50 via-black/30 to-black/20" />
 

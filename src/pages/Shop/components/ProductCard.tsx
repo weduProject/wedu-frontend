@@ -75,7 +75,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         <div className="mb-4 flex flex-wrap gap-1.5">
-          {product.tags.map((tag) => (
+          {product.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
               className="rounded-md bg-[#FAF8F4] px-2 py-0.5 text-xs text-text-muted"
