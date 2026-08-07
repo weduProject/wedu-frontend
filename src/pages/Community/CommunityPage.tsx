@@ -18,6 +18,27 @@ const categories = [
 
 const POSTS_PER_PAGE = 8;
 
+const parseDate = (dateStr: string) => {
+  if (!dateStr || dateStr === "방금 전") return Number.MAX_SAFE_INTEGER;
+
+  const parts = dateStr.replace(/\s/g, "").split(/[./]/).filter(Boolean);
+
+  if (parts.length >= 3) {
+    let year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+
+    if (year < 100) {
+      year += 2000;
+    }
+
+    const time = new Date(year, month, day).getTime();
+    return isNaN(time) ? 0 : time;
+  }
+
+  return 0;
+};
+
 export default function CommunityPage() {
   const navigate = useNavigate();
   const { posts } = useCommunity();
@@ -26,6 +47,11 @@ export default function CommunityPage() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortType, setSortType] = useState<"latest" | "popular">("latest");
+
+  const handleSortChange = (type: "latest" | "popular") => {
+    setSortType(type);
+    setCurrentPage(1);
+  };
 
   const filteredPosts = posts
     .filter((post) => {
@@ -41,22 +67,11 @@ export default function CommunityPage() {
     })
     .sort((a, b) => {
       if (sortType === "popular") {
-        return b.likes - a.likes;
+        if (b.likes !== a.likes) {
+          return b.likes - a.likes;
+        }
       }
       
-      const parseDate = (dateStr: string) => {
-        if (!dateStr || dateStr === "방금 전") return Number.MAX_SAFE_INTEGER;
-        
-        let str = dateStr.replace(/\./g, "/").trim();
-        if (str.endsWith("/")) str = str.slice(0, -1);
-        if (str.split("/")[0].trim().length === 2) {
-          str = "20" + str;
-        }
-        
-        const time = new Date(str).getTime();
-        return isNaN(time) ? 0 : time;
-      };
-
       const timeA = parseDate(a.date);
       const timeB = parseDate(b.date);
 
@@ -104,7 +119,7 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
             <button
@@ -114,6 +129,7 @@ export default function CommunityPage() {
                 setSelectedCategory(category);
                 setCurrentPage(1);
               }}
+              aria-pressed={selectedCategory === category}
               className={clsx(
                 "rounded-full px-5 py-2 text-sm font-medium transition-colors",
                 selectedCategory === category ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
@@ -124,9 +140,11 @@ export default function CommunityPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
-            onClick={() => { setSortType("latest"); setCurrentPage(1); }}
+            type="button"
+            onClick={() => handleSortChange("latest")}
+            aria-pressed={sortType === "latest"}
             className={clsx(
               "rounded-full px-3 py-1.5 text-sm font-bold transition-colors",
               sortType === "latest" ? "bg-primary/10 text-primary" : "text-text-muted hover:text-text"
@@ -134,9 +152,13 @@ export default function CommunityPage() {
           >
             최신순
           </button>
-          <span className="text-xs text-border">|</span>
+          
+          <span className="text-xs text-border" aria-hidden="true">|</span>
+          
           <button
-            onClick={() => { setSortType("popular"); setCurrentPage(1); }}
+            type="button"
+            onClick={() => handleSortChange("popular")}
+            aria-pressed={sortType === "popular"}
             className={clsx(
               "rounded-full px-3 py-1.5 text-sm font-bold transition-colors",
               sortType === "popular" ? "bg-primary/10 text-primary" : "text-text-muted hover:text-text"

@@ -31,6 +31,10 @@ import { CartProvider } from './pages/Shop/CartContext';
 import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
+import AuthCallbackPage from './pages/Login/AuthCallbackPage';
+import InvitationPage from './pages/invitation/InvitationPage';
+import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
+import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
 
 function OnboardingRoutes() {
   return (
@@ -49,6 +53,11 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            
+            <Route path="/invitation" element={<InvitationPage />} />
+            <Route path="/invitation/create" element={<InvitationCreatePage />} />
+            <Route path="/invitation/:id" element={<InvitationDetailPage />} />
 
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
