@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { ScheduleItem } from '../CalendarPage';
 import { apiFetch, getToken } from '../../../lib/apiClient';
+import { fromBackendEvent, toBackendPayload } from '../utils/apiMapping';
 
 interface ScheduleContextType {
   schedules: ScheduleItem[];
@@ -23,33 +24,31 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-const fetchSchedules = useCallback(async () => {
-  if (!getToken()) {
-    setIsLoading(false);
-    return;
-  }
+  const fetchSchedules = useCallback(async () => {
+    if (!getToken()) {
+      setIsLoading(false);
+      return;
+    }
 
-  setIsLoading(true);
-  try {
-    const res = await apiFetch(`/api/calendar-events?year=${year}&month=${month}`);
-    if (!res.ok) throw new Error('데이터 로드 실패');
-    const body = await res.json();
+    setIsLoading(true);
+    try {
+      const res = await apiFetch(`/api/calendar-events?year=${year}&month=${month}`);
+      if (!res.ok) throw new Error('데이터 로드 실패');
+      const body = await res.json();
+      const list = Array.isArray(body) ? body : body.data;
+      if (!Array.isArray(list)) throw new Error('예상치 못한 응답 형식');
 
-    // 응답이 { success, data } 형태로 감싸져 있는 경우 대응
-    const list = Array.isArray(body) ? body : body.data;
-    if (!Array.isArray(list)) throw new Error('예상치 못한 응답 형식');
-
-    setSchedules(list);
-  } catch (error) {
-    console.warn('API 호출 실패, 임시 더미데이터를 유지합니다.', error);
-    setSchedules([
-      { id: '1', title: '드레스 2차 피팅', date: '2026-07-12', time: '14:00', category: '스튜디오/드레스', memo: '' },
-      { id: '2', title: '웨딩밴드 픽업', date: '2026-07-20', time: '13:30', category: '예물/예단', memo: '종로 웨듀다이아' },
-    ]);
-  } finally {
-    setIsLoading(false);
-  }
-}, [year, month]);
+      setSchedules(list.map(fromBackendEvent));
+    } catch (error) {
+      console.warn('API 호출 실패, 임시 더미데이터를 유지합니다.', error);
+      setSchedules([
+        { id: '1', title: '드레스 2차 피팅', date: '2026-07-12', time: '14:00', category: '스튜디오/드레스', memo: '' },
+        { id: '2', title: '웨딩밴드 픽업', date: '2026-07-20', time: '13:30', category: '예물/예단', memo: '종로 웨듀다이아' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [year, month]);
 
   useEffect(() => {
     fetchSchedules();
@@ -79,12 +78,19 @@ const fetchSchedules = useCallback(async () => {
     setSchedules((prev) => [...prev, addedItem]);
 
     try {
-      await apiFetch('/api/calendar-events', {
+      const res = await apiFetch('/api/calendar-events', {
         method: 'POST',
-        body: JSON.stringify(newSchedule),
+        body: JSON.stringify(toBackendPayload(newSchedule)),
       });
+      if (!res.ok) throw new Error('일정 저장 실패');
+      const body = await res.json();
+      const saved = fromBackendEvent(body.data ?? body);
+
+      // 임시 id를 서버가 준 진짜 eventId로 교체
+      setSchedules((prev) => prev.map((item) => (item.id === tempId ? saved : item)));
     } catch (error) {
       console.error('일정 추가 에러:', error);
+      setSchedules((prev) => prev.filter((item) => item.id !== tempId));
     }
   };
 
@@ -99,16 +105,20 @@ const fetchSchedules = useCallback(async () => {
   };
 
   const updateSchedule = async (id: string, updatedData: Partial<ScheduleItem>) => {
+    const prevItem = schedules.find((item) => item.id === id);
     setSchedules((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...updatedData } : item))
     );
 
+    if (!prevItem) return;
+
     try {
-      // TODO: 백엔드 API 연동 시 주석 해제
-      // await apiFetch(`/api/calendar-events/${id}`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify(updatedData),
-      // });
+      const merged = { ...prevItem, ...updatedData };
+      const res = await apiFetch(`/api/calendar-events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(toBackendPayload(merged)),
+      });
+      if (!res.ok) throw new Error('일정 수정 실패');
     } catch (error) {
       console.error('일정 수정 에러:', error);
     }

@@ -36,13 +36,13 @@ export default function ScheduleModal({ initialData, onClose, onSubmit }: Schedu
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-110 animate-in zoom-in-95 fade-in duration-200 rounded-2xl bg-white p-6 shadow-xl">
+      <div className="flex max-h-[90vh] w-full max-w-110 animate-in zoom-in-95 fade-in duration-200 flex-col rounded-2xl bg-white p-6 shadow-xl">
         
         <h3 className="text-base font-bold text-text md:text-lg">
           {isEditMode ? '일정 수정' : '새 일정 추가'}
         </h3>
         
-        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-1 flex-col gap-4 overflow-y-auto">
           {/* 제목 입력 */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-[#968178]">제목</label>
