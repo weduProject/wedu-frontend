@@ -11,6 +11,9 @@ interface ScheduleDetailModalProps {
 export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDelete }: ScheduleDetailModalProps) {
 
   const displayDate = schedules[0]?.date || '';
+  const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+  const dateObj = displayDate ? new Date(displayDate) : null;
+  const displayDay = dateObj ? DAYS[dateObj.getDay()] : '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
@@ -19,7 +22,7 @@ export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDele
         {/* 상단 헤더 영역 */}
         <div className="shrink-0 items-center border-b border-border p-6 pb-4">
           <h3 className="text-lg font-bold text-text">
-            {displayDate} 일정
+            {displayDate} ({displayDay}) 일정
           </h3>
         </div>
 
