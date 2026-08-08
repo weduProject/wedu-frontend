@@ -71,7 +71,6 @@ export default function ShopPage() {
     smoothScrollTo(gridRef.current, 800);
   };
 
-  // TODO: 백엔드 검색/필터 API 나오면 API 호출로 교체
   const products = PRODUCTS.filter((product) => {
     const categoryMatch = filters.category === '전체' || product.category === filters.category;
     const styleMatch =
@@ -88,52 +87,44 @@ export default function ShopPage() {
   });
 
   return (
-    <div className="relative mx-auto max-w-5xl">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-6 -top-8 -z-10 h-full w-[calc(100%+3rem)] opacity-[0.03]"
-        style={{
-          background:
-            'radial-gradient(70.71% 113.14% at 50% 80%, rgba(197,136,176,0.15) 0%, rgba(0,0,0,0) 50%), radial-gradient(113.14% 113.14% at 80% 20%, rgba(198,147,86,0.2) 0%, rgba(0,0,0,0) 50%), radial-gradient(113.14% 70.71% at 20% 50%, rgba(232,121,108,0.3) 0%, rgba(0,0,0,0) 50%)',
-        }}
-      />
-
+    <div className="-m-5 md:-m-8">
       <ShopHero />
 
-      {/* 카테고리(sticky) ~ 상품 그리드를 한 부모(relative) 안에 묶어서, sticky가 이 영역 끝까지 따라오게 함 */}
-      <div className="relative mt-2">
+      <div className="relative">
         <CategoryFilter
           categories={CATEGORIES}
           activeCategory={filters.category}
           onCategoryChange={(category) => setFilters((prev) => ({ ...prev, category }))}
         />
 
-        <StyleAndSearchBar
-          styleTags={STYLE_TAGS}
-          activeStyle={filters.styleTag}
-          onStyleChange={(styleTag) => setFilters((prev) => ({ ...prev, styleTag }))}
-          keyword={keyword}
-          onKeywordChange={setKeyword}
-        />
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <StyleAndSearchBar
+            styleTags={STYLE_TAGS}
+            activeStyle={filters.styleTag}
+            onStyleChange={(styleTag) => setFilters((prev) => ({ ...prev, styleTag }))}
+            keyword={keyword}
+            onKeywordChange={setKeyword}
+          />
 
-        <div ref={gridRef} className="scroll-mt-6">
-          <p className="mt-6 text-sm text-[#968178]">총 {products.length}개</p>
-          <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div ref={gridRef} className="scroll-mt-6 pb-14 pt-6">
+            <p className="mb-3 text-sm text-[#968178]">총 {products.length}개</p>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+            {products.length === 0 && (
+              <p className="mt-10 text-center text-sm text-[#968178]">조건에 맞는 상품이 없어요.</p>
+            )}
           </div>
-          {products.length === 0 && (
-            <p className="mt-10 text-center text-sm text-[#968178]">조건에 맞는 상품이 없어요.</p>
-          )}
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mx-auto max-w-5xl px-5 pb-8 md:px-8">
         <TasteFinder selected={selectedTastes} onToggle={toggleTaste} />
       </div>
 
-      <div className="mt-8">
+      <div className="mx-auto max-w-5xl px-5 pb-14 md:px-8">
         <ShopCTA />
       </div>
     </div>
