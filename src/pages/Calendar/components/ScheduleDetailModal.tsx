@@ -4,7 +4,7 @@ import type { ScheduleItem } from '../CalendarPage';
 interface ScheduleDetailModalProps {
   schedules: ScheduleItem[];
   onClose: () => void;
-  onEdit: (item) => void;
+  onEdit: (item: ScheduleItem) => void;
   onDelete: (id: string) => void;
 }
 

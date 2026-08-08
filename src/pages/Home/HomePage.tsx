@@ -136,14 +136,19 @@ export default function HomePage() {
 
       {viewSchedule && (
         <ScheduleDetailModal
-          schedule={viewSchedule}
+          schedules={[viewSchedule]}
           onClose={() => setViewSchedule(null)}
-          onEdit={() => {
-            setEditSchedule(viewSchedule); 
+          onEdit={(scheduleToEdit) => {
+            setEditSchedule(scheduleToEdit); 
             setViewSchedule(null); 
+          }}
+          onDelete={(id) => {
+            deleteSchedule(id);
+            setViewSchedule(null);
           }}
         />
       )}
+      
 
       {editSchedule && (
         <ScheduleModal

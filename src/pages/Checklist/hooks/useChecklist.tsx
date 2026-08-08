@@ -28,11 +28,10 @@ interface ChecklistContextType {
 }
 
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
-const TODOS_STORAGE_KEY = 'wedding_checklist_todos';
 
 export function ChecklistProvider({ children }: { children: ReactNode }) {
     const [todos, setTodos] = useState<TodoItem[]>(() => {
-    const savedTodos = localStorage.getItem(TODOS_STORAGE_KEY);
+    const savedTodos = localStorage.getItem('wedding_checklist_todos');
     if (savedTodos) {
       try {
         return JSON.parse(savedTodos);
@@ -45,7 +44,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+    localStorage.setItem('wedding_checklist_todos', JSON.stringify(todos));
   }, [todos]);
 
   const addTodo = (text: string, category: CategoryType) => {

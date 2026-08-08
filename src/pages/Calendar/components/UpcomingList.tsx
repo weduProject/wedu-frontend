@@ -7,7 +7,7 @@ interface UpcomingListProps {
   onScheduleClick?: (schedule: ScheduleItem) => void;
 }
 
-export default function UpcomingList({ schedules, onScheduleClick, onDelete }: UpcomingListProps) {
+export default function UpcomingList({ schedules, onScheduleClick }: UpcomingListProps) {
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
   return (
