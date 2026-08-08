@@ -1,7 +1,7 @@
 // src/pages/Checklist/ChecklistPage.tsx
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { Check, EyeOff, Lightbulb, X } from 'lucide-react';
+import { Check, EyeOff, Lightbulb, Trash2, X } from 'lucide-react';
 
 import BaseCard from '../../components/ui/BaseCard';
 import ProgressBar from '../../components/ui/ProgressBar';
@@ -18,7 +18,7 @@ export default function ChecklistPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { todos:rawTodos, addTodo, toggleTodo } = useChecklist();
+  const { todos:rawTodos, addTodo, toggleTodo, deleteTodo } = useChecklist();
   const todos = user ? rawTodos : [];
   
 
@@ -57,6 +57,11 @@ export default function ChecklistPage() {
 
   const handleToggleComplete = (id: string) => {
     toggleTodo(id);
+  };
+
+  const handleDeleteTodo = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    deleteTodo(id);
   };
 
   const handleAddTodo = (e: React.FormEvent) => {
@@ -217,33 +222,56 @@ export default function ChecklistPage() {
                   key={todo.id}
                   onClick={() => handleToggleComplete(todo.id)}
                   className={clsx(
-                    'group flex cursor-pointer items-center gap-4 rounded-xl p-4 transition-colors',
+                    'group flex cursor-pointer items-center justify-between gap-4 rounded-xl p-4 transition-colors',
                     todo.isCompleted ? 'bg-primary-light/40' : 'bg-[#FAFAFA] hover:bg-primary-light/20'
                   )}
                 >
-                  {/* 커스텀 체크박스 */}
-                  <div 
-                    className={clsx(
-                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors',
-                      todo.isCompleted 
-                        ? 'border-primary bg-primary' 
-                        : 'border-gray-300 bg-white group-hover:border-primary'
-                    )}
-                  >
-                    {todo.isCompleted && (
-                      <Check className="h-4 w-4 text-white" strokeWidth={3} />
-                    )}
+                  <div className="flex flex-1 items-center gap-4 overflow-hidden">
+                    {/* 커스텀 체크박스 */}
+                    <div 
+                      className={clsx(
+                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors',
+                        todo.isCompleted 
+                          ? 'border-primary bg-primary' 
+                          : 'border-gray-300 bg-white group-hover:border-primary'
+                      )}
+                    >
+                      {todo.isCompleted && (
+                        <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                      )}
+                    </div>
+                    
+                    {/* 텍스트 영역 */}
+                    <span 
+                      className={clsx(
+                        'truncate text-sm font-medium transition-all',
+                        todo.isCompleted ? 'text-text-muted line-through' : 'text-text'
+                      )}
+                    >
+                      {todo.text}
+                    </span>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span 
+                      className={clsx(
+                        "rounded px-2.5 py-1 text-xs font-medium transition-opacity",
+                        todo.isCompleted ? "opacity-60 text-text-muted" : "text-primary"
+                      )}
+                    >
+                      {todo.category}
+                    </span>
+                    
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteTodo(e, todo.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:bg-red-50 hover:text-red-500"
+                      aria-label="할 일 삭제"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                   
-                  {/* 텍스트 영역 */}
-                  <span 
-                    className={clsx(
-                      'text-sm font-medium transition-all',
-                      todo.isCompleted ? 'text-text-muted line-through' : 'text-text'
-                    )}
-                  >
-                    {todo.text}
-                  </span>
                 </div>
               ))
             )}

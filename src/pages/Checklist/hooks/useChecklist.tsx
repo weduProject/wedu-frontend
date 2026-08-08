@@ -1,5 +1,5 @@
 // src/pages/Checklist/hooks/useChecklist.tsx
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
 // 타입 정의
@@ -24,12 +24,29 @@ interface ChecklistContextType {
   todos: TodoItem[];
   addTodo: (text: string, category: CategoryType) => void;
   toggleTodo: (id: string) => void;
+  deleteTodo: (id: string) => void;
 }
 
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
+const TODOS_STORAGE_KEY = 'wedding_checklist_todos';
 
 export function ChecklistProvider({ children }: { children: ReactNode }) {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
+    const [todos, setTodos] = useState<TodoItem[]>(() => {
+    const savedTodos = localStorage.getItem(TODOS_STORAGE_KEY);
+    if (savedTodos) {
+      try {
+        return JSON.parse(savedTodos);
+      } catch (e) {
+        console.error('Failed to parse todos from localStorage');
+        return [];
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+  }, [todos]);
 
   const addTodo = (text: string, category: CategoryType) => {
     const newTodo: TodoItem = { id: Date.now().toString(), text, category, isCompleted: false };
@@ -42,8 +59,12 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const deleteTodo = (id: string) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
   return (
-    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo }}>
+    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo }}>
       {children}
     </ChecklistContext.Provider>
   );
