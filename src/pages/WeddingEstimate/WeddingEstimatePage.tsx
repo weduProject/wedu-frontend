@@ -69,7 +69,9 @@ export default function WeddingEstimatePage() {
     setItems(items.map(item => {
       if (item.id !== id) return item;
       const isNowPaid = !item.is_paid;
-      const newActual = (isNowPaid && item.actual === 0) ? item.planned : item.actual;
+      const newActual = isNowPaid 
+        ? (item.actual === 0 ? item.planned : item.actual) 
+        : 0;
       return { ...item, is_paid: isNowPaid, actual: newActual };
     }));
   };
@@ -102,7 +104,7 @@ export default function WeddingEstimatePage() {
 
     setItems(items.map(item => {
       if (item.id !== id) return item;
-      const newIsPaid = actual > 0 ? true : item.is_paid;
+      const newIsPaid = actual > 0 ? true : false;
       return { ...item, planned, actual, is_paid: newIsPaid };
     }));
     
