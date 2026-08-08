@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { useWishlist } from '../utils/useWishlist';
 import { useAuth } from '../../../contexts/AuthContext';
 import Button from '../../../components/ui/Button';
+import { formatWon } from '../utils/price'; 
 
 interface ProductCardProps {
   product: Product;
@@ -87,7 +88,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="mt-auto flex items-center justify-between">
           <span className="text-sm font-bold text-text">
-            {product.price}
+            {formatWon(product.price)}
           </span>
           <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={handleDetailClick}>
             상세보기

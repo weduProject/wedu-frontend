@@ -7,6 +7,7 @@ import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import clsx from 'clsx';
+import { formatWon } from '../Shop/utils/price'; 
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -149,7 +150,7 @@ export default function ShopDetailPage() {
 
           <div className="mb-5">
             <span className="text-3xl font-bold text-text">
-              {product.price.replace('~', '')}
+              {formatWon(product.price)}
             </span>
             <span className="ml-1 text-sm text-text-muted">부터</span>
           </div>
