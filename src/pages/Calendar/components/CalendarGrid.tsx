@@ -3,7 +3,7 @@ import type { ScheduleItem } from '../CalendarPage';
 
 interface CalendarGridProps {
   schedules: ScheduleItem[];
-  onScheduleClick: (schedule: ScheduleItem) => void;
+  onScheduleClick: (schedules: ScheduleItem[]) => void;
   year: number;
   month: number;
   onPrevMonth: () => void;
@@ -51,16 +51,16 @@ export default function CalendarGrid({ schedules, onScheduleClick, year, month, 
           return (
             <div
               key={day}
-              onClick={() => hasSchedule && onScheduleClick(schedulesForDay[0])}
+              onClick={() => hasSchedule && onScheduleClick(schedulesForDay)}
               className="flex min-h-15 cursor-pointer flex-col items-center justify-start rounded-lg p-2 transition-colors hover:bg-primary-light/50 md:min-h-[80px]"
             >
               <span className="font-medium text-text">{day}</span>
 
               {hasSchedule && (
                 <div className="mt-1 flex gap-1">
-                  {schedulesForDay.map((_, idx) => (
+                  {schedulesForDay.map((schedule, idx) => (
                     <div
-                      key={idx}
+                      key={schedule.id}
                       className={`h-1.5 w-1.5 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-orange-300'}`}
                     ></div>
                   ))}
