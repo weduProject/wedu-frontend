@@ -34,6 +34,7 @@ import ScrollToTop from './components/ScrollToTop';
 import AuthCallbackPage from './pages/Login/AuthCallbackPage';
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
+import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
 
 function OnboardingRoutes() {
   return (
@@ -79,6 +80,7 @@ export default function App() {
               <Route path="/shop/wishlist" element={<WishlistPage />} />
               <Route path="/wedding-shop" element={<WeddingShopPage />} />
               <Route path="/wedding-shop/:id" element={<WeddingShopDetailPage />} />
+              <Route path="/wedding-estimate" element={<WeddingEstimatePage />} />
               <Route path="/shop/cart" element={<CartPage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
