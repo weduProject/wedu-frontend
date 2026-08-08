@@ -1,105 +1,47 @@
 import clsx from 'clsx';
-import { useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../../styles/categoryTab';
 
+interface CategoryOption {
+  id: string;
+  label: string;
+  Icon: LucideIcon;
+}
+
 interface CategoryFilterProps {
-  categories: string[];
-  styleTags: string[];
+  categories: readonly CategoryOption[];
   activeCategory: string;
-  activeStyle: string;
   onCategoryChange: (category: string) => void;
-  onStyleChange: (styleTag: string) => void;
-  keyword: string;
-  onKeywordChange: (keyword: string) => void;
 }
 
 export default function CategoryFilter({
   categories,
-  styleTags,
   activeCategory,
-  activeStyle,
   onCategoryChange,
-  onStyleChange,
-  keyword,
-  onKeywordChange,
 }: CategoryFilterProps) {
-  const [inputValue, setInputValue] = useState(keyword);
-
-  const handleSearch = () => {
-    onKeywordChange(inputValue.trim());
-  };
-
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {categories.map((cat) => {
-            const active = cat === activeCategory;
+    <div className="sticky top-16 z-30 border-b border-[#E7E4E3]/60 bg-[#FAF8F8]/80 backdrop-blur-[12px] md:top-20">
+      <div className="mx-auto max-w-5xl px-5 md:px-8">
+        <div className="flex items-center gap-1.5 py-4">
+          {categories.map(({ id, label, Icon }) => {
+            const active = id === activeCategory;
             return (
               <button
-                key={cat}
+                key={id}
                 type="button"
-                onClick={() => onCategoryChange(cat)}
+                onClick={() => onCategoryChange(id)}
                 aria-pressed={active}
                 className={clsx(
-                  'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all',
+                  'flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-all',
                   active ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
                 )}
               >
-                {cat}
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                {label}
               </button>
             );
           })}
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-xl border border-[#DDD7C9] bg-white px-4 focus-within:border-primary transition-colors">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                if (e.target.value === '') onKeywordChange('');
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearch();
-              }}
-              placeholder="상품 검색"
-              className="w-48 border-0 bg-transparent py-2.5 text-sm text-[#594941] outline-none placeholder:text-[#9CA3AF]"
-              aria-label="상품 검색"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="rounded-full border border-[#DDD7C9] bg-white px-5 py-2.5 text-sm font-medium text-[#594941] transition-colors hover:bg-[#FAF8F5]"
-          >
-            검색
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs font-medium text-text-muted">스타일:</span>
-        {styleTags.map((tag) => {
-          const active = tag === activeStyle;
-          return (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => onStyleChange(tag)}
-              aria-pressed={active}
-              className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                active
-                  ? 'bg-text text-white'
-                  : 'bg-[#F0EEED] text-[#7C6358] hover:bg-[#E7E4E3]',
-              )}
-            >
-              {tag}
-            </button>
-          );
-        })}
       </div>
     </div>
   );

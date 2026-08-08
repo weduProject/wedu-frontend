@@ -4,6 +4,6 @@ export function parsePriceToNumber(priceStr: string): number {
   return Number(match[1]) * 10000;
 }
 
-export function formatWon(amount: number): string {
-  return `${amount.toLocaleString()}원`;
+export function formatWon(price: number): string {
+  return `₩${new Intl.NumberFormat('ko-KR').format(price)}`;
 }
