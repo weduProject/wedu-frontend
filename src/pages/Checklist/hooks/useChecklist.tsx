@@ -25,6 +25,7 @@ interface ChecklistContextType {
   addTodo: (text: string, category: CategoryType) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
+  updateTodo: (id: string, newText: string) => void;
 }
 
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
@@ -62,8 +63,14 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
   };
 
+  const updateTodo = (id: string, newText: string) => {
+  setTodos((prev) =>
+    prev.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
+  );
+};
+
   return (
-    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo }}>
+    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, updateTodo }}>
       {children}
     </ChecklistContext.Provider>
   );

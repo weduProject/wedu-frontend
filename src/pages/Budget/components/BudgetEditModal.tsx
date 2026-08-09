@@ -1,25 +1,36 @@
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import Button from '../../../components/ui/Button';
-import type { BudgetItem } from '../hooks/useBudget';
+import type { BudgetCategory, BudgetItem } from '../hooks/useBudget';
+import clsx from 'clsx';
+import { TextField } from '../../../components';
 
 interface BudgetEditModalProps {
   item: BudgetItem;
   onClose: () => void;
-  onSave: (id: string, paidAmount: number, budgetAmount: number) => void;
+  onSave: (id: string, updates: Partial<BudgetItem>) => void;
   onDelete: (id: string) => void;
 }
 
+const CATEGORIES: BudgetCategory[] = ['웨딩홀/예식장', '스튜디오/드레스', '허니문', '예물/예단', '기타'];
+
 export default function BudgetEditModal({ item, onClose, onSave, onDelete }: BudgetEditModalProps) {
-  // 기존 데이터를 초기값으로 세팅
+  const [category, setCategory] = useState<BudgetCategory>(item.category);
+  const [title, setTitle] = useState(item.title);
   const [paidAmount, setPaidAmount] = useState(item.paidAmount.toString());
   const [budgetAmount, setBudgetAmount] = useState(item.budgetAmount.toString());
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(item.id, Number(paidAmount), Number(budgetAmount));
-  };
+    if (!title.trim()) return;
 
+    onSave(item.id, {
+      category,
+      title: title.trim(),
+      paidAmount: Number(paidAmount),
+      budgetAmount: Number(budgetAmount),
+    });
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
@@ -37,6 +48,38 @@ export default function BudgetEditModal({ item, onClose, onSave, onDelete }: Bud
         </div>
         
         <form onSubmit={handleSave} className="flex flex-col gap-4">
+
+          {/* ✨ 카테고리 수정 영역 추가 */}
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-text-muted">카테고리</label>
+            <div className="flex flex-wrap items-center gap-2">
+              {CATEGORIES.map((cat) => {
+                const active = category === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(cat)}
+                    className={clsx(
+                      'cursor-pointer rounded-full border-0 px-3 py-1.5 text-xs font-medium transition-colors',
+                      active ? 'bg-primary text-white' : 'bg-primary-light text-primary hover:bg-primary/15'
+                    )}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ✨ 항목 이름 수정 영역 추가 */}
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-text-muted">항목 이름</label>
+            <TextField
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
           <div className="mt-4 flex gap-2">
             {/* 실제 결제 금액 수정 */}
