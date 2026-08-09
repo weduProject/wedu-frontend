@@ -3,7 +3,7 @@ import { Receipt } from 'lucide-react';
 import { PRODUCTS } from './shopData';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { parsePriceToNumber, formatWon } from './utils/price';
+import { formatWon } from './utils/price';
 import { Button, BaseCard, CategoryBadge } from '../../components';
 import { groupByCategory } from './utils/groupByCategory';
 
@@ -29,7 +29,7 @@ export default function CartPage() {
 
   const cartProducts = PRODUCTS.filter((product) => cartIds.includes(product.id));
   const totalPrice = cartProducts.reduce(
-    (sum, product) => sum + parsePriceToNumber(product.price),
+    (sum, product) => sum + product.price,
     0,
   );
 

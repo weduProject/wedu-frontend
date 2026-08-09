@@ -6,7 +6,7 @@ export interface RecommendedItem {
   title: string;
   category: string;
   price: number;
-  displayPrice: string;
+  displayPrice: number;
   icon: string;
 }
 
@@ -50,7 +50,7 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
     if (foodName.includes("다이닝") && product.title.includes("다이닝")) score += 15;
     if (foodName.includes("오마카세") && product.title.includes("커스텀")) score += 10;
 
-    const priceNum = parseInt(product.price.replace(/[^0-9]/g, "")) * 10000;
+    const priceNum = product.price;
     return { ...product, score, priceNum };
   });
 
