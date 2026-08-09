@@ -1,6 +1,8 @@
+export type ProductCategory = 'RING' | 'EVENT' | 'FLOWER' | 'PHOTO' | 'LETTER' | 'ETC';
+
 export interface Product {
   id: number;
-  category: string;
+  category: ProductCategory;
   categoryType: string;
   styles: string[];
   tastes: string[];
@@ -23,8 +25,8 @@ export const PRODUCTS: Product[] = [
   // ============================================================
   {
     id: 1,
-    category: '🍽️ 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['로맨틱', '우아한'],
     tastes: ['와인&샴페인', '미식'],
     title: '더 리버 르다 프라이빗 다이닝',
@@ -42,8 +44,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 2,
-    category: '🍽️ 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['우아한', '럭셔리'],
     tastes: ['미식', '와인&샴페인'],
     title: '파크 하얏트 서울 코너스톤',
@@ -61,8 +63,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 3,
-    category: '🍽️ 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['감성적', '아늑한'],
     tastes: ['미식', '와인&샴페인'],
     title: '아이오유 프라이빗 룸 다이닝',
@@ -85,8 +87,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 4,
-    category: '🏨 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['럭셔리', '우아한'],
     tastes: ['럭셔리 패키지', '와인&샴페인'],
     title: '시그니엘 서울',
@@ -104,8 +106,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 5,
-    category: '🏨 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['우아한', '럭셔리'],
     tastes: ['럭셔리 패키지', '와인&샴페인'],
     title: '서울 신라 호텔',
@@ -123,8 +125,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 6,
-    category: '🏨 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['럭셔리', '감성적'],
     tastes: ['럭셔리 패키지', '와인&샴페인'],
     title: '그랜드 하얏트 서울',
@@ -142,8 +144,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 7,
-    category: '🏨 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['모던', '럭셔리'],
     tastes: ['럭셔리 패키지', '미식'],
     title: '호텔 나루 서울 엠갤러리',
@@ -166,8 +168,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 8,
-    category: '🌅 장소',
-    categoryType: '장소',
+    category: 'PHOTO',
+    categoryType: '사진/영상',
     styles: ['감성적', '모험적'],
     tastes: ['자연 속에서', '사진 촬영'],
     title: '제주의오후 감성 노을 스냅',
@@ -185,8 +187,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 9,
-    category: '🌅 장소',
-    categoryType: '장소',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['감성적', '로맨틱'],
     tastes: ['자연 속에서', '꽃과 장미'],
     title: '파티부 제주 프로포즈',
@@ -204,8 +206,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 10,
-    category: '🌅 장소',
-    categoryType: '장소',
+    category: 'PHOTO',
+    categoryType: '사진/영상',
     styles: ['감성적', '모험적'],
     tastes: ['자연 속에서', '사진 촬영'],
     title: '레코드필름 제주 바다 커플 스냅',
@@ -228,8 +230,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 11,
-    category: '💐 서비스',
-    categoryType: 'services',
+    category: 'FLOWER',
+    categoryType: '플라워',
     styles: ['로맨틱', '감성적'],
     tastes: ['꽃과 장미', '캔들 무드'],
     title: '보우원플라워 프로포즈 데코',
@@ -247,8 +249,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 12,
-    category: '💐 서비스',
-    categoryType: '서비스',
+    category: 'FLOWER',
+    categoryType: '플라워',
     styles: ['로맨틱', '감성적'],
     tastes: ['꽃과 장미', '풍선 데코'],
     title: 'DE mood Seoul',
@@ -266,8 +268,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 13,
-    category: '💐 서비스',
-    categoryType: '서비스',
+    category: 'FLOWER',
+    categoryType: '플라워',
     styles: ['로맨틱', '감성적'],
     tastes: ['꽃과 장미'],
     title: '플로블랑',
@@ -285,8 +287,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 14,
-    category: '💐 서비스',
-    categoryType: '서비스',
+    category: 'FLOWER',
+    categoryType: '플라워',
     styles: ['로맨틱', '깜짝'],
     tastes: ['풍선 데코', '꽃과 장미'],
     title: '풍써니',
@@ -304,8 +306,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 15,
-    category: '💐 서비스',
-    categoryType: '서비스',
+    category: 'FLOWER',
+    categoryType: '플라워',
     styles: ['감성적', '아늑한'],
     tastes: ['사진 촬영', '꽃과 장미'],
     title: '추억룸',
@@ -328,8 +330,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 16,
-    category: '📸 서비스',
-    categoryType: '서비스',
+    category: 'PHOTO',
+    categoryType: '사진/영상',
     styles: ['감성적', '아늑한'],
     tastes: ['사진 촬영', '자연 속에서'],
     title: '미상스냅',
@@ -347,8 +349,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 17,
-    category: '📸 서비스',
-    categoryType: '서비스',
+    category: 'PHOTO',
+    categoryType: '사진/영상',
     styles: ['감성적', '우아한'],
     tastes: ['사진 촬영'],
     title: '포지스냅',
@@ -366,8 +368,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 18,
-    category: '📸 서비스',
-    categoryType: '서비스',
+    category: 'PHOTO',
+    categoryType: '사진/영상',
     styles: ['감성적', '모던'],
     tastes: ['사진 촬영', '영상 편지'],
     title: '존존픽쳐스 시네마틱 영상 스냅',
@@ -390,8 +392,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 19,
-    category: '🎻 경험',
-    categoryType: '경험',
+    category: 'ETC',
+    categoryType: '기타',
     styles: ['우아한', '감성적'],
     tastes: ['라이브 음악'],
     title: '아르떼뮤직 웨딩·이벤트 연주',
@@ -409,8 +411,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 20,
-    category: '🎻 경험',
-    categoryType: '경험',
+    category: 'ETC',
+    categoryType: '기타',
     styles: ['우아한', '감성적'],
     tastes: ['라이브 음악'],
     title: '다온음 프로포즈 현악 4중주',
@@ -433,8 +435,8 @@ export const PRODUCTS: Product[] = [
   
   {
     id: 21,
-    category: '🎆 경험',
-    categoryType: '경험',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['깜짝', '모험적'],
     tastes: ['깜짝 이벤트', '자연 속에서'],
     title: '요트홀릭 프라이빗 요트 패키지',
@@ -452,8 +454,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 22,
-    category: '🎆 경험',
-    categoryType: '경험',
+    category: 'EVENT',
+    categoryType: '이벤트/공간',
     styles: ['깜짝', '로맨틱'],
     tastes: ['깜짝 이벤트', '풍선 데코'],
     title: '두근두근 맞춤 프로포즈',
@@ -476,8 +478,8 @@ export const PRODUCTS: Product[] = [
 
   {
     id: 23,
-    category: '💍 선물',
-    categoryType: '선물',
+    category: 'RING',
+    categoryType: '주얼리',
     styles: ['우아한', '럭셔리'],
     tastes: ['럭셔리 패키지', '커플'],
     title: '바이가미 청담 웨딩 주얼리',
@@ -495,8 +497,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 24,
-    category: '💍 선물',
-    categoryType: '선물',
+    category: 'RING',
+    categoryType: '주얼리',
     styles: ['모던', '우아한'],
     tastes: ['커플', '럭셔리 패키지'],
     title: '제이버튼 주얼리',
