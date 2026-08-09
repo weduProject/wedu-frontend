@@ -14,10 +14,10 @@ const PRIMARY_LINKS = [
 
 const WEDDING_LINKS = [
   { label: '웨딩 룩북', path: '/wedding-shop' },
+  { label: '웨딩 매거진', path: '/magazine' },
   // { label: '웨딩 견적', path: '/wedding-estimate' },
-  // { label: '웨딩 매거진', path: '/wedding-fair' },
   // { label: '모바일 청첩장', path: '/invitation' },
-  // { label: '파트너 연결', path: '/connect' },
+  { label: '파트너 연결', path: '/connect' },
 ] as const;
 
 const TOOL_LINKS = [

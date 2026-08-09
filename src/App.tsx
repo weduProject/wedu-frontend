@@ -34,6 +34,8 @@ import ScrollToTop from './components/ScrollToTop';
 import AuthCallbackPage from './pages/Login/AuthCallbackPage';
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
+import ConnectPage from './pages/Partner/ConnectPage';
+import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
 
 function OnboardingRoutes() {
   return (
@@ -104,6 +106,8 @@ export default function App() {
               <Route path="/community/:id" element={<CommunityDetailPage />} />
               <Route path="/community/write" element={<CommunityWritePage />} />
               <Route path="/mypage" element={<MypagePage />} />
+              <Route path="/connect" element={<ConnectPage />} />
+              <Route path="/magazine" element={<WeddingMagazinePage />} />
             </Route>
           </Routes>
         </ScheduleProvider>
