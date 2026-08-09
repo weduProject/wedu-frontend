@@ -12,7 +12,7 @@ export default function UpcomingList({ schedules, onScheduleClick }: UpcomingLis
 
   return (
     <BaseCard className="p-5 md:p-6 shadow-sm h-full">
-      <h3 className="mb-4 text-base font-bold text-text">다가오는 일정</h3>
+      <h3 className="mb-4 text-base font-bold font-serif text-text">다가오는 일정</h3>
 
       <div className="flex flex-col gap-3">
         {schedules.length === 0 ? (

@@ -59,7 +59,7 @@ export default function CalendarPage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text md:text-3xl">일정 관리</h2>
+          <h2 className="text-2xl font-bold font-serif text-text md:text-3xl">일정 관리</h2>
           <p className="mt-2 text-sm text-text-muted">웨딩 준비 일정을 한눈에 확인하고 관리하세요.</p>
         </div>
         <Button

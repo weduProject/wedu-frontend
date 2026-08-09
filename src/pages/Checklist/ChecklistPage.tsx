@@ -80,6 +80,8 @@ export default function ChecklistPage() {
         <p className="mt-2 text-sm text-text-muted">웨딩 준비, 하나씩 체크하며 완벽하게</p>
       </div>
 
+      {user && (
+        <>
       {/* 웨딩 체크리스트 추천 UI 영역 */}
       {showRecommendations && (
         <BaseCard className="mb-8 p-6 shadow-sm md:p-8">
@@ -121,6 +123,9 @@ export default function ChecklistPage() {
           </div>
         </BaseCard>
       )}
+      </>
+      )}
+      
 
       {/* 1. 진행률 카드 (BaseCard 적용) */}
       <BaseCard className="mb-6 p-6 shadow-sm md:p-8">
