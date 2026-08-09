@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Header from '../../../components/layout/Header';
+import Button from '../../../components/ui/Button';
 
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -10,7 +11,11 @@ export default function HeroSection() {
       <Header />
 
       <div className="absolute inset-0 bg-[#463730]">
-        {/* TODO: Hero 배경 이미지 URL 추가 */}
+        <img
+          src="https://readdy.ai/api/search-image?query=Elegant%20wedding%20ceremony%20setting%20bride%20in%20white%20gown%20luxurious%20white%20floral%20arrangements%20ivory%20roses%20soft%20natural%20backlighting%20clean%20minimalist%20aesthetic%20high-end%20editorial%20wedding%20photography%20bright%20airy%20atmosphere%20candlelight%20chandelier%20modern%20venue&width=1600&height=900&seq=wedu-hero-03&orientation=landscape"
+          alt="Wedding hero"
+          className="h-full w-full object-cover object-top"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/30" />
       </div>
 
@@ -30,14 +35,15 @@ export default function HeroSection() {
               WEDU와 함께라면 결혼 준비도 설레는 여정이 됩니다.
             </p>
             <div className="flex flex-col gap-3 md:pt-2">
-              <button
-                type="button"
+              <Button
+                variant="main"
+                size="md"
                 onClick={() => navigate('/onboarding')}
-                className="flex w-fit items-center gap-2 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                className="inline-flex w-fit items-center gap-2 px-6 py-3"
               >
                 심리테스트 시작하기
                 <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={() => navigate('/shop')}

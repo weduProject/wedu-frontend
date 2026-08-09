@@ -13,6 +13,13 @@ export default function FeatureSection() {
     <section className="bg-white py-20 md:py-28">
       <div className="w-full px-6 md:px-16">
         <div className="mb-16 text-center">
+          <div className="mb-8 mx-auto flex h-40 w-40 items-center justify-center md:h-52 md:w-52">
+            <img
+              src="https://public.readdy.ai/ai/img_res/0cbfc8af-0693-4c0f-9cdc-2b3ca35b8a0d.png"
+              alt="WEDU"
+              className="h-full w-full object-contain"
+            />
+          </div>
           <span className="mb-4 inline-block rounded-full border border-primary/40 px-4 py-1.5 text-xs font-medium text-primary">
             Our Services
           </span>
