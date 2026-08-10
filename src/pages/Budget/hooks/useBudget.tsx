@@ -62,7 +62,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   });
   const [targetBudget, setTargetBudget] = useState<number>(() => {
     const saved = localStorage.getItem('wedding_target_budget');
-    return saved ? JSON.parse(saved) : 5000; 
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed !== 'number' || isNaN(parsed)) {
+          return 5000;
+        }
+        return parsed;
+      } catch (error) {
+        console.error('목표 예산 데이터를 불러오는 데 실패했습니다.', error);
+        return 5000;
+      }
+    }
+    return 5000;
   });
 
   useEffect(() => {

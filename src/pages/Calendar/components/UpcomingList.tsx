@@ -3,7 +3,6 @@ import type { ScheduleItem } from '../CalendarPage';
 
 interface UpcomingListProps {
   schedules: ScheduleItem[];
-  onDelete?: (id: string) => void;
   onScheduleClick?: (schedule: ScheduleItem) => void;
 }
 
@@ -37,20 +36,6 @@ export default function UpcomingList({ schedules, onScheduleClick }: UpcomingLis
                   <p className="truncate text-sm font-semibold text-text">{item.title}</p>
                   <p className="mt-0.5 text-xs text-[#968178]">{dayOfWeek}요일 {item.time}</p>
                 </div>
-
-                {/* 삭제 버튼: 평소엔 흐릿하게, hover 시 진하게 (항상 클릭 가능) */}
-                {/* {onDelete && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation(); // 삭제 버튼 누를 때 상세 모달까지 열리는 것 방지
-                      onDelete(item.id);
-                    }}
-                    className="shrink-0 rounded-md p-2 text-xs text-red-400 opacity-70 transition-opacity hover:text-red-600 group-hover:opacity-100 cursor-pointer"
-                  >
-                    삭제
-                  </button>
-                )} */}
               </div>
             );
           })

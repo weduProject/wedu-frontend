@@ -4,6 +4,7 @@ import { Check, Edit2, Trash2, Plus, X } from 'lucide-react';
 
 import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
+import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 
 type CategoryTab = '예식장' | '예물' | '신혼여행';
 
@@ -35,6 +36,7 @@ const formatWon = (n: number) => '₩' + n.toLocaleString('ko-KR');
 export default function WeddingEstimatePage() {
   const [activeTab, setActiveTab] = useState<CategoryTab>('예식장');
   const [items, setItems] = useState<EstimateItem[]>(() => {
+    
     const saved = localStorage.getItem('wedding_estimate_items');
     if (saved) {
       return JSON.parse(saved);
@@ -110,6 +112,8 @@ export default function WeddingEstimatePage() {
     
     setEditingId(null);
   };
+
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   const handleDeleteItem = (id: string) => {
     setItems(items.filter(item => item.id !== id));
@@ -295,7 +299,7 @@ export default function WeddingEstimatePage() {
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteItem(item.id)}
+                        onClick={() => setItemToDelete(item.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-red-50 hover:text-red-500"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -321,6 +325,16 @@ export default function WeddingEstimatePage() {
           </div>
         )}
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={() => {
+          if (itemToDelete) {
+            handleDeleteItem(itemToDelete); // 여기서 실제 삭제 함수 호출
+            setItemToDelete(null);
+          }
+        }}
+      />
 
     </div>
   );

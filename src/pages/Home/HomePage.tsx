@@ -77,7 +77,6 @@ export default function HomePage() {
         <div className="md:col-span-1 flex flex-col">
           <UpcomingList
             schedules={upcomingSchedules}
-            onDelete={deleteSchedule}
             onScheduleClick={(schedule) => setViewSchedule(schedule)}
           />
         </div>

@@ -91,7 +91,6 @@ export default function CalendarPage() {
         <div className='h-full'>
           <UpcomingList
           schedules={filteredSchedules}
-          onDelete={deleteSchedule}
           onScheduleClick={(schedules) => setViewSchedules([schedules])}
           />
         </div>
