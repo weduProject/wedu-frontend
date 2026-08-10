@@ -1,5 +1,5 @@
 // src/pages/Checklist/hooks/useChecklist.tsx
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
 // 타입 정의
@@ -11,31 +11,42 @@ export interface TodoItem {
   isCompleted: boolean;
 }
 
-const INITIAL_TODOS: TodoItem[] = [
-  { id: '1', text: '결혼식 날짜 정하기', category: '기본', isCompleted: true },
-  { id: '2', text: '예식장 투어 및 계약', category: '예식', isCompleted: true },
-  { id: '3', text: '스튜디오 예약', category: '촬영', isCompleted: true },
-  { id: '4', text: '드레스 투어', category: '촬영', isCompleted: false },
-  { id: '5', text: '신혼집 구하기', category: '주거', isCompleted: true },
-  { id: '6', text: '웨딩밴드 맞추기', category: '예물', isCompleted: false },
-  { id: '7', text: '청첩장 제작', category: '기본', isCompleted: true },
-  { id: '8', text: '허니문 예약', category: '여행', isCompleted: true },
-  { id: '9', text: '혼수 장만', category: '주거', isCompleted: false },
-  { id: '10', text: '본식 메이크업 예약', category: '예식', isCompleted: false },
-  { id: '11', text: '웨딩 케이크 주문', category: '예식', isCompleted: false },
-  { id: '12', text: '부케 선택', category: '예식', isCompleted: false },
-];
+export const RECOMMENDED_TODOS: Record<CategoryType, string[]> = {
+  기본: ['결혼식 날짜 정하기', '청첩장 제작'],
+  예식: ['예식장 투어 및 계약', '본식 메이크업 예약', '웨딩 케이크 주문', '부케 선택'],
+  촬영: ['스튜디오 예약', '드레스 투어'],
+  예물: ['웨딩밴드 맞추기'],
+  주거: ['신혼집 구하기', '혼수 장만'],
+  여행: ['허니문 예약']
+};
 
 interface ChecklistContextType {
   todos: TodoItem[];
   addTodo: (text: string, category: CategoryType) => void;
   toggleTodo: (id: string) => void;
+  deleteTodo: (id: string) => void;
+  updateTodo: (id: string, newText: string) => void;
 }
 
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
 
 export function ChecklistProvider({ children }: { children: ReactNode }) {
-  const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
+    const [todos, setTodos] = useState<TodoItem[]>(() => {
+    const savedTodos = localStorage.getItem('wedding_checklist_todos');
+    if (savedTodos) {
+      try {
+        return JSON.parse(savedTodos);
+      } catch (e) {
+        console.error('Failed to parse todos from localStorage');
+        return [];
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('wedding_checklist_todos', JSON.stringify(todos));
+  }, [todos]);
 
   const addTodo = (text: string, category: CategoryType) => {
     const newTodo: TodoItem = { id: Date.now().toString(), text, category, isCompleted: false };
@@ -48,8 +59,18 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const deleteTodo = (id: string) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
+  const updateTodo = (id: string, newText: string) => {
+  setTodos((prev) =>
+    prev.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
+  );
+};
+
   return (
-    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo }}>
+    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, updateTodo }}>
       {children}
     </ChecklistContext.Provider>
   );
