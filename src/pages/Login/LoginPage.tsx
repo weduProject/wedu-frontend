@@ -44,17 +44,19 @@ export default function LoginPage() {
         {/* 로고 */}
         <div className="flex-1 flex flex-col items-center justify-center gap-0 mb-10">
           <img src={weduLogo} alt="WEDU 로고" className="w-36 h-36 object-contain" />
-          <span
-            className="text-3xl font-extrabold tracking-wide -mt-3"
-            style={{
-              background: 'linear-gradient(111deg, var(--color-btn-from), var(--color-btn-to))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            WEDU
-          </span>
+          <div style={{ filter: 'drop-shadow(0 4px 20px rgba(183, 110, 121, 0.45))', opacity: 1 }} className="-mt-3">
+            <span
+              className="text-3xl font-extrabold tracking-wide"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-rosegold-1) 0%, var(--color-rosegold-2) 25%, var(--color-rosegold-3) 50%, var(--color-rosegold-4) 75%, var(--color-rosegold-1) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              WEDU
+            </span>
+          </div>
           <p className="text-xs text-gray-400 text-center">특별한 순간을 함께 준비해요</p>
         </div>
 

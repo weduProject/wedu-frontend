@@ -62,6 +62,7 @@ interface AuthContextValue {
   isLoading: boolean; // 앱 첫 로드 시 "토큰 유효한지 확인 중" 상태
   loginWithOAuth: (provider: Provider, code: string) => Promise<User>;
   logout: () => void;
+  markOnboardingComplete: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -128,8 +129,12 @@ async function loginWithOAuth(provider: Provider, code: string): Promise<User> {
     setUser(null);
   }
 
+  function markOnboardingComplete() {
+    setUser((prev) => prev ? { ...prev, onboardingCompleted: true } : prev);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, loginWithOAuth,logout }}>
+    <AuthContext.Provider value={{ user, isLoading, loginWithOAuth, logout, markOnboardingComplete }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,9 +5,11 @@ import clsx from 'clsx';
 import { Button, ProgressBar } from '../../components';
 import { useOnboarding, QUIZ_QUESTIONS, TRAVEL_REGIONS } from './OnboardingContext';
 import type { QuizAnswers } from './OnboardingContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function QuizPage() {
   const navigate = useNavigate();
+  const { markOnboardingComplete } = useAuth();
   const { quizAnswers, setQuizAnswers } = useOnboarding();
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>(quizAnswers);
@@ -71,6 +73,7 @@ export default function QuizPage() {
       setCurrent(current + 1);
     } else {
       setQuizAnswers(answers);
+      markOnboardingComplete();
       navigate('/onboarding/partner');
     }
   }
@@ -102,7 +105,7 @@ export default function QuizPage() {
       </div>
 
       {/* 퀴즈 카드 */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-4 overflow-hidden">
+      <div className="flex-1 flex items-start justify-center px-4 pt-4 pb-6 overflow-y-auto">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border/60 p-5 flex flex-col gap-3">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">

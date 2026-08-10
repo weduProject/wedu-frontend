@@ -16,19 +16,18 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = ['RING', 'EVENT', 'FLOWER',
 
 
 // ─── 2. Proposal (나만의 프로포즈) ─────────────────────────────────────────────
-// Product와 거의 동일하나 PHOTO 대신 STUDIO 사용
-export type ProposalCategory = 'RING' | 'STUDIO' | 'EVENT' | 'LETTER' | 'FLOWER' | 'ETC';
+export type ProposalCategory = 'RING' | 'PHOTO' | 'EVENT' | 'LETTER' | 'FLOWER' | 'ETC';
 
 export const PROPOSAL_CATEGORY_MAP: Record<ProposalCategory, { label: string; emoji: string }> = {
-  RING:   { label: '반지',     emoji: '💍' },
-  STUDIO: { label: '스튜디오', emoji: '📸' },
-  EVENT:  { label: '이벤트',   emoji: '✨' },
-  LETTER: { label: '편지',     emoji: '💌' },
-  FLOWER: { label: '플라워',   emoji: '💐' },
-  ETC:    { label: '기타',     emoji: '📦' },
+  RING:   { label: '반지',   emoji: '💍' },
+  PHOTO:  { label: '사진',   emoji: '📸' },
+  EVENT:  { label: '이벤트', emoji: '✨' },
+  LETTER: { label: '편지',   emoji: '💌' },
+  FLOWER: { label: '플라워', emoji: '💐' },
+  ETC:    { label: '기타',   emoji: '📦' },
 };
 
-export const PROPOSAL_CATEGORIES: ProposalCategory[] = ['RING', 'STUDIO', 'EVENT', 'LETTER', 'FLOWER', 'ETC'];
+export const PROPOSAL_CATEGORIES: ProposalCategory[] = ['RING', 'PHOTO', 'EVENT', 'LETTER', 'FLOWER', 'ETC'];
 
 
 // ─── 3. Checklist ──────────────────────────────────────────────────────────────

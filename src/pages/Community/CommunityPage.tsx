@@ -5,7 +5,6 @@ import clsx from "clsx";
 import { Button } from "../../components";
 import CommunityCard from "./CommunityCard";
 import { useCommunity } from "./CommunityContext";
-import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from "../../styles/categoryTab";
 
 const categories = [
   "전체",
@@ -89,7 +88,7 @@ export default function CommunityPage() {
             }}
             className={clsx(
               'rounded-full px-5 py-2 text-sm font-medium transition-colors',
-              selectedCategory === category ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              selectedCategory === category ? 'category-tab-active' : 'category-tab-inactive',
             )}
           >
             {category}

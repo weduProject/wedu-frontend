@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, HeartPlus, Star, ArrowRight } from 'lucide-react';
+import { User, HeartPlus, Star, ArrowRight, CheckCircle } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const STEPS = [
   {
@@ -32,6 +33,8 @@ const STATS = [
 
 export default function OnboardingStartPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isCompleted = user?.onboardingCompleted ?? false;
 
   return (
     <div className="-mx-5 -mt-5 md:-mx-8 md:-mt-8">
@@ -54,20 +57,38 @@ export default function OnboardingStartPage() {
         </p>
 
         <div className="mb-16 flex gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/onboarding/intro')}
-            className="btn-primary"
-          >
-            무료 테스트 시작하기
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('/shop')}
-            className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
-          >
-            프로포즈 둘러보기
-          </button>
+          {isCompleted ? (
+            <>
+              <div className="flex items-center gap-2 rounded-full bg-primary-light px-5 py-3 text-sm font-semibold text-primary">
+                <CheckCircle className="h-4 w-4" strokeWidth={2} />
+                테스트 완료
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/onboarding/intro')}
+                className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
+              >
+                다시 하기
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => navigate('/onboarding/intro')}
+                className="btn-primary"
+              >
+                무료 테스트 시작하기
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/shop')}
+                className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
+              >
+                프로포즈 둘러보기
+              </button>
+            </>
+          )}
         </div>
 
         {/* 3단계 프로세스 */}

@@ -221,18 +221,34 @@ export default function HomePage() {
               </span>
               <h3 className="text-sm font-bold text-text">프로포즈 스타일</h3>
             </div>
-            <Link to="/onboarding/quiz" className="text-xs font-medium text-primary no-underline hover:underline">
-              결과보기
-            </Link>
+            {user?.onboardingCompleted && (
+              <Link to="/onboarding/quiz" className="text-xs font-medium text-primary no-underline hover:underline">
+                결과보기
+              </Link>
+            )}
           </div>
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="mb-3 text-sm text-text-muted">아직 심리테스트를 하지 않으셨어요</p>
-            <Link
-              to="/onboarding/quiz"
-              className="text-sm font-semibold text-primary no-underline hover:underline"
-            >
-              테스트 하러 가기
-            </Link>
+            {user?.onboardingCompleted ? (
+              <>
+                <p className="mb-3 text-sm text-text-muted">심리테스트가 완료되었어요</p>
+                <Link
+                  to="/onboarding/quiz"
+                  className="text-sm font-semibold text-primary no-underline hover:underline"
+                >
+                  결과 다시 보기
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mb-3 text-sm text-text-muted">아직 심리테스트를 하지 않으셨어요</p>
+                <Link
+                  to="/onboarding"
+                  className="text-sm font-semibold text-primary no-underline hover:underline"
+                >
+                  테스트 하러 가기
+                </Link>
+              </>
+            )}
           </div>
         </BaseCard>
       </div>
