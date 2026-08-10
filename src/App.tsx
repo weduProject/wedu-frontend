@@ -107,6 +107,9 @@ export default function App() {
               <Route path="/community/:id" element={<CommunityDetailPage />} />
               <Route path="/community/write" element={<CommunityWritePage />} />
               <Route path="/mypage" element={<MypagePage />} />
+              <Route path="/invitation" element={<InvitationPage />} />
+              <Route path="/invitation/create" element={<InvitationCreatePage />} />
+              <Route path="/invitation/:id" element={<InvitationDetailPage />} />
             </Route>
           </Routes>
         </ScheduleProvider>

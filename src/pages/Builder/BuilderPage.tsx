@@ -1,4 +1,4 @@
-import { Button } from "../../components"; 
+import { useEffect } from "react";
 import { useBuilder } from "./BuilderContext";
 import BuilderOptionCard from "./BuilderOptionCard";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +21,6 @@ const stepInfo = [
 
 export default function BuilderPage() {
   const navigate = useNavigate();
-
   const {
     builder,
     nextStep,
@@ -35,6 +34,11 @@ export default function BuilderPage() {
   const currentStep = builder.step;
   const currentInfo = stepInfo[currentStep - 1];
 
+  // 단계(step)가 바뀔 때마다 무조건 화면 맨 위로 스크롤 이동
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [currentStep]);
+
   const canNext =
     (currentStep === 1 && builder.weddingHall !== null) ||
     (currentStep === 2 && builder.seudeume !== null) ||
@@ -43,161 +47,194 @@ export default function BuilderPage() {
 
   const recommendedProducts = getRecommendedProducts(builder);
 
+  const handleNext = () => {
+    if (currentStep === 4) {
+      navigate("/builder/cart");
+    } else {
+      nextStep();
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep === 1) {
+      navigate("/builder-start");
+    } else {
+      prevStep();
+    }
+  };
+
+  const currentSelectedItem = 
+    currentStep === 1 ? builder.weddingHall :
+    currentStep === 2 ? builder.seudeume :
+    currentStep === 3 ? builder.honeymoon : null;
+
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
-      <div className="flex items-center justify-center gap-2 mb-8">
-        {steps.map((_, index) => {
-          const stepNumber = index + 1;
-          const completed = currentStep > stepNumber;
-          const active = currentStep === stepNumber;
+    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-32">
+      <div className="max-w-[900px] mx-auto px-4">
+        {/* 상단 프로그레스 바 */}
+        <div className="flex items-center justify-center mb-10">
+          {steps.map((_, index) => {
+            const stepNumber = index + 1;
+            const completed = currentStep > stepNumber;
+            const active = currentStep === stepNumber;
 
-          return (
-            <div key={stepNumber} className="flex items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition
-                  ${completed || active ? "bg-primary text-white" : "bg-gray-200 text-gray-400"}
-                `}
-              >
-                {completed ? "✓" : stepNumber}
+            return (
+              <div key={stepNumber} className="flex items-center">
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-[15px] font-bold transition-all duration-300 shadow-sm
+                    ${completed || active ? "bg-[#F48171] text-white" : "bg-white text-gray-400 border border-gray-200"}
+                  `}
+                >
+                  {completed ? "✓" : stepNumber}
+                </div>
+                {index !== steps.length - 1 && (
+                  <div className={`w-10 md:w-16 h-[2px] transition-colors duration-300 ${currentStep > stepNumber ? "bg-[#F48171]" : "bg-gray-200"}`} />
+                )}
               </div>
-              {index !== steps.length - 1 && (
-                <div className={`w-12 h-[2px] mx-2 ${currentStep > stepNumber ? "bg-primary" : "bg-gray-200"}`} />
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <div className="text-center mb-10">
-        <span className="text-primary font-bold text-sm bg-primary/10 px-3 py-1 rounded-full mb-3 inline-block">
-          {currentInfo.step}
-        </span>
-        <h2 className="text-3xl font-bold mb-2">{currentInfo.title}</h2>
-        <p className="text-gray-500">{currentInfo.subtitle}</p>
-      </div>
+        <div className="text-center mb-12">
+          <span className="text-[#F48171] font-bold text-[13px] bg-[#FFF5F4] px-4 py-1.5 rounded-full mb-4 inline-block">
+            {currentInfo.step}
+          </span>
+          <h2 className="text-2xl md:text-[32px] font-bold mb-3 text-gray-900 tracking-tight">{currentInfo.title}</h2>
+          <p className="text-gray-500 text-[15px]">{currentInfo.subtitle}</p>
+        </div>
 
-      <div className="bg-white rounded-2xl p-2">
-        {currentStep !== 4 ? (
-          <div>
-            <p className="text-sm font-bold text-gray-700 mb-4 ml-1">모든 옵션</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {currentStep === 1 && weddingHallList.map((item) => (
-                <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.weddingHall?.id === item.id} onClick={() => selectWeddingHall(item)} />
-              ))}
-              {currentStep === 2 && seudeumeList.map((item) => (
-                <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.seudeume?.id === item.id} onClick={() => selectSeudeume(item)} />
-              ))}
-              {currentStep === 3 && honeymoonList.map((item) => (
-                <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.honeymoon?.id === item.id} onClick={() => selectHoneymoon(item)} />
-              ))}
-            </div>
-            
-            <div className="mt-8 animate-fade-in">
-              {currentStep === 1 && builder.weddingHall && (
-                <BuilderOptionCard title={builder.weddingHall.name} description={builder.weddingHall.description} tags={builder.weddingHall.tags} icon={builder.weddingHall.icon} showPrice={false} selected={true} onClick={() => {}} showCheckmark={false} />
-              )}
-              {currentStep === 2 && builder.seudeume && (
-                <BuilderOptionCard title={builder.seudeume.name} description={builder.seudeume.description} tags={builder.seudeume.tags} icon={builder.seudeume.icon} showPrice={false} selected={true} onClick={() => {}} showCheckmark={false} />
-              )}
-              {currentStep === 3 && builder.honeymoon && (
-                <BuilderOptionCard title={builder.honeymoon.name} description={builder.honeymoon.description} tags={builder.honeymoon.tags} icon={builder.honeymoon.icon} showPrice={false} selected={true} onClick={() => {}} showCheckmark={false} />
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-bold text-lg mb-4">지금까지의 선택</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{builder.weddingHall?.icon}</span>
-                    <div>
-                      <p className="text-xs text-gray-500">장소</p>
-                      <p className="font-bold">{builder.weddingHall?.name}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{builder.seudeume?.icon}</span>
-                    <div>
-                      <p className="text-xs text-gray-500">분위기</p>
-                      <p className="font-bold">{builder.seudeume?.name}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{builder.honeymoon?.icon}</span>
-                    <div>
-                      <p className="text-xs text-gray-500">음식</p>
-                      <p className="font-bold">{builder.honeymoon?.name}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-bold text-gray-700 mb-4 ml-1">예산 범위</p>
-              <div className="grid grid-cols-2 gap-4">
-                {budgetList?.map((item) => (
-                  <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.budget?.id === item.id} onClick={() => selectBudget(item)} />
+        {/* 메인 컨텐츠 영역 */}
+        <div>
+          {currentStep !== 4 ? (
+            <div className="animate-fade-in max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-10">
+                {currentStep === 1 && weddingHallList.map((item) => (
+                  <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.weddingHall?.id === item.id} onClick={() => selectWeddingHall(item)} />
+                ))}
+                {currentStep === 2 && seudeumeList.map((item) => (
+                  <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.seudeume?.id === item.id} onClick={() => selectSeudeume(item)} />
+                ))}
+                {currentStep === 3 && honeymoonList.map((item) => (
+                  <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.honeymoon?.id === item.id} onClick={() => selectHoneymoon(item)} />
                 ))}
               </div>
-            </div>
 
-            {builder.budget && (
-              <div className="mt-12 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm animate-fade-in">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-bold text-lg">🚀 추천 상품</h3>
-                  <span className="bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    선택한 예산 및 스타일 일치
-                  </span>
+              {currentSelectedItem && (
+                <div className="mt-12 p-6 flex flex-col md:flex-row md:items-center gap-5 bg-grey rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-fade-in">
+                  <div className="flex items-center gap-5 flex-1">
+                    <div className="text-3xl w-12 h-12 flex items-center justify-center bg-gray-50 rounded-2xl">{currentSelectedItem.icon}</div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-[17px] text-gray-900">{currentSelectedItem.name}</h3>
+                      <p className="text-gray-500 text-sm leading-relaxed mt-1 line-clamp-1">{currentSelectedItem.description}</p>
+                    </div>
+                  </div>
+                  
+                  {/* 우측 핑크색 태그 영역 */}
+                  <div className="flex flex-wrap gap-2 pt-4 md:pt-0 border-t md:border-t-0 md:pl-5 border-gray-100/70">
+                    {currentSelectedItem.tags?.map(tag => (
+                      <span key={tag} className="rounded-full bg-[#FFF5F4] px-4 py-1.5 text-[11px] font-bold text-[#F48171]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 mb-5">
-                  선택하신 예산 범위 내에서 최적의 상품 조합을 찾아 구성했습니다.
-                </p>
-                
-                <div className="space-y-3">
-                  {recommendedProducts.map((p) => (
-                    <div key={p.id} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 hover:border-primary/30 transition">
+              )}
+            </div>
+          ) : (
+            // Step 4 (예산/추천) 영역
+            <div className="space-y-10 animate-fade-in max-w-4xl mx-auto">
+              {/* 요약 카드 */}
+              <div className="bg-[#F8F9FA] rounded-[2rem] p-8 md:p-10 border border-gray-100/50">
+                <h3 className="font-bold text-[17px] mb-6 text-gray-900">지금까지의 선택</h3>
+                <div className="space-y-4">
+                  {[
+                    { label: "장소", item: builder.weddingHall },
+                    { label: "분위기", item: builder.seudeume },
+                    { label: "음식", item: builder.honeymoon },
+                  ].map((data, idx) => (
+                    <div key={idx} className="flex justify-between items-center bg-transparent pb-4 border-b border-gray-200/60 last:border-0 last:pb-0">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-lg text-lg">
-                          {p.icon}
-                        </div>
+                        <span className="text-2xl w-10 text-center">{data.item?.icon}</span>
                         <div>
-                          <p className="font-bold text-sm">{p.title}</p>
-                          <p className="text-xs text-gray-500">{p.category}</p>
+                          <p className="text-[12px] text-gray-500 font-medium">{data.label}</p>
+                          <p className="font-bold text-[15px] text-gray-900 mt-0.5">{data.item?.name}</p>
                         </div>
                       </div>
-                      <span className="font-bold text-sm">{p.displayPrice}</span>
+                      <button className="text-[#F48171] text-[13px] font-bold px-3 py-1.5 hover:bg-[#F48171]/10 rounded-lg transition-colors">
+                        수정
+                      </button>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
-            
-          </div>
-        )}
 
-        <div className="flex justify-between items-center gap-3 mt-12 border-t pt-6">
-          <Button variant="secondary" onClick={() => { if (currentStep === 1) navigate("/builder-start"); else prevStep(); }}>
-            ← 이전
-          </Button>
+              {/* 예산 선택 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {budgetList?.map((item) => (
+                  <BuilderOptionCard key={item.id} title={item.name} description={item.description} tags={item.tags} icon={item.icon} showPrice={false} selected={builder.budget?.id === item.id} onClick={() => selectBudget(item)} />
+                ))}
+              </div>
 
-          {currentStep === 4 ? (
-            <Button onClick={() => navigate("/builder/cart")} disabled={!canNext}>
-              플랜 생성하고 장바구니 보기 🛒
-            </Button>
-          ) : (
-            <Button onClick={nextStep} disabled={!canNext}>
+              {/* 추천 상품 */}
+              {builder.budget && (
+                <div className="bg-[#FFF6F5] rounded-[2rem] p-8 md:p-10 border border-[#FFE0DC] shadow-sm animate-fade-in">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
+                      🎯 추천 상품
+                    </h3>
+                    <span className="bg-white text-[#F48171] border border-[#F48171]/20 text-[11px] font-bold px-2.5 py-1 rounded-full">
+                      선택한 스타일 기반
+                    </span>
+                  </div>
+                  <p className="text-[13px] text-gray-500 mb-8">
+                    선택하신 장소와 분위기에 어울리는 상품들입니다. 완료 시 장바구니에 자동으로 담겨요.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {recommendedProducts.map((p) => (
+                      <div key={p.id} className="flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-xl shadow-sm border border-gray-100">
+                            {p.icon}
+                          </div>
+                          <div>
+                            <p className="font-bold text-[15px] text-gray-900">{p.title}</p>
+                            <p className="text-[12px] text-gray-500 mt-0.5">{p.category}</p>
+                          </div>
+                        </div>
+                        <span className="font-bold text-[15px] text-gray-900">{p.displayPrice}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 하단 고정 버튼 영역 */}
+          <div className="flex justify-between items-center gap-4 mt-16 max-w-4xl mx-auto">
+            <button 
+              className="px-4 py-2 text-gray-500 text-[15px] font-medium flex items-center gap-1 hover:text-gray-900 transition-colors" 
+              onClick={handlePrev}
+            >
+              ← 이전
+            </button>
+
+            <button 
+              className={`px-8 py-4 rounded-full font-bold text-[15px] transition-all duration-300 shadow-md ${
+                canNext 
+                  ? "bg-gradient-to-r from-[#F89685] to-[#F2705C] text-white hover:shadow-lg hover:shadow-[#F2705C]/20 hover:-translate-y-0.5" 
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+              onClick={handleNext} 
+              disabled={!canNext}
+            >
               {currentStep === 1 && "다음: 분위기 선택 →"}
               {currentStep === 2 && "다음: 음식 선택 →"}
               {currentStep === 3 && "다음: 예산 확인 →"}
-            </Button>
-          )}
+              {currentStep === 4 && "플랜 완성하고 장바구니 보기 🛒"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

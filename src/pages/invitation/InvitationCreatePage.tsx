@@ -1,16 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-type SectionKey =
-  | 'basic'
-  | 'photos'
-  | 'wedding'
-  | 'message'
-  | 'gallery'
-  | 'account'
-  | 'parents'
-  | 'directions'
-  | 'design';
+type SectionKey = 'basic' | 'photos' | 'wedding' | 'message' | 'gallery' | 'account' | 'parents' | 'directions' | 'design';
 
 interface SectionDef {
   key: SectionKey;
@@ -41,77 +32,45 @@ const colorOptions = [
   { name: '피치', value: '#E8C8A0' },
 ];
 
-interface GalleryItem {
-  url: string;
-  order: number;
-}
-
 export default function InvitationCreatePage() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<SectionKey>('basic');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
     template_id: 'classic-ivory',
-    groom_name: '',
-    bride_name: '',
-    groom_photo: '',
-    bride_photo: '',
-    groom_contact: '',
-    bride_contact: '',
-    groom_parents: '',
-    bride_parents: '',
-    wedding_date: '',
-    wedding_time: '',
-    venue_name: '',
-    venue_address: '',
-    venue_detail: '',
-    latitude: '',
-    longitude: '',
-    main_greeting: '',
-    invitation_message: '',
-    additional_message: '',
-    gallery_images: [] as GalleryItem[],
-    groom_bank: '',
-    groom_account: '',
-    groom_account_holder: '',
-    bride_bank: '',
-    bride_account: '',
-    bride_account_holder: '',
-    groom_parent_contact: '',
-    bride_parent_contact: '',
-    transport_guide: '',
-    parking_guide: '',
-    public_transport_guide: '',
     main_color: '#C9A96E',
-    font_family: 'serif',
-    bgm_url: '',
   });
 
   const updateField = useCallback((field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleSave = useCallback((publish: boolean) => {
+  const handleDraft = useCallback(() => {
     setSaving(true);
     setSaveMessage(null);
-
     setTimeout(() => {
       setSaving(false);
       setSaveMessage({
         type: 'success',
-        text: publish ? '청첩장이 발행되었습니다!' : '임시 저장되었습니다.',
+        text: '임시 저장되었습니다.',
       });
-      if (publish) {
-        navigate('/invitation');
-      }
     }, 600);
-  }, [navigate]);
+  }, []);
 
-  const handlePublish = useCallback(() => handleSave(true), [handleSave]);
-  const handleDraft = useCallback(() => handleSave(false), [handleSave]);
+  const handlePublish = useCallback(() => {
+    setShowPublishModal(true);
+    setIsPublished(false);
+    
+    setTimeout(() => {
+      setIsPublished(true);
+    }, 1500);
+  }, []);
 
   const currentSectionIdx = sections.findIndex((s) => s.key === activeSection);
 
@@ -139,7 +98,7 @@ export default function InvitationCreatePage() {
             </div>
           </div>
 
-          <div className="hidden md:flex justify-center sticky top-4 z-50 mb-8">
+          <div className="hidden md:flex justify-center sticky top-4 z-40 mb-8">
             <div className="w-full max-w-4xl flex items-center justify-center gap-1 bg-white/90 backdrop-blur-md rounded-2xl p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-x-auto scrollbar-hide">
               {sections.map((section) => (
                 <button
@@ -158,26 +117,9 @@ export default function InvitationCreatePage() {
             </div>
           </div>
 
-          <div className="md:hidden sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm -mx-4 px-4 py-3 mb-6">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-              {sections.map((section) => (
-                <button
-                  key={section.key}
-                  onClick={() => setActiveSection(section.key)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                    activeSection === section.key
-                      ? 'bg-[#C9A96E] text-white shadow-md shadow-[#C9A96E]/20'
-                      : 'bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100'
-                  }`}
-                >
-                  {section.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-12 min-h-[400px]">
+              
               {activeSection === 'basic' && (
                 <div className="animate-fade-in">
                   <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-2">
@@ -285,6 +227,51 @@ export default function InvitationCreatePage() {
           </div>
         </div>
       </div>
+
+      {showPublishModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+            onClick={() => isPublished && setShowPublishModal(false)}
+          ></div>
+          <div className="relative bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-fade-in border border-gray-100">
+            {!isPublished ? (
+              <div className="py-8">
+                <div className="w-14 h-14 border-4 border-[#C9A96E]/20 border-t-[#C9A96E] rounded-full animate-spin mx-auto mb-6"></div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">청첩장을 발행하고 있습니다...</h3>
+                <p className="text-sm text-gray-500">잠시만 기다려주세요.</p>
+              </div>
+            ) : (
+              <div className="py-4 animate-fade-in">
+                <div className="w-16 h-16 bg-[#C9A96E]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#C9A96E] text-3xl shadow-inner">
+                  ✓
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">발행이 완료되었습니다!</h3>
+                <p className="text-sm text-gray-500 mb-8">이제 소중한 사람들에게 청첩장을 공유해보세요.</p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => {
+                      alert('클립보드에 URL이 복사되었습니다!');
+                    }}
+                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <i className="ri-file-copy-line mr-2"></i>URL 복사하기
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowPublishModal(false);
+                      navigate('/invitation');
+                    }}
+                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-[#C9A96E] text-white hover:bg-[#B8985D] transition-colors shadow-md shadow-[#C9A96E]/20"
+                  >
+                    목록으로 돌아가기
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
