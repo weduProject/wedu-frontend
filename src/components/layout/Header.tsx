@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,7 +8,7 @@ import { useCart } from '../../pages/Shop/CartContext';
 
 const PRIMARY_LINKS = [
   { label: '홈', path: '/home' },
-  { label: '심리테스트', path: '/onboarding/quiz' },
+  { label: '심리테스트', path: '/onboarding' },
   { label: '프로포즈 플래닝', path: '/shop' },
 ] as const;
 
@@ -38,6 +38,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [scrolled, setScrolled] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
@@ -224,13 +225,15 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="hidden bg-transparent text-sm font-semibold text-primary transition-opacity hover:opacity-80 sm:inline"
-            >
-              로그인
-            </button>
+            location.pathname !== '/login' && (
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="hidden bg-transparent text-sm font-semibold text-primary transition-opacity hover:opacity-80 sm:inline"
+              >
+                로그인
+              </button>
+            )
           )}
 
           <button

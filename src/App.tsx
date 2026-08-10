@@ -54,14 +54,7 @@ export default function App() {
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route element={<OnboardingRoutes />}>
-              <Route path="/onboarding" element={<OnboardingStartPage />} />
-              <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
-              <Route path="/onboarding/quiz" element={<QuizPage />} />
-              <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
-            </Route>
 
             <Route
               element={
@@ -74,6 +67,7 @@ export default function App() {
                 </CommunityProvider>
               }
             >
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/dday" element={<DDayPage />} />
               <Route path="/shop" element={<ShopPage />} />
@@ -108,6 +102,13 @@ export default function App() {
               <Route path="/mypage" element={<MypagePage />} />
               <Route path="/connect" element={<ConnectPage />} />
               <Route path="/magazine" element={<WeddingMagazinePage />} />
+              {/* 온보딩 전체 — PageLayout 안에서 Header/Footer 포함 */}
+              <Route element={<OnboardingRoutes />}>
+                <Route path="/onboarding" element={<OnboardingStartPage />} />
+                <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
+                <Route path="/onboarding/quiz" element={<QuizPage />} />
+                <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
+              </Route>
             </Route>
           </Routes>
         </ScheduleProvider>

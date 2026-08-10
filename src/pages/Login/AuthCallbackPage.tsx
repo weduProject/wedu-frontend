@@ -23,8 +23,8 @@ export default function AuthCallbackPage() {
     }
 
     loginWithOAuth((provider as 'kakao' | 'google') ?? 'kakao', code)
-      .then(({ onboardingCompleted }) => {
-        navigate(onboardingCompleted ? '/home' : '/onboarding', { replace: true });
+      .then(() => {
+        navigate('/home', { replace: true });
       })
       .catch((err) => {
         const message = err instanceof Error ? err.message : '로그인에 실패했어요.';
