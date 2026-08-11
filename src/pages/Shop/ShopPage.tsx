@@ -62,6 +62,7 @@ export default function ShopPage() {
     fetchProducts({
       category: filters.category === '전체' ? undefined : filters.category,
       keyword: keyword || undefined,
+      size: 100, // 지금은 상품이 24개뿐이니 넉넉하게
     })
       .then(setAllProducts)
       .catch((err) => console.warn('상품 목록 조회 실패', err))
