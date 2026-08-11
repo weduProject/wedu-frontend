@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { LayoutGrid, UtensilsCrossed, Building2, Sun, Flower2, Camera, Music, Flame, Gem } from 'lucide-react';
+import { LayoutGrid, Gem, PartyPopper, Flower2, Camera, Mail, Music } from 'lucide-react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
 import StyleAndSearchBar from './components/StyleAndSearchBar';
@@ -10,14 +10,12 @@ import { PRODUCTS } from './shopData';
 
 const CATEGORIES = [
   { id: '전체', label: '전체', Icon: LayoutGrid },
-  { id: '🍽️ 장소', label: '프라이빗다이닝', Icon: UtensilsCrossed },
-  { id: '🏨 장소', label: '5성급호텔', Icon: Building2 },
-  { id: '🌅 장소', label: '제주', Icon: Sun },
-  { id: '💐 서비스', label: '플라워데코', Icon: Flower2 },
-  { id: '📸 서비스', label: '스냅', Icon: Camera },
-  { id: '🎻 경험', label: '라이브연주', Icon: Music },
-  { id: '🎆 경험', label: '이벤트', Icon: Flame },
-  { id: '💍 선물', label: '주얼리', Icon: Gem },
+  { id: 'RING', label: '주얼리', Icon: Gem },
+  { id: 'EVENT', label: '이벤트/공간', Icon: PartyPopper },
+  { id: 'FLOWER', label: '플라워', Icon: Flower2 },
+  { id: 'PHOTO', label: '사진/영상', Icon: Camera },
+  { id: 'LETTER', label: '편지/레터', Icon: Mail },
+  { id: 'ETC', label: '기타', Icon: Music },
 ] as const;
 
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '럭셔리', '감성적', '모던', '아늑한', '깜짝', '모험적'];

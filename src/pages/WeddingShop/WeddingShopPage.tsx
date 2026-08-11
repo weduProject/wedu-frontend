@@ -6,6 +6,8 @@ import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients
 import { CATEGORIES, MOCK_PRODUCTS } from './mockProducts';
 import { formatPrice } from './utils/formatPrice';
 import { IMAGE_PLACEHOLDER_BG, CARD_BORDER } from './styles';
+import weddingShopHeroBg from '../../assets/wedding-shop/hero.jpg';
+import weddingShopCtaBg from '../../assets/wedding-shop/cta.jpg';
 
 export default function WeddingShopPage() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -15,7 +17,7 @@ export default function WeddingShopPage() {
     <div className="-m-5 md:-m-8">
       <section className="relative">
         <div className="relative h-[658px] w-full overflow-hidden">
-          <img src="https://readdy.ai/api/search-image?query=Elegant%20luxurious%20editorial%20flat%20lay%20photography%20of%20wedding%20essentials%20including%20silk%20dress%20fabric%20swatches%20lace%20ribbons%20gold%20rings%20pearl%20necklace%20and%20dried%20cream%20flowers%20on%20light%20beige%20marble%20surface%2C%20soft%20natural%20window%20light%20from%20left%2C%20minimalist%20composition%20with%20ample%20negative%20space%2C%20editorial%20luxury%20magazine%20style%20with%20warm%20neutral%20cream%20and%20champagne%20gold%20palette&width=1600&height=700&seq=wedding-shop-hero-01&orientation=landscape" alt="웨딩 룩북" className="h-full w-full object-cover object-top" />
+          <img src={weddingShopHeroBg} alt="웨딩 룩북" className="h-full w-full object-cover object-top" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.4) 100%)' }} />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <span className="mb-6 inline-block rounded-full border border-white/20 bg-white/15 px-[17px] py-[7px] text-sm font-medium tracking-[2.8px] text-white/90 backdrop-blur-[6px]">
@@ -84,7 +86,7 @@ export default function WeddingShopPage() {
 
       <section className="mx-auto max-w-5xl px-5 pb-14 md:px-8">
         <div className="relative overflow-hidden rounded-2xl bg-[#F0EEED]">
-          <img src="https://readdy.ai/api/search-image?query=Soft%20abstract%20cream%20beige%20and%20champagne%20gold%20gradient%20background%20with%20subtle%20delicate%20floral%20line%20art%20illustrations%20in%20light%20tone%2C%20minimalist%20elegant%20texture%2C%20editorial%20style%20with%20ample%20negative%20space%20and%20luxurious%20warm%20palette&width=1200&height=400&seq=wedding-shop-cta-01&orientation=landscape" alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <img src={weddingShopCtaBg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
           <div className="relative flex flex-col items-center justify-between gap-6 px-8 py-10 md:flex-row md:px-12 md:py-14">
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-semibold text-[#181515] md:text-3xl">맞춤 견적이 필요하신가요?</h2>
