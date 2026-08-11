@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Header from '../../../components/layout/Header';
 import Button from '../../../components/ui/Button';
+import heroBg from '../../../assets/landing/hero-bg.jpg';
 
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function HeroSection() {
 
       <div className="absolute inset-0 bg-[#463730]">
         <img
-          src="https://readdy.ai/api/search-image?query=Elegant%20wedding%20ceremony%20setting%20bride%20in%20white%20gown%20luxurious%20white%20floral%20arrangements%20ivory%20roses%20soft%20natural%20backlighting%20clean%20minimalist%20aesthetic%20high-end%20editorial%20wedding%20photography%20bright%20airy%20atmosphere%20candlelight%20chandelier%20modern%20venue&width=1600&height=900&seq=wedu-hero-03&orientation=landscape"
+          src={heroBg}
           alt="Wedding hero"
           className="h-full w-full object-cover object-top"
         />

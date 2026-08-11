@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Button from '../../../components/ui/Button'; 
+import ctaCouple from '../../../assets/landing/cta-couple.jpg';
 
 export default function CtaSection() {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ export default function CtaSection() {
       <div className="flex min-h-[500px] flex-col md:flex-row">
         <div className="relative min-h-[280px] w-full md:min-h-full md:w-1/2">
           <img
-            src="https://readdy.ai/api/search-image?query=Romantic%20wedding%20couple%20embracing%20soft%20rose%20gold%20lighting%20ivory%20dress%20editorial%20photography%20luxury%20wedding%20moment%20emotional%20warm%20tones%20high-end&width=800&height=900&seq=wedu-cta-01&orientation=portrait"
+            src={ctaCouple}
             alt="Wedding couple"
             className="h-full w-full object-cover object-top"
           />

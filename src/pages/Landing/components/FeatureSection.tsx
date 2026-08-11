@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HeartPulse, MapPin, Sparkles, Wallet, ArrowRight } from 'lucide-react';
+import weduLogo from '../../../assets/landing/logo.png';
 
 const FEATURES = [
   { Icon: HeartPulse, title: '심리테스트', desc: '성향 분석으로 찾는\n맞춤형 프로포즈 스타일', link: '/onboarding' },
@@ -15,7 +16,7 @@ export default function FeatureSection() {
         <div className="mb-16 text-center">
           <div className="mb-8 mx-auto flex h-40 w-40 items-center justify-center md:h-52 md:w-52">
             <img
-              src="https://public.readdy.ai/ai/img_res/0cbfc8af-0693-4c0f-9cdc-2b3ca35b8a0d.png"
+              src={weduLogo}
               alt="WEDU"
               className="h-full w-full object-contain"
             />

@@ -1,9 +1,11 @@
+import shopHeroBg from '../../../assets/shop/hero.jpg';
+
 export default function ShopHero() {
   return (
     <section className="relative">
       <div className="relative h-[658px] w-full overflow-hidden">
         <img
-          src="https://readdy.ai/api/search-image?query=Romantic%20proposal%20planning%20workspace%20with%20soft%20warm%20cream%20and%20blush%20tones%2C%20elegant%20stationery%20and%20flower%20arrangement%20on%20marble%20desk%2C%20rose%20gold%20accessories%2C%20editorial%20flat%20lay%20photography%20with%20diffused%20natural%20light%2C%20sophisticated%20feminine%20aesthetic%2C%20minimal%20composition&width=1600&height=600&seq=propose-hero-v3&orientation=landscape"
+          src={shopHeroBg}
           alt="프로포즈 편집실"
           className="h-full w-full object-cover object-top"
         />

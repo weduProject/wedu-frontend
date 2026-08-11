@@ -1,5 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import vendorHotel from '../../../assets/landing/vendor-hotel.jpg';
+import vendorOutdoor from '../../../assets/landing/vendor-outdoor.jpg';
+import vendorRooftop from '../../../assets/landing/vendor-rooftop.jpg';
+import vendorBeach from '../../../assets/landing/vendor-beach.jpg';
 
 // TODO: 백엔드 연동 시 GET /api/recommend/place 응답으로 교체
 interface PackageItem {
@@ -13,10 +17,10 @@ interface PackageItem {
 }
 
 const PACKAGE_ITEMS: PackageItem[] = [
-  { id: 1, title: '스카이뷰 호텔 패키지', location: '서울 강남구', price: '₩450,000~', rating: 4.8, reviewCount: 120, image: 'https://readdy.ai/api/search-image?query=Luxury%20hotel%20wedding%20venue%20ballroom%20elegant%20chandelier%20rose%20gold%20decor%20ivory%20table%20settings%20editorial%20wedding%20photography%20warm%20lighting%20high-end&width=600&height=800&seq=wedu-vendor-01&orientation=portrait' },
-  { id: 2, title: '프라이빗 다이닝 패키지', location: '서울 이태원', price: '₩350,000~', rating: 4.7, reviewCount: 86, image: 'https://readdy.ai/api/search-image?query=Outdoor%20garden%20wedding%20venue%20floral%20arch%20greenery%20natural%20light%20romantic%20setting%20editorial%20photography%20high-end%20wedding%20details%20soft%20warm%20tones&width=600&height=800&seq=wedu-vendor-02&orientation=portrait' },
-  { id: 3, title: '감성 야외 프로포즈', location: '경기 가평', price: '₩250,000~', rating: 4.9, reviewCount: 203, image: 'https://readdy.ai/api/search-image?query=Modern%20rooftop%20wedding%20venue%20city%20skyline%20night%20string%20lights%20elegant%20setup%20editorial%20photography%20luxury%20atmosphere%20warm%20rose%20gold%20tones&width=600&height=800&seq=wedu-vendor-03&orientation=portrait' },
-  { id: 4, title: '비치 썬셋 프로포즈', location: '부산 해운대', price: '₩500,000~', rating: 4.6, reviewCount: 54, image: 'https://readdy.ai/api/search-image?query=Beach%20wedding%20venue%20sunset%20ocean%20view%20white%20drapes%20elegant%20setup%20editorial%20photography%20luxury%20romantic%20atmosphere%20warm%20golden%20hour%20light&width=600&height=800&seq=wedu-vendor-04&orientation=portrait' },
+  { id: 1, title: '스카이뷰 호텔 패키지', location: '서울 강남구', price: '₩450,000~', rating: 4.8, reviewCount: 120, image: vendorHotel },
+  { id: 2, title: '프라이빗 다이닝 패키지', location: '서울 이태원', price: '₩350,000~', rating: 4.7, reviewCount: 86, image: vendorOutdoor },
+  { id: 3, title: '감성 야외 프로포즈', location: '경기 가평', price: '₩250,000~', rating: 4.9, reviewCount: 203, image: vendorRooftop },
+  { id: 4, title: '비치 썬셋 프로포즈', location: '부산 해운대', price: '₩500,000~', rating: 4.6, reviewCount: 54, image: vendorBeach },
 ];
 
 export default function VendorSection() {

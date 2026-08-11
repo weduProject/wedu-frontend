@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import avatar01 from '../../../assets/landing/testimonial-01.jpg';
+import avatar02 from '../../../assets/landing/testimonial-02.jpg';
+import avatar03 from '../../../assets/landing/testimonial-03.jpg';
 
 interface Testimonial {
   text: string;
@@ -17,21 +20,21 @@ const TESTIMONIALS: Testimonial[] = [
     name: '김지연 & 박민수',
     role: '2027년 3월 결혼 예정',
     rating: 4.9,
-    avatar: 'https://readdy.ai/api/search-image?query=Portrait%20of%20young%20Korean%20couple%20wedding%20attire%20smiling%20soft%20natural%20light%20editorial%20photography%20clean%20background%20warm%20tones&width=100&height=100&seq=wedu-avatar-01&orientation=squarish'
+    avatar: avatar01,
   },
   {
     text: 'WEDU 덕분에 예산 관리가 정말 쉬워졌어요. 어느 항목에 얼마를 쓸지 감이 안 잡혔는데, 플랫폼에서 추천해준 예산 분배대로 하니까 스트레스 없이 준비할 수 있었습니다.',
     name: '이서연 & 최준혁',
     role: '2026년 12월 결혼 예정',
     rating: 4.8,
-    avatar: 'https://readdy.ai/api/search-image?query=Portrait%20of%20happy%20young%20Korean%20bride%20groom%20wedding%20dress%20formal%20soft%20natural%20daylight%20editorial%20style%20clean%20minimal%20background%20warm%20tones&width=100&height=100&seq=wedu-avatar-02&orientation=squarish'
+    avatar: avatar02,
   },
   {
     text: '체크리스트 기능이 최고예요. 할 일이 너무 많아서 정리가 안 됐는데, WEDU에서 제공하는 기본 체크리스트를 바탕으로 커스텀해서 사용하니까 하나도 빠짐없이 준비할 수 있었습니다.',
     name: '한채원 & 김도윤',
     role: '2026년 9월 결혼 예정',
     rating: 5.0,
-    avatar: 'https://readdy.ai/api/search-image?query=Portrait%20of%20smiling%20young%20Asian%20couple%20engagement%20ring%20soft%20natural%20light%20editorial%20photography%20clean%20simple%20background%20warm%20rose%20gold%20tones&width=100&height=100&seq=wedu-avatar-03&orientation=squarish'
+    avatar: avatar03,
   },
 ];
 
