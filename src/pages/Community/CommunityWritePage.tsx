@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components"; 
 import { useCommunity } from "./CommunityContext";
-import { communityApi } from "../../api/community"; // 👈 방금 만든 API 모듈 불러오기!
+import { communityApi } from "../../api/community"; 
 
 const categories = ["프로포즈", "웨딩준비", "신혼생활", "고민상담", "Tip공유"];
 
@@ -18,7 +18,7 @@ export default function CommunityWritePage() {
 
   const MAX_LENGTH = 3000;
 
-  // 🚀 Axios 기반 API 모듈로 실제 서버와 통신하도록 수정
+  //Axios 기반 API 모듈로 실제 서버와 통신하도록 수정
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) return;
     

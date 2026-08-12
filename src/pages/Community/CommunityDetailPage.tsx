@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Heart, MessageCircle, User } from "lucide-react";
-import { Button, CategoryBadge } from "../../components"; // 👈 CategoryBadge 임포트 추가
+import { Button, CategoryBadge } from "../../components"; 
 import { useCommunity } from "./CommunityContext";
 
 export default function CommunityDetailPage() {
