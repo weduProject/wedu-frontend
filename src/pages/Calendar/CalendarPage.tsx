@@ -25,7 +25,7 @@ export default function CalendarPage() {
   const [activeCategory, setActiveCategory] = useState('전체');
 
   // 상태 분리: 상세보기용 데이터 vs 수정용 데이터
-  const [viewSchedule, setViewSchedule] = useState<ScheduleItem | null>(null);
+  const [viewSchedules, setViewSchedules] = useState<ScheduleItem[] | null>(null);
   const [editSchedule, setEditSchedule] = useState<ScheduleItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -48,13 +48,18 @@ export default function CalendarPage() {
   // 필터링 로직
   const filteredSchedules = schedules.filter((item) => {
     return activeCategory === '전체' || item.category === activeCategory;
+  })
+  .sort((a,b) => {
+    const datetimeA = new Date(`${a.date}T${a.time}`).getTime();
+    const datetimeB = new Date(`${b.date}T${b.time}`).getTime();
+    return datetimeA - datetimeB; // 시간순 정렬
   });
 
   return (
-    <div className="mx-auto max-w-[1024px]">
+    <div className="mx-auto max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text md:text-3xl">일정 관리</h2>
+          <h2 className="text-2xl font-bold font-serif text-text md:text-3xl">일정 관리</h2>
           <p className="mt-2 text-sm text-text-muted">웨딩 준비 일정을 한눈에 확인하고 관리하세요.</p>
         </div>
         <Button
@@ -76,7 +81,7 @@ export default function CalendarPage() {
         <div className="lg:col-span-2">
           <CalendarGrid
             schedules={filteredSchedules}
-            onScheduleClick={(schedule) => setViewSchedule(schedule)}
+            onScheduleClick={(schedules) => setViewSchedules(schedules)}
             year={year}
             month={month}
             onPrevMonth={goToPrevMonth}
@@ -86,8 +91,7 @@ export default function CalendarPage() {
         <div className='h-full'>
           <UpcomingList
           schedules={filteredSchedules}
-          onDelete={deleteSchedule}
-          onScheduleClick={(schedule) => setViewSchedule(schedule)}
+          onScheduleClick={(schedules) => setViewSchedules([schedules])}
           />
         </div>
       </div>
@@ -118,13 +122,23 @@ export default function CalendarPage() {
       )}
 
       {/* 2. 일정 상세 보기 모달 (viewSchedule에 데이터가 있을 때 뜸) */}
-      {viewSchedule && (
+      {viewSchedules && viewSchedules.length > 0 && (
         <ScheduleDetailModal
-          schedule={viewSchedule}
-          onClose={() => setViewSchedule(null)}
-          onEdit={() => {
-            setEditSchedule(viewSchedule); 
-            setViewSchedule(null); 
+          schedules={viewSchedules}
+          onClose={() => setViewSchedules(null)}
+          onEdit={(scheduleToEdit) => {
+            setEditSchedule(scheduleToEdit); 
+            setViewSchedules(null); 
+          }}
+          onDelete={(id) => {
+            deleteSchedule(id); 
+            
+            setViewSchedules((prev) => {
+              if (!prev) return null;
+              const remainingSchedules = prev.filter((s) => s.id !== id);
+              
+              return remainingSchedules.length > 0 ? remainingSchedules : null;
+            });
           }}
         />
       )}

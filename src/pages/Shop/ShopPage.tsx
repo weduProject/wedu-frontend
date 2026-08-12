@@ -1,23 +1,22 @@
-import { useState, useRef } from 'react';
-import { LayoutGrid, UtensilsCrossed, Building2, Sun, Flower2, Camera, Music, Flame, Gem } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { LayoutGrid, Gem, PartyPopper, Flower2, Camera, Mail, Music } from 'lucide-react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
 import StyleAndSearchBar from './components/StyleAndSearchBar';
 import ProductCard from './components/ProductCard';
 import TasteFinder from './components/TasteFinder';
 import ShopCTA from './components/ShopCTA';
-import { PRODUCTS } from './shopData';
+import { fetchProducts } from './shopApi';
+import type { DisplayProduct } from './shopApi';
 
 const CATEGORIES = [
   { id: '전체', label: '전체', Icon: LayoutGrid },
-  { id: '🍽️ 장소', label: '프라이빗다이닝', Icon: UtensilsCrossed },
-  { id: '🏨 장소', label: '5성급호텔', Icon: Building2 },
-  { id: '🌅 장소', label: '제주', Icon: Sun },
-  { id: '💐 서비스', label: '플라워데코', Icon: Flower2 },
-  { id: '📸 서비스', label: '스냅', Icon: Camera },
-  { id: '🎻 경험', label: '라이브연주', Icon: Music },
-  { id: '🎆 경험', label: '이벤트', Icon: Flame },
-  { id: '💍 선물', label: '주얼리', Icon: Gem },
+  { id: 'RING', label: '주얼리', Icon: Gem },
+  { id: 'EVENT', label: '이벤트/공간', Icon: PartyPopper },
+  { id: 'FLOWER', label: '플라워', Icon: Flower2 },
+  { id: 'PHOTO', label: '사진/영상', Icon: Camera },
+  { id: 'LETTER', label: '편지/레터', Icon: Mail },
+  { id: 'ETC', label: '기타', Icon: Music },
 ] as const;
 
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '럭셔리', '감성적', '모던', '아늑한', '깜짝', '모험적'];
@@ -36,54 +35,49 @@ function smoothScrollTo(target: HTMLElement | null, duration: number) {
   const distance = targetY - startY;
   let startTime: number | null = null;
 
-  const easeInOutQuad = (t: number) =>
-    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
   function step(currentTime: number) {
     if (startTime === null) startTime = currentTime;
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-
     window.scrollTo(0, startY + distance * easeInOutQuad(progress));
-
-    if (elapsed < duration) {
-      requestAnimationFrame(step);
-    }
+    if (elapsed < duration) requestAnimationFrame(step);
   }
 
   requestAnimationFrame(step);
 }
 
 export default function ShopPage() {
-  const [filters, setFilters] = useState({
-    category: '전체',
-    styleTag: '전체 스타일',
-  });
-
+  const [filters, setFilters] = useState({ category: '전체', styleTag: '전체 스타일' });
   const [selectedTastes, setSelectedTastes] = useState<string[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
   const [keyword, setKeyword] = useState('');
 
+  const [allProducts, setAllProducts] = useState<DisplayProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchProducts({
+      category: filters.category === '전체' ? undefined : filters.category,
+      keyword: keyword || undefined,
+      size: 100, // 지금은 상품이 24개뿐이니 넉넉하게
+    })
+      .then(setAllProducts)
+      .catch((err) => console.warn('상품 목록 조회 실패', err))
+      .finally(() => setIsLoading(false));
+  }, [filters.category, keyword]);
+
   const toggleTaste = (label: string) => {
-    setSelectedTastes((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
-    );
+    setSelectedTastes((prev) => (prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]));
     smoothScrollTo(gridRef.current, 800);
   };
 
-  const products = PRODUCTS.filter((product) => {
-    const categoryMatch = filters.category === '전체' || product.category === filters.category;
-    const styleMatch =
-      filters.styleTag === '전체 스타일' || product.styles.includes(filters.styleTag);
-    const tasteMatch =
-      selectedTastes.length === 0 || selectedTastes.some((t) => product.tastes.includes(t));
-    const keywordMatch =
-      keyword === '' ||
-      product.title.toLowerCase().includes(keyword.toLowerCase()) ||
-      product.description.toLowerCase().includes(keyword.toLowerCase()) ||
-      product.tags.some((tag) => tag.toLowerCase().includes(keyword.toLowerCase()));
-
-    return categoryMatch && styleMatch && tasteMatch && keywordMatch;
+  const products = allProducts.filter((product) => {
+    const styleMatch = filters.styleTag === '전체 스타일' || product.styles.includes(filters.styleTag);
+    const tasteMatch = selectedTastes.length === 0 || selectedTastes.some((t) => product.tastes.includes(t));
+    return styleMatch && tasteMatch;
   });
 
   return (
@@ -107,14 +101,20 @@ export default function ShopPage() {
           />
 
           <div ref={gridRef} className="scroll-mt-6 pb-14 pt-6">
-            <p className="mb-3 text-sm text-[#968178]">총 {products.length}개</p>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-            {products.length === 0 && (
-              <p className="mt-10 text-center text-sm text-[#968178]">조건에 맞는 상품이 없어요.</p>
+            {isLoading ? (
+              <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>
+            ) : (
+              <>
+                <p className="mb-3 text-sm text-[#968178]">총 {products.length}개</p>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+                {products.length === 0 && (
+                  <p className="mt-10 text-center text-sm text-[#968178]">조건에 맞는 상품이 없어요.</p>
+                )}
+              </>
             )}
           </div>
         </div>

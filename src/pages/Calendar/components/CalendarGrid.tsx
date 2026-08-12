@@ -3,7 +3,7 @@ import type { ScheduleItem } from '../CalendarPage';
 
 interface CalendarGridProps {
   schedules: ScheduleItem[];
-  onScheduleClick: (schedule: ScheduleItem) => void;
+  onScheduleClick: (schedules: ScheduleItem[]) => void;
   year: number;
   month: number;
   onPrevMonth: () => void;
@@ -13,6 +13,11 @@ interface CalendarGridProps {
 export default function CalendarGrid({ schedules, onScheduleClick, year, month, onPrevMonth, onNextMonth }: CalendarGridProps) {
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
+  const realToday = new Date();
+  const todayYear = realToday.getFullYear();
+  const todayMonth = realToday.getMonth() + 1;
+  const todayDate = realToday.getDate();
+  
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -23,7 +28,7 @@ export default function CalendarGrid({ schedules, onScheduleClick, year, month, 
     <BaseCard className="p-5 md:p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-center">
         <button onClick={onPrevMonth} className="text-text-muted hover:text-text cursor-pointer">&lt;</button>
-        <h3 className="mx-8 text-lg font-bold text-text">
+        <h3 className="mx-8 text-lg font-bold font-serif text-text">
           {year}년 {month}월
         </h3>
         <button onClick={onNextMonth} className="text-text-muted hover:text-text cursor-pointer">&gt;</button>
@@ -48,19 +53,24 @@ export default function CalendarGrid({ schedules, onScheduleClick, year, month, 
           const schedulesForDay = schedules.filter((s) => s.date === targetDateStr);
           const hasSchedule = schedulesForDay.length > 0;
 
+          const isToday = year === todayYear && month === todayMonth && day === todayDate;
+
           return (
             <div
               key={day}
-              onClick={() => hasSchedule && onScheduleClick(schedulesForDay[0])}
-              className="flex min-h-15 cursor-pointer flex-col items-center justify-start rounded-lg p-2 transition-colors hover:bg-primary-light/50 md:min-h-[80px]"
+              onClick={() => hasSchedule && onScheduleClick(schedulesForDay)}
+              className={
+                isToday
+                ? "flex min-h-15 cursor-pointer flex-col items-center justify-start rounded-lg p-2 bg-primary/20 transition-colors hover:bg-primary/30 border-2 border-primary/70 md:min-h-20"
+                : "flex min-h-15 cursor-pointer flex-col items-center justify-start rounded-lg p-2 transition-colors hover:bg-primary-light/50 md:min-h-20"}
             >
-              <span className="font-medium text-text">{day}</span>
+              <span className={"font-medium text-text"}>{day}</span>
 
               {hasSchedule && (
                 <div className="mt-1 flex gap-1">
-                  {schedulesForDay.map((_, idx) => (
+                  {schedulesForDay.map((schedule, idx) => (
                     <div
-                      key={idx}
+                      key={schedule.id}
                       className={`h-1.5 w-1.5 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-orange-300'}`}
                     ></div>
                   ))}

@@ -1,12 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Heart, ShoppingBag, AtSign, ExternalLink, MapPin, Navigation } from 'lucide-react';
-import { PRODUCTS } from './shopData';
 import { useWishlist } from './utils/useWishlist';
 import { useCart } from './CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 import { formatWon } from './utils/price';
+import { fetchProductDetail, fetchProducts } from './shopApi';
+import type { DisplayProduct } from './shopApi';
 
 export default function ShopDetailPage() {
   const { id } = useParams();
@@ -15,11 +16,33 @@ export default function ShopDetailPage() {
   const { isWished, toggleWish } = useWishlist();
   const { isInCart, addToCart, removeFromCart } = useCart();
 
+  const [product, setProduct] = useState<DisplayProduct | null>(null);
+  const [related, setRelated] = useState<DisplayProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (!id) return;
+
+    setIsLoading(true);
+    fetchProductDetail(Number(id))
+      .then((detail) => {
+        setProduct(detail);
+        return fetchProducts({ category: detail.category });
+      })
+      .then((sameCategory) => {
+        setRelated(sameCategory.filter((p) => p.id !== Number(id)).slice(0, 3));
+      })
+      .catch((err) => {
+        console.warn('상품 상세 조회 실패', err);
+        setProduct(null);
+      })
+      .finally(() => setIsLoading(false));
   }, [id]);
 
-  const product = PRODUCTS.find((p) => p.id === Number(id));
+  if (isLoading) {
+    return <div className="mx-auto max-w-5xl py-20 text-center text-text-muted">불러오는 중...</div>;
+  }
 
   if (!product) {
     return (
@@ -34,26 +57,16 @@ export default function ShopDetailPage() {
 
   const liked = isWished(product.id);
   const inCart = isInCart(product.id);
-  const related = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
 
   const handleWishClick = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    if (!user) { navigate('/login'); return; }
     toggleWish(product.id);
   };
 
   const handleCartClick = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    if (inCart) {
-      removeFromCart(product.id);
-    } else {
-      addToCart(product.id);
-    }
+    if (!user) { navigate('/login'); return; }
+    if (inCart) removeFromCart(product.id);
+    else addToCart({ id: product.id, title: product.title, price: product.price });
   };
 
   const attributeTags = [
@@ -75,7 +88,6 @@ export default function ShopDetailPage() {
 
       <section className="pt-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* 왼쪽: 이미지 + 지도 */}
           <div className="flex flex-col gap-6">
             <div className="h-[380px] w-full overflow-hidden rounded-2xl bg-[#F0EEED]">
               {product.image ? (
@@ -114,10 +126,9 @@ export default function ShopDetailPage() {
             ) : null}
           </div>
 
-          {/* 오른쪽: 상품 정보 */}
           <div className="flex flex-col justify-center gap-6">
             <span className="inline-block w-fit rounded-full bg-[#FAE4CC] px-3 py-1 text-xs font-medium tracking-[0.3px] text-[#715129]">
-              {product.category}
+              {product.categoryType}
             </span>
 
             <h1 className="text-[40px] font-semibold leading-[44px] text-[#0C0B0A]">{product.title}</h1>
@@ -200,21 +211,23 @@ export default function ShopDetailPage() {
         </div>
       </section>
 
-      <section className="py-16">
-        <h2 className="mb-4 text-lg font-bold text-text">함께 보면 좋은 상품</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {related.map((item) => (
-            <button key={item.id} type="button" onClick={() => navigate(`/shop/${item.id}`)} className="flex flex-col rounded-2xl border border-border bg-white p-4 text-left transition-shadow hover:shadow-md">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm font-semibold text-text">{item.title}</span>
-                <span className="text-text-muted" aria-hidden>→</span>
-              </div>
-              <p className="mb-2 text-xs leading-5 text-[#7C6358]">{item.description}</p>
-              <span className="text-sm font-bold text-text">{formatWon(item.price)}</span>
-            </button>
-          ))}
-        </div>
-      </section>
+      {related.length > 0 && (
+        <section className="py-16">
+          <h2 className="mb-4 text-lg font-bold text-text">함께 보면 좋은 상품</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {related.map((item) => (
+              <button key={item.id} type="button" onClick={() => navigate(`/shop/${item.id}`)} className="flex flex-col rounded-2xl border border-border bg-white p-4 text-left transition-shadow hover:shadow-md">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-text">{item.title}</span>
+                  <span className="text-text-muted" aria-hidden>→</span>
+                </div>
+                <p className="mb-2 line-clamp-2 text-xs leading-5 text-[#7C6358]">{item.detailDescription}</p>
+                <span className="text-sm font-bold text-text">{formatWon(item.price)}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

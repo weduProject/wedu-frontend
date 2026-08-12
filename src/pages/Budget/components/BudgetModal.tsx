@@ -93,6 +93,7 @@ export default function BudgetModal({ onClose, onSubmit }: BudgetModalProps) {
           <div className="mt-4 flex gap-2">
             <Button
               type="button"
+              variant='secondary'
               onClick={onClose}
               className="flex-1 bg-gray-200 text-text hover:bg-gray-300"
             >

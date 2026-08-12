@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type BudgetCategory = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';
@@ -56,8 +56,34 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export function BudgetProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<BudgetItem[]>(INITIAL_BUDGETS);
-  const [targetBudget, setTargetBudget] = useState<number>(2360); // 초기 전체 예산 설정
+  const [items, setItems] = useState<BudgetItem[]>(() => {
+    const saved = localStorage.getItem('wedding_budget_items');
+    return saved ? JSON.parse(saved) : INITIAL_BUDGETS;
+  });
+  const [targetBudget, setTargetBudget] = useState<number>(() => {
+    const saved = localStorage.getItem('wedding_target_budget');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed !== 'number' || isNaN(parsed)) {
+          return 5000;
+        }
+        return parsed;
+      } catch (error) {
+        console.error('목표 예산 데이터를 불러오는 데 실패했습니다.', error);
+        return 5000;
+      }
+    }
+    return 5000;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('wedding_budget_items', JSON.stringify(items));
+  }, [items]);
+
+  useEffect(() => {
+    localStorage.setItem('wedding_target_budget', JSON.stringify(targetBudget));
+  }, [targetBudget]);
 
   const updateTargetBudget = (amount: number) => setTargetBudget(amount);
 

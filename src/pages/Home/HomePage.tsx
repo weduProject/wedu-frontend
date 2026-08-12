@@ -22,7 +22,7 @@ export default function HomePage() {
   const [viewSchedule, setViewSchedule] = useState<ScheduleItem | null>(null);
   const [editSchedule, setEditSchedule] = useState<ScheduleItem | null>(null);
 
-  const { schedules: rawSchedules, updateSchedule } = useSchedules();
+  const { schedules: rawSchedules, updateSchedule, deleteSchedule } = useSchedules();
   const schedules = user ? rawSchedules : [];
   const upcomingSchedules = [...schedules]
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -262,14 +262,19 @@ export default function HomePage() {
 
       {viewSchedule && (
         <ScheduleDetailModal
-          schedule={viewSchedule}
+          schedules={[viewSchedule]}
           onClose={() => setViewSchedule(null)}
-          onEdit={() => {
-            setEditSchedule(viewSchedule);
+          onEdit={(scheduleToEdit) => {
+            setEditSchedule(scheduleToEdit);
+            setViewSchedule(null);
+          }}
+          onDelete={(id) => {
+            deleteSchedule(id);
             setViewSchedule(null);
           }}
         />
       )}
+      
 
       {editSchedule && (
         <ScheduleModal

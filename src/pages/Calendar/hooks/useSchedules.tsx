@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import type { ScheduleItem } from '../CalendarPage';
 import { apiFetch, getToken } from '../../../lib/apiClient';
 import { fromBackendEvent, toBackendPayload } from '../utils/apiMapping';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface ScheduleContextType {
   schedules: ScheduleItem[];
@@ -18,6 +19,7 @@ interface ScheduleContextType {
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -51,8 +53,10 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }, [year, month]);
 
   useEffect(() => {
-    fetchSchedules();
-  }, [fetchSchedules]);
+    if (user) {
+      fetchSchedules();
+    }
+  }, [fetchSchedules, user]);
 
   const goToPrevMonth = () => {
     if (month === 1) {

@@ -34,11 +34,18 @@ import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
 import AuthCallbackPage from './pages/Login/AuthCallbackPage';
+
+import InvitationPage from './pages/invitation/InvitationPage';
+import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
+import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
+
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
 import ConnectPage from './pages/Partner/ConnectPage';
 import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
 import SharePage from './pages/Share/SharePage';
+import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
+import SharedChecklistPage from './pages/Checklist/SharedChecklistPage';
 
 function OnboardingRoutes() {
   return (
@@ -49,7 +56,6 @@ function OnboardingRoutes() {
 }
 
 export default function App() {
-
   return (
     <DDayProvider>
     <BudgetProvider>
@@ -60,6 +66,13 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/share/:token" element={<SharePage />} />
+
+            <Route element={<OnboardingRoutes />}>
+              <Route path="/onboarding" element={<OnboardingStartPage />} />
+              <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
+              <Route path="/onboarding/quiz" element={<QuizPage />} />
+              <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
+            </Route>
 
             <Route
               element={
@@ -80,6 +93,7 @@ export default function App() {
               <Route path="/shop/wishlist" element={<WishlistPage />} />
               <Route path="/wedding-shop" element={<WeddingShopPage />} />
               <Route path="/wedding-shop/:id" element={<WeddingShopDetailPage />} />
+              <Route path="/wedding-estimate" element={<WeddingEstimatePage />} />
               <Route path="/shop/cart" element={<CartPage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
@@ -99,6 +113,7 @@ export default function App() {
                 }
               />
               <Route path="/checklist" element={<ChecklistPage />} />
+              <Route path="/shared/checklist/:token" element={<SharedChecklistPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/budget" element={<BudgetPage />} />
               <Route path="/community" element={<CommunityPage />} />
@@ -108,13 +123,9 @@ export default function App() {
               <Route path="/mypage/edit" element={<MypageEditPage />} />
               <Route path="/connect" element={<ConnectPage />} />
               <Route path="/magazine" element={<WeddingMagazinePage />} />
-              {/* 온보딩 전체 — PageLayout 안에서 Header/Footer 포함 */}
-              <Route element={<OnboardingRoutes />}>
-                <Route path="/onboarding" element={<OnboardingStartPage />} />
-                <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
-                <Route path="/onboarding/quiz" element={<QuizPage />} />
-                <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
-              </Route>
+              <Route path="/invitation" element={<InvitationPage />} />
+              <Route path="/invitation/create" element={<InvitationCreatePage />} />
+              <Route path="/invitation/:id" element={<InvitationDetailPage />} />
             </Route>
           </Routes>
         </ScheduleProvider>
