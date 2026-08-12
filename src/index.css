@@ -18,11 +18,19 @@
   --color-rosegold-2: #c99070;
   --color-rosegold-3: #9e5060;
   --color-rosegold-4: #cc9488;
+
+  /* 폰트 토큰 */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Noto Sans KR', sans-serif;
 }
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-sans);
   color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
 }
 
 /* 카테고리 탭 공용 스타일 */
