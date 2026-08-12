@@ -430,7 +430,7 @@ function HeaderIconButton({ icon, label, count, onClick }: HeaderIconButtonProps
 function HeaderIconButtons() {
   const navigate = useNavigate();
   const { wishedIds } = useWishlist();
-  const { cartIds } = useCart();
+  const { cart } = useCart();
 
   return (
     <>
@@ -443,7 +443,7 @@ function HeaderIconButtons() {
       <HeaderIconButton
         icon={<ShoppingBag className="h-5 w-5" strokeWidth={1.8} />}
         label="장바구니"
-        count={cartIds.length}
+        count={cart?.items.length ?? 0}
         onClick={() => navigate('/shop/cart')}
       />
     </>
