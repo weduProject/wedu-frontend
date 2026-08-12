@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CircleDollarSign, ListChecks, CalendarDays, Heart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDDay } from '../../contexts/DDayContext';
 import { useSchedules } from '../Calendar/hooks/useSchedules';
 import type { ScheduleItem } from '../Calendar/CalendarPage';
 import ScheduleDetailModal from '../Calendar/components/ScheduleDetailModal';
@@ -14,6 +15,7 @@ import QuickMenu from './components/QuickMenu';
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { dday } = useDDay();
   const navigate = useNavigate();
   const userName = user?.name ?? 'OOO';
 
@@ -46,13 +48,15 @@ export default function HomePage() {
         <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-primary-light px-4 py-3">
           <div className="text-center">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">D-DAY</p>
-            <p className="text-lg font-bold leading-tight text-text">미설정</p>
+            <p className="text-lg font-bold leading-tight text-text">
+              {dday ? `D-${dday.daysRemaining}` : '미설정'}
+            </p>
           </div>
           <Link
             to="/dday"
             className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-text no-underline shadow-sm hover:bg-gray-50"
           >
-            설정하기
+            {dday ? '상세보기' : '설정하기'}
           </Link>
         </div>
       </section>

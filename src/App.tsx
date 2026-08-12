@@ -12,6 +12,7 @@ import CalendarPage from './pages/Calendar/CalendarPage';
 import BudgetPage from './pages/Budget/BudgetPage';
 import CommunityPage from './pages/Community/CommunityPage';
 import MypagePage from './pages/Mypage/MypagePage';
+import MypageEditPage from './pages/Mypage/MypageEditPage';
 import { PageLayout } from './components';
 import { OnboardingProvider } from './pages/Onboarding/OnboardingContext';
 import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
@@ -24,6 +25,7 @@ import DDayPage from './pages/Home/DDayPage';
 import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
 import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
 import { BudgetProvider } from './pages/Budget/hooks/useBudget';
+import { DDayProvider } from './contexts/DDayContext';
 import { BuilderProvider } from './pages/Builder/BuilderContext';
 import { CommunityProvider } from './pages/Community/CommunityContext';
 import { WishlistProvider } from './pages/Shop/WishlistContext';
@@ -36,6 +38,7 @@ import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
 import ConnectPage from './pages/Partner/ConnectPage';
 import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
+import SharePage from './pages/Share/SharePage';
 
 function OnboardingRoutes() {
   return (
@@ -48,6 +51,7 @@ function OnboardingRoutes() {
 export default function App() {
 
   return (
+    <DDayProvider>
     <BudgetProvider>
       <ChecklistProvider>
         <ScheduleProvider>
@@ -55,6 +59,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/share/:token" element={<SharePage />} />
 
             <Route
               element={
@@ -100,6 +105,7 @@ export default function App() {
               <Route path="/community/:id" element={<CommunityDetailPage />} />
               <Route path="/community/write" element={<CommunityWritePage />} />
               <Route path="/mypage" element={<MypagePage />} />
+              <Route path="/mypage/edit" element={<MypageEditPage />} />
               <Route path="/connect" element={<ConnectPage />} />
               <Route path="/magazine" element={<WeddingMagazinePage />} />
               {/* 온보딩 전체 — PageLayout 안에서 Header/Footer 포함 */}
@@ -114,5 +120,6 @@ export default function App() {
         </ScheduleProvider>
       </ChecklistProvider>
     </BudgetProvider>
+    </DDayProvider>
   );
 }
