@@ -55,10 +55,6 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             
-            <Route path="/invitation" element={<InvitationPage />} />
-            <Route path="/invitation/create" element={<InvitationCreatePage />} />
-            <Route path="/invitation/:id" element={<InvitationDetailPage />} />
-
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
               <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />

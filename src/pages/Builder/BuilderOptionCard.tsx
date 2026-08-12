@@ -24,7 +24,7 @@ export default function BuilderOptionCard({
       type="button"
       onClick={onClick}
       className={`
-        relative w-full rounded-3xl border overflow-hidden text-left transition-all duration-300
+        group relative w-full rounded-3xl border overflow-hidden text-left transition-all duration-300
         ${selected
           ? "border-[#F48171] bg-[#FFF9F8] ring-1 ring-[#F48171]"
           : "border-gray-200 bg-white hover:border-[#F48171]/50 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-1"

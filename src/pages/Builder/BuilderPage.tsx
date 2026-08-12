@@ -120,7 +120,7 @@ export default function BuilderPage() {
               </div>
 
               {currentSelectedItem && (
-                <div className="mt-12 p-6 flex flex-col md:flex-row md:items-center gap-5 bg-grey rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-fade-in">
+                <div className="mt-12 p-6 flex flex-col md:flex-row md:items-center gap-5 bg-grey-50 rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-fade-in">
                   <div className="flex items-center gap-5 flex-1">
                     <div className="text-3xl w-12 h-12 flex items-center justify-center bg-gray-50 rounded-2xl">{currentSelectedItem.icon}</div>
                     <div className="flex-1">

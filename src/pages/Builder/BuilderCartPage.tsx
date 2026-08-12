@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../components"; // 👈 이 import가 추가되었습니다!
 import { useBuilder } from "./BuilderContext";
 import { getRecommendedProducts, type RecommendedItem } from "./builderUtils"; 
 
@@ -111,19 +112,21 @@ export default function BuilderCartPage() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-          <button 
-            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-[15px] bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors" 
+        {/* 하단 버튼 영역 */}
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-8">
+          <Button 
+            variant="secondary"
+            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-[15px] bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors border-0" 
             onClick={handleRestart}
           >
             계속 둘러보기
-          </button>
-          <button 
-            className="w-full sm:w-auto px-10 py-4 rounded-full font-bold text-[15px] text-white bg-gradient-to-r from-[#F89685] to-[#F2705C] shadow-lg shadow-[#F2705C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all" 
+          </Button>
+          <Button 
+            className="w-full sm:w-auto px-10 py-4 rounded-full font-bold text-[15px] text-white bg-gradient-to-r from-[#F89685] to-[#F2705C] shadow-lg shadow-[#F2705C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all border-0" 
             onClick={() => navigate("/shop")}
           >
             나만의 프로포즈 다시 만들기
-          </button>
+          </Button>
         </div>
       </div>
     </div>

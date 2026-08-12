@@ -1,24 +1,26 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User, Camera, CalendarCheck, MessageCircleHeart, Image as ImageIcon, Landmark, Users, MapPin, Palette } from 'lucide-react'; // Remix Icon -> Lucide React 교체
 
 type SectionKey = 'basic' | 'photos' | 'wedding' | 'message' | 'gallery' | 'account' | 'parents' | 'directions' | 'design';
 
 interface SectionDef {
   key: SectionKey;
   label: string;
-  icon: string;
+  icon: React.ElementType; // 아이콘 타입 변경
 }
 
+// Lucide 컴포넌트 매핑
 const sections: SectionDef[] = [
-  { key: 'basic', label: '기본 정보', icon: 'ri-user-line' },
-  { key: 'photos', label: '사진', icon: 'ri-camera-line' },
-  { key: 'wedding', label: '예식 정보', icon: 'ri-calendar-check-line' },
-  { key: 'message', label: '인사말', icon: 'ri-chat-heart-line' },
-  { key: 'gallery', label: '갤러리', icon: 'ri-image-line' },
-  { key: 'account', label: '계좌 정보', icon: 'ri-bank-line' },
-  { key: 'parents', label: '혼주·연락처', icon: 'ri-user-heart-line' },
-  { key: 'directions', label: '오시는 길', icon: 'ri-map-pin-line' },
-  { key: 'design', label: '디자인', icon: 'ri-palette-line' },
+  { key: 'basic', label: '기본 정보', icon: User },
+  { key: 'photos', label: '사진', icon: Camera },
+  { key: 'wedding', label: '예식 정보', icon: CalendarCheck },
+  { key: 'message', label: '인사말', icon: MessageCircleHeart },
+  { key: 'gallery', label: '갤러리', icon: ImageIcon },
+  { key: 'account', label: '계좌 정보', icon: Landmark },
+  { key: 'parents', label: '혼주·연락처', icon: Users },
+  { key: 'directions', label: '오시는 길', icon: MapPin },
+  { key: 'design', label: '디자인', icon: Palette },
 ];
 
 const colorOptions = [
@@ -51,26 +53,47 @@ export default function InvitationCreatePage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleDraft = useCallback(() => {
+  // 🚀 API 연동을 위한 임시저장 로직 수정
+  const handleDraft = useCallback(async () => {
     setSaving(true);
     setSaveMessage(null);
-    setTimeout(() => {
-      setSaving(false);
-      setSaveMessage({
-        type: 'success',
-        text: '임시 저장되었습니다.',
+    try {
+      // API 통신 예시 (실제 백엔드 엔드포인트로 수정 필요)
+      await fetch('/api/invitations/draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, status: 'DRAFT' })
       });
-    }, 600);
-  }, []);
+      setSaveMessage({ type: 'success', text: '임시 저장되었습니다.' });
+    } catch (error) {
+      setSaveMessage({ type: 'error', text: '저장에 실패했습니다.' });
+    } finally {
+      setSaving(false);
+    }
+  }, [form]);
 
-  const handlePublish = useCallback(() => {
+  // 🚀 API 연동을 위한 발행 로직 수정
+  const handlePublish = useCallback(async () => {
     setShowPublishModal(true);
     setIsPublished(false);
     
-    setTimeout(() => {
+    try {
+      // API 통신 예시 (실제 백엔드 엔드포인트로 수정 필요)
+      const response = await fetch('/api/invitations/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, status: 'PUBLISHED' })
+      });
+      
+      if (!response.ok) throw new Error('발행 실패');
+      
+      // 통신 성공 시 완료 모달 전환
       setIsPublished(true);
-    }, 1500);
-  }, []);
+    } catch (error) {
+      setShowPublishModal(false);
+      alert('발행 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }, [form]);
 
   const currentSectionIdx = sections.findIndex((s) => s.key === activeSection);
 
@@ -100,20 +123,23 @@ export default function InvitationCreatePage() {
 
           <div className="hidden md:flex justify-center sticky top-4 z-40 mb-8">
             <div className="w-full max-w-4xl flex items-center justify-center gap-1 bg-white/90 backdrop-blur-md rounded-2xl p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-x-auto scrollbar-hide">
-              {sections.map((section) => (
-                <button
-                  key={section.key}
-                  onClick={() => setActiveSection(section.key)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer whitespace-nowrap ${
-                    activeSection === section.key
-                      ? 'bg-[#C9A96E] text-white shadow-md shadow-[#C9A96E]/20 transform scale-[1.02]'
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  <i className={`${section.icon} text-sm`}></i>
-                  <span>{section.label}</span>
-                </button>
-              ))}
+              {sections.map((section) => {
+                const IconComponent = section.icon;
+                return (
+                  <button
+                    key={section.key}
+                    onClick={() => setActiveSection(section.key)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer whitespace-nowrap ${
+                      activeSection === section.key
+                        ? 'bg-[#C9A96E] text-white shadow-md shadow-[#C9A96E]/20 transform scale-[1.02]'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    <IconComponent className="w-3.5 h-3.5" />
+                    <span>{section.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -172,7 +198,7 @@ export default function InvitationCreatePage() {
               {activeSection !== 'basic' && activeSection !== 'design' && (
                 <div className="py-20 flex flex-col items-center justify-center text-gray-400">
                   <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-                    <i className="ri-tools-line text-2xl text-gray-300"></i>
+                    <Palette className="h-8 w-8 text-gray-300" strokeWidth={1.5} />
                   </div>
                   <p className="text-sm font-medium">해당 섹션 설정 영역입니다. (미리보기 모드)</p>
                 </div>
@@ -255,7 +281,7 @@ export default function InvitationCreatePage() {
                     }}
                     className="w-full py-3.5 rounded-full text-[15px] font-bold bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 transition-colors"
                   >
-                    <i className="ri-file-copy-line mr-2"></i>URL 복사하기
+                    URL 복사하기
                   </button>
                   <button
                     onClick={() => {

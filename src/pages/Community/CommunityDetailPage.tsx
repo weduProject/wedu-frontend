@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Heart, MessageCircle, User } from "lucide-react";
-import { Button } from "../../components";
+import { Button, CategoryBadge } from "../../components"; // 👈 CategoryBadge 임포트 추가
 import { useCommunity } from "./CommunityContext";
 
 export default function CommunityDetailPage() {
@@ -75,12 +75,10 @@ export default function CommunityDetailPage() {
           목록으로
         </button>
 
-        {/* 메인 게시글 영역 */}
         <div className="rounded-[2rem] border border-gray-100 bg-white p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.02)] mb-8">
           <div className="flex items-center gap-3 mb-6">
-            <span className="rounded-full bg-[#FFF0E8] px-3.5 py-1.5 text-[12px] font-bold text-[#E27D5F]">
-              {post.category}
-            </span>
+            {/* 🚀 피드백 반영: 공용 CategoryBadge 컴포넌트 재사용 */}
+            <CategoryBadge category={post.category} />
             <span className="text-[13px] font-medium text-gray-400">{post.date}</span>
           </div>
 
@@ -89,7 +87,6 @@ export default function CommunityDetailPage() {
           </h1>
 
           <div className="mt-6 flex items-center gap-3">
-            {/* 작성자 기본 프로필 아이콘 */}
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF0E8] text-[#E27D5F]">
               <User className="h-5 w-5" strokeWidth={2.5} />
             </div>
@@ -100,11 +97,9 @@ export default function CommunityDetailPage() {
           </div>
 
           <hr className="my-8 border-gray-100" />
-
           <p className="min-h-[200px] whitespace-pre-line leading-relaxed text-[15px] text-gray-700">
             {post.content}
           </p>
-
           <hr className="my-8 border-gray-100" />
 
           <div className="flex items-center justify-between">
@@ -137,7 +132,6 @@ export default function CommunityDetailPage() {
           </div>
         </div>
 
-        {/* 댓글 영역 */}
         <div className="rounded-[2rem] border border-gray-100 bg-white p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
           <h2 className="mb-8 text-xl font-bold text-gray-900 flex items-center gap-2">
             댓글 <span className="text-[#F48171] bg-[#FFF0E8] px-2.5 py-0.5 rounded-full text-[13px]">{comments.length}</span>
@@ -148,7 +142,6 @@ export default function CommunityDetailPage() {
               <div key={comment.id} className="border-b border-gray-50 pb-5 last:border-0 last:pb-0">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    {/* 댓글 작성자 기본 프로필 아이콘 */}
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                       <User className="h-4 w-4" strokeWidth={2.5} />
                     </div>
