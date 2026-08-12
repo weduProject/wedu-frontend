@@ -4,8 +4,8 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { Calendar } from 'lucide-react';
 
 interface DDayCardProps {
-  targetDate: string;
-  showEditButton?: boolean; // 대시보드/상세페이지 구분
+  targetDate: string | null;
+  showEditButton?: boolean;
   onEditClick?: () => void;
 }
 
@@ -22,6 +22,8 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
 
   useEffect(() => {
     function calculateTimeLeft() {
+      if (!targetDate) return;
+
       const difference = +new Date(targetDate) - +new Date();
       if (difference <= 0) return;
 
@@ -39,17 +41,15 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
     return () => clearInterval(timer);
   }, [targetDate]);
 
-  // "2026년 7월 26일 (일요일)" 형식 포맷팅
   const getFormattedToday = () => {
     const dateObj = new Date();
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     return `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 (${days[dateObj.getDay()]}요일)`;
   };
 
-  // "2026. 11. 18" 타겟 날짜 포맷팅
-  const formattedTargetDate = targetDate.replace(/-/g, '. ');
+  const formattedTargetDate = targetDate ? targetDate.replace(/-/g, '. ') : '';
 
-  if (!user) {
+  if (!user || !targetDate) {
     return (
       <div className="relative flex h-100 w-full flex-col items-center justify-center overflow-hidden rounded-4xl bg-gray-900 text-white shadow-xl md:h-120">
         <div 
@@ -65,7 +65,12 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
         <button 
           onClick={(e) => {
             e.stopPropagation();
-            navigate('/login')}}
+            if (!user) {
+                navigate('/login'); // 비회원이면 로그인으로
+              } else if (onEditClick) {
+                onEditClick(); // 회원이면 등록 모달 열기
+              }
+            }}
           className="flex items-center gap-2 rounded-full border border-white/40 bg-black/20 px-6 py-2.5 text-sm font-medium backdrop-blur-sm transition-colors hover:bg-white/20"
           >
           날짜 등록하기

@@ -1,7 +1,7 @@
 import { useAuth } from '../../contexts/AuthContext';
 import ChecklistSummaryCard from './components/ChecklistSummaryCard';
 import QuickMenu from './components/QuickMenu';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSchedules } from '../Calendar/hooks/useSchedules';
 import type { ScheduleItem } from '../Calendar/CalendarPage';
@@ -10,11 +10,13 @@ import ScheduleDetailModal from '../Calendar/components/ScheduleDetailModal';
 import DDayCard from './components/DDayCard';
 import ScheduleModal from '../Calendar/components/ScheduleModal';
 import BudgetSummaryCard from './components/BudgetSummaryCard';
+import { apiFetch, getToken } from '../../lib/apiClient';
 
 export default function HomePage() {
   const { user } = useAuth();
   const userName = user?.name ?? 'OOO';
   const navigate = useNavigate();
+  const [targetDate, setTargetDate] = useState<string | null>(null);
 
   const [viewSchedule, setViewSchedule] = useState<ScheduleItem | null>(null);
   const [editSchedule, setEditSchedule] = useState<ScheduleItem | null>(null);
@@ -26,6 +28,34 @@ export default function HomePage() {
   const upcomingSchedules = schedules
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
+
+  useEffect(() => {
+    const fetchDDayInfo = async () => {
+      if (!user || !getToken()) {
+        setTargetDate(null);
+        return;
+      }
+
+      try {
+        const response = await apiFetch('/api/ddays/me');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setTargetDate(result.data.weddingDate);
+          } else {
+            setTargetDate(null);
+          }
+        } else {
+          setTargetDate(null);
+        }
+      } catch (error) {
+        console.error('홈페이지 D-Day 불러오기 실패:', error);
+        setTargetDate(null);
+      }
+    };
+
+    fetchDDayInfo();
+  }, [user]);
 
   return (
     <main className="flex flex-col gap-8">
@@ -40,11 +70,11 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {user ? (
             <Link to="/dday" className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18" />
+              <DDayCard targetDate={targetDate} />
             </Link>
           ) : (
             <div onClick={() => navigate('/dday')} className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18"/>
+              <DDayCard targetDate={targetDate}/>
             </div>
           )}
           {user ? (

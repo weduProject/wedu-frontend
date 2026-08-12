@@ -1,13 +1,13 @@
 import DDayCard from "./components/DDayCard";
 import BaseCard from "../../components/ui/BaseCard";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown, Luggage, Check } from 'lucide-react';
 import { useChecklist } from "../Checklist/hooks/useChecklist";
 import { useAuth } from "../../contexts/AuthContext";
+import { apiFetch, getToken } from "../../lib/apiClient";
 
 
-// 더미 데이터 배열
 const ANNIVERSARIES = [
   { id: 1, title: '처음 만난 날', desc: '운명적인 첫 만남, 모든 것이 시작된 순간.', icon: <Heart className="h-4 w-4" /> },
   { id: 2, title: '프로포즈', desc: '평생 잊지 못할 가장 특별한 순간.', icon: <Gift className="h-4 w-4" /> },
@@ -17,31 +17,87 @@ const ANNIVERSARIES = [
 
 export default function DDayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetDate, setTargetDate] = useState(() => {
-    return localStorage.getItem('weddingDate') || "2026-11-18";
-  });
-
-  const [tempDate, setTempDate] = useState(targetDate);
+  const [targetDate, setTargetDate] = useState<string | null>(null);
+  const [hasDDay, setHasDDay] = useState(false)
+  const [tempDate, setTempDate] = useState('');
 
   const { user } = useAuth();
   const navigate = useNavigate();
   const { todos, toggleTodo } = useChecklist();
   const previewTodos = todos.slice(0, 5);
 
+  // 1. apiFetch로 내 D-day 정보 불러오기
+  useEffect(() => {
+    const fetchDDayInfo = async () => {
+      // 로그인 안 되어 있거나 토큰이 없으면 중단
+      if (!user || !getToken()) return; 
+
+      try {
+        const response = await apiFetch('/api/ddays/me'); // ✨ GET 요청
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setTargetDate(result.data.weddingDate);
+            setHasDDay(true);
+          } else {
+            setTargetDate(null);
+            setHasDDay(false);
+          }
+        } else {
+          setTargetDate(null);
+          setHasDDay(false);
+        }
+      } catch (error) {
+        console.error("D-Day 불러오기 실패:", error);
+        setTargetDate(null);
+        setHasDDay(false);
+      }
+    };
+
+    fetchDDayInfo();
+  }, [user]);
+
   const handleOpenModal = () => {
-    setTempDate(targetDate);
+    const defaultDate = targetDate || new Date().toISOString().split('T')[0];
+    setTempDate(defaultDate);
     setIsModalOpen(true);
   };
 
-  const handleSaveDate = () => {
-    setTargetDate(tempDate);
-    localStorage.setItem('weddingDate', tempDate);
-    setIsModalOpen(false);
+  // 2. apiFetch로 D-day 생성(POST) 및 수정(PATCH) 연동하기
+  const handleSaveDate = async () => {
+    if (!tempDate) return;
+
+    try {
+      const url = hasDDay ? '/api/ddays/me' : '/api/ddays';
+      const method = hasDDay ? 'PATCH' : 'POST';
+      
+      const response = await apiFetch(url, { // ✨ POST/PATCH 요청
+        method: method,
+        // apiFetch 내부에 Content-Type이나 Authorization 세팅이 되어있을 것이므로 body만 넘겨줍니다.
+        body: JSON.stringify({ weddingDate: tempDate }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setTargetDate(tempDate);
+          setHasDDay(true);
+          setIsModalOpen(false);
+        } else {
+          throw new Error(result.error?.message || '저장 실패');
+        }
+      } else {
+        throw new Error('API 요청 에러');
+      }
+    } catch (error) {
+      console.error("D-Day 저장 실패:", error);
+      alert("디데이 설정에 실패했습니다.");
+    }
   };
 
   return (
-    <div className="mx-auto max-w-[1024px] pb-20">
-      {/* 1. 상단 D-day 카드 (버튼 활성화) */}
+    <div className="mx-auto max-w-5xl pb-20">
       <DDayCard 
         targetDate={targetDate}
         showEditButton={true} 
@@ -87,7 +143,7 @@ export default function DDayPage() {
             </div>
           </div>
 
-          {!user && (
+          {!user ? (
             <div className="flex h-full flex-col p-6">
               <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
@@ -103,9 +159,7 @@ export default function DDayPage() {
                 </button>
               </div>
             </div>
-          )}
-
-          {user && (
+          ) : (
             <>
             <div className="flex flex-1 flex-col gap-5">
               {previewTodos.map((item) => (
