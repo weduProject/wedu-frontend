@@ -106,13 +106,6 @@ export default function Header() {
           ))}
 
 
-          {/* WEDDING_LINKS 출력 부분 추가 */}
-          {WEDDING_LINKS.map((item) => (
-            <NavLink key={item.path} to={item.path} className={navLinkClass}>
-              {item.label}
-            </NavLink>
-          ))}
-
           {/* 웨딩 플래닝 드롭다운 — 버튼과 메뉴 사이 gap을 pt-2(패딩)로 감싸서 마우스 이탈 방지 */}
           <div
             ref={weddingRef}
@@ -280,22 +273,6 @@ export default function Header() {
                 ))}
 
 
-                {/* 모바일 메뉴에도 WEDDING_LINKS 출력 추가 */}
-                {WEDDING_LINKS.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMobileOpen(false)}
-                    className={({ isActive }) =>
-                      clsx(
-                        'block py-3 text-base font-medium no-underline transition-colors',
-                        isActive ? 'text-primary' : 'text-text',
-                      )
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                ))}
 
                 <button
                   type="button"
