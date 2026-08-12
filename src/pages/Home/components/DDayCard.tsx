@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Calendar } from 'lucide-react';
+import ddayBgImage from '/src/assets/dday/background.jpg';
+
 
 interface DDayCardProps {
   targetDate: string | null;
@@ -55,7 +57,7 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
         <div 
         className="absolute inset-0 bg-cover bg-center opacity-60"
       >
-        <img alt="배경 이미지" className="h-full w-full object-cover" src="/src/assets/dday/background.jpg"></img>
+        <img alt="배경 이미지" className="h-full w-full object-cover" src={ddayBgImage}></img>
       </div>
         <Calendar className="mx-auto mb-3 h-10 w-10" />
         <h3 className="mb-4 text-6xl font-bold font-serif">D-Day</h3>

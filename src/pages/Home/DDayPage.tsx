@@ -1,11 +1,11 @@
 import DDayCard from "./components/DDayCard";
 import BaseCard from "../../components/ui/BaseCard";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown, Luggage, Check } from 'lucide-react';
 import { useChecklist } from "../Checklist/hooks/useChecklist";
 import { useAuth } from "../../contexts/AuthContext";
-import { apiFetch, getToken } from "../../lib/apiClient";
+import { useDDay } from "./hooks/useDDay";
 
 
 const ANNIVERSARIES = [
@@ -17,8 +17,7 @@ const ANNIVERSARIES = [
 
 export default function DDayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetDate, setTargetDate] = useState<string | null>(null);
-  const [hasDDay, setHasDDay] = useState(false)
+  const { targetDate, saveDDay } = useDDay();
   const [tempDate, setTempDate] = useState('');
 
   const { user } = useAuth();
@@ -26,74 +25,21 @@ export default function DDayPage() {
   const { todos, toggleTodo } = useChecklist();
   const previewTodos = todos.slice(0, 5);
 
-  // 1. apiFetch로 내 D-day 정보 불러오기
-  useEffect(() => {
-    const fetchDDayInfo = async () => {
-      // 로그인 안 되어 있거나 토큰이 없으면 중단
-      if (!user || !getToken()) return; 
+  const handleSaveDate = async () => {
+    if (!tempDate) return;
 
-      try {
-        const response = await apiFetch('/api/ddays/me'); // ✨ GET 요청
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setTargetDate(result.data.weddingDate);
-            setHasDDay(true);
-          } else {
-            setTargetDate(null);
-            setHasDDay(false);
-          }
-        } else {
-          setTargetDate(null);
-          setHasDDay(false);
-        }
-      } catch (error) {
-        console.error("D-Day 불러오기 실패:", error);
-        setTargetDate(null);
-        setHasDDay(false);
-      }
-    };
-
-    fetchDDayInfo();
-  }, [user]);
+    const success = await saveDDay(tempDate); 
+    if (success) {
+      setIsModalOpen(false);
+    } else {
+      alert("디데이 설정에 실패했습니다.");
+    }
+  };
 
   const handleOpenModal = () => {
     const defaultDate = targetDate || new Date().toISOString().split('T')[0];
     setTempDate(defaultDate);
     setIsModalOpen(true);
-  };
-
-  // 2. apiFetch로 D-day 생성(POST) 및 수정(PATCH) 연동하기
-  const handleSaveDate = async () => {
-    if (!tempDate) return;
-
-    try {
-      const url = hasDDay ? '/api/ddays/me' : '/api/ddays';
-      const method = hasDDay ? 'PATCH' : 'POST';
-      
-      const response = await apiFetch(url, { // ✨ POST/PATCH 요청
-        method: method,
-        // apiFetch 내부에 Content-Type이나 Authorization 세팅이 되어있을 것이므로 body만 넘겨줍니다.
-        body: JSON.stringify({ weddingDate: tempDate }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setTargetDate(tempDate);
-          setHasDDay(true);
-          setIsModalOpen(false);
-        } else {
-          throw new Error(result.error?.message || '저장 실패');
-        }
-      } else {
-        throw new Error('API 요청 에러');
-      }
-    } catch (error) {
-      console.error("D-Day 저장 실패:", error);
-      alert("디데이 설정에 실패했습니다.");
-    }
   };
 
   return (
