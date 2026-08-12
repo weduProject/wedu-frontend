@@ -7,11 +7,62 @@
   --color-text: #221A18;
   --color-text-muted: #8D8482;
   --color-error: #e53935;
+
+  /* 버튼 전용 그라디언트 색상 */
+  --color-btn-from: #F79689;
+  --color-btn-mid: #FEABA0;
+  --color-btn-to: #E8796C;
+
+  /* 로즈골드 (로고 텍스트용) */
+  --color-rosegold-1: #e8c8c2;
+  --color-rosegold-2: #c99070;
+  --color-rosegold-3: #9e5060;
+  --color-rosegold-4: #cc9488;
 }
 
 body {
   font-family: sans-serif;
   color: #333;
+}
+
+/* 카테고리 탭 공용 스타일 */
+.category-tab-active {
+  background: linear-gradient(123deg, var(--color-btn-from), var(--color-btn-to), var(--color-btn-mid), var(--color-btn-to));
+  color: white;
+  box-shadow: 0px 4px 14px rgba(161,86,77,0.18), 0px 0px 24px rgba(232,121,108,0.28), inset 0px 1px 0px rgba(255,255,255,0.2);
+}
+
+.category-tab-inactive {
+  border: 1px solid rgba(219,214,213,0.4);
+  background: rgba(250,248,248,0.72);
+  color: #514C4A;
+}
+.category-tab-inactive:hover {
+  background: white;
+}
+
+/* 정적 그라디언트 배경 — 섹션·비버튼 요소에 사용 */
+.gradient-primary-bg {
+  background: linear-gradient(111deg, var(--color-btn-from), var(--color-btn-to), var(--color-btn-mid), var(--color-btn-to));
+}
+
+/* 그라디언트 글로우 그림자 */
+.shadow-gradient-primary {
+  box-shadow: 0px 4px 14px rgba(161,86,77,0.18), 0px 0px 24px rgba(232,121,108,0.28), inset 0px 1px 0px rgba(255,255,255,0.2);
+}
+
+/* 애니메이션 버튼 */
+.btn-primary {
+  @apply rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90;
+  background: linear-gradient(111deg, var(--color-btn-from), var(--color-btn-to), var(--color-btn-mid), var(--color-btn-to));
+  background-size: 200% 200%;
+  box-shadow: 0px 4px 14px rgba(161,86,77,0.25), inset 0px 1px 0px rgba(255,255,255,0.25);
+  animation: gradient-move 3s ease infinite;
+}
+
+@keyframes gradient-move {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
 }
 
 .scrollbar-hide {

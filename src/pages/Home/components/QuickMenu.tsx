@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
+import { Heart, CalendarCheck, ListChecks, DollarSign, MessageCircle, User } from 'lucide-react';
 
 const MENU_ITEMS = [
-  { label: '나만의 프로포즈', path: '/builder', emoji: '💍' },
-  { label: '체크리스트', path: '/checklist', emoji: '✅' },
-  { label: '캘린더/일정', path: '/calendar', emoji: '📅' },
-  { label: '예산 관리', path: '/budget', emoji: '💰' },
+  { label: '프로포즈', path: '/shop', Icon: Heart },
+  { label: 'D-DAY', path: '/dday', Icon: CalendarCheck },
+  { label: '체크리스트', path: '/checklist', Icon: ListChecks },
+  { label: '예산', path: '/budget', Icon: DollarSign },
+  { label: '커뮤니티', path: '/community', Icon: MessageCircle },
+  { label: '마이페이지', path: '/mypage', Icon: User },
 ] as const;
 
 export default function QuickMenu() {
@@ -12,17 +15,17 @@ export default function QuickMenu() {
 
   return (
     <section>
-      <h2 className="text-base text-text-muted mb-3">빠른 메뉴</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {MENU_ITEMS.map((item) => (
+      <h2 className="mb-3 text-base font-bold text-text">바로가기</h2>
+      <div className="flex gap-2">
+        {MENU_ITEMS.map(({ path, label, Icon }) => (
           <button
-            key={item.path}
+            key={path}
             type="button"
-            onClick={() => navigate(item.path)}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white border border-border hover:border-primary/40 transition-colors cursor-pointer"
+            onClick={() => navigate(path)}
+            className="flex flex-1 flex-col items-center gap-2 rounded-xl border border-border bg-white py-4 transition-colors hover:border-primary/40 cursor-pointer"
           >
-            <span className="text-2xl">{item.emoji}</span>
-            <span className="text-xs text-text text-center leading-tight">{item.label}</span>
+            <Icon className="h-5 w-5 text-text-muted" strokeWidth={1.5} />
+            <span className="text-xs text-text-muted">{label}</span>
           </button>
         ))}
       </div>

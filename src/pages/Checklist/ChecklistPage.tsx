@@ -10,9 +10,7 @@ import Button from '../../components/ui/Button';
 import { useChecklist, RECOMMENDED_TODOS, type CategoryType } from './hooks/useChecklist';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../styles/categoryTab';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
-
 
 const CATEGORIES: CategoryType[] = ['기본', '예식', '촬영', '예물', '주거', '여행'];
 
@@ -211,7 +209,7 @@ export default function ChecklistPage() {
             onClick={() => setActiveFilter('전체')}
             className={clsx(
               'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-              activeFilter === '전체' ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              activeFilter === '전체' ? 'category-tab-active' : 'category-tab-inactive',
             )}
           >
             전체
@@ -223,7 +221,7 @@ export default function ChecklistPage() {
               onClick={() => setActiveFilter(cat)}
               className={clsx(
                 'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors',
-                activeFilter === cat ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+                activeFilter === cat ? 'category-tab-active' : 'category-tab-inactive',
               )}
             >
               {cat}

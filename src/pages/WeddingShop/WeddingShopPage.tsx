@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Image as ImageIcon, Heart } from 'lucide-react';
 import clsx from 'clsx';
-import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
 import { CATEGORIES, MOCK_PRODUCTS } from './mockProducts';
 import { formatPrice } from './utils/formatPrice';
 import { IMAGE_PLACEHOLDER_BG, CARD_BORDER } from './styles';
@@ -92,7 +91,7 @@ export default function WeddingShopPage() {
               <h2 className="text-2xl font-semibold text-[#181515] md:text-3xl">맞춤 견적이 필요하신가요?</h2>
               <p className="mt-2 max-w-md text-sm text-text-muted md:text-base">웨딩 플래너가 당신만을 위한 커스텀 견적을 제안해 드립니다.</p>
             </div>
-            <Link to="/wedding-estimate" className={clsx('whitespace-nowrap rounded-full px-8 py-3 text-sm font-medium text-white no-underline transition-opacity hover:opacity-90', PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW)}>
+            <Link to="/wedding-estimate" className="whitespace-nowrap rounded-full px-8 py-3 text-sm font-medium text-white no-underline transition-opacity hover:opacity-90 gradient-primary-bg shadow-gradient-primary">
               파트너와 함께 준비하기
             </Link>
           </div>
