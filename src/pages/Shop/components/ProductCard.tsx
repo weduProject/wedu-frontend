@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import type { Product } from '../shopData';
+import type { DisplayProduct } from '../shopApi';
 import { Heart } from 'lucide-react';
 import { useWishlist } from '../utils/useWishlist';
 import { useAuth } from '../../../contexts/AuthContext';
 import { formatWon } from '../utils/price';
 
 interface ProductCardProps {
-  product: Product;
+  product: DisplayProduct;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -40,7 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-[#463730] backdrop-blur-sm">
-          {product.category}
+          {product.categoryType}
         </span>
 
         <button
@@ -59,7 +59,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-5">
         <h3 className="mb-2 line-clamp-1 text-base font-semibold text-text">{product.title}</h3>
-        <p className="mb-3 line-clamp-2 text-sm leading-6 text-[#7C6358]">{product.description}</p>
+        <p className="mb-3 line-clamp-2 text-sm leading-6 text-[#7C6358]">{product.detailDescription}</p>
 
         <div className="mb-4 flex flex-wrap gap-1.5">
           {product.tags.slice(0, 3).map((tag) => (

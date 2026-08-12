@@ -1,15 +1,31 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS } from './shopData';
 import ProductCard from './components/ProductCard';
 import { useWishlist } from './utils/useWishlist';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
+import { fetchProductDetail } from './shopApi';
+import type { DisplayProduct } from './shopApi';
 import { groupByCategory } from './utils/groupByCategory';
 
 export default function WishlistPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { wishedIds, clearWishlist } = useWishlist();
+  const [wishedProducts, setWishedProducts] = useState<DisplayProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (wishedIds.length === 0) {
+      setWishedProducts([]);
+      return;
+    }
+    setIsLoading(true);
+    Promise.all(wishedIds.map((id) => fetchProductDetail(id)))
+      .then(setWishedProducts)
+      .catch((err) => console.warn('찜 상품 조회 실패', err))
+      .finally(() => setIsLoading(false));
+  }, [wishedIds]);
 
   if (!user) {
     return (
@@ -26,10 +42,6 @@ export default function WishlistPage() {
     );
   }
 
-  const wishedProducts = PRODUCTS.filter((product) =>
-    wishedIds.includes(product.id),
-  );
-
   const groupedProducts = groupByCategory(wishedProducts);
 
   return (
@@ -37,7 +49,7 @@ export default function WishlistPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text">찜한 상품</h1>
 
-        {wishedProducts.length > 0 && (
+        {wishedIds.length > 0 && (
           <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={clearWishlist}>
             전체 삭제
           </Button>
@@ -46,7 +58,9 @@ export default function WishlistPage() {
 
       <p className="mb-3 text-sm text-text-muted">총 {wishedProducts.length}개</p>
 
-      {wishedProducts.length > 0 ? (
+      {isLoading ? (
+        <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>
+      ) : wishedProducts.length > 0 ? (
         <div className="flex flex-col gap-8">
           {Object.entries(groupedProducts).map(([label, products]) => (
             <section key={label}>
