@@ -49,7 +49,7 @@ export default function WishlistPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text">찜한 상품</h1>
 
-        {wishedProducts.length > 0 && (
+        {wishedIds.length > 0 && (
           <Button variant="pill" size="sm" className="px-4 py-2 text-xs" onClick={clearWishlist}>
             전체 삭제
           </Button>
