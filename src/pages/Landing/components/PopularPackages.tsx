@@ -5,7 +5,6 @@ import vendorOutdoor from '../../../assets/landing/vendor-outdoor.jpg';
 import vendorRooftop from '../../../assets/landing/vendor-rooftop.jpg';
 import vendorBeach from '../../../assets/landing/vendor-beach.jpg';
 
-// TODO: 백엔드 연동 시 GET /api/recommend/place 응답으로 교체
 interface PackageItem {
   id: number;
   title: string;

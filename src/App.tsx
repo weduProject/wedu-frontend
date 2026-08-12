@@ -35,6 +35,7 @@ import AuthCallbackPage from './pages/Login/AuthCallbackPage';
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
 import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
+import SharedChecklistPage from './pages/Checklist/SharedChecklistPage';
 
 function OnboardingRoutes() {
   return (
@@ -100,6 +101,7 @@ export default function App() {
                 }
               />
               <Route path="/checklist" element={<ChecklistPage />} />
+              <Route path="/shared/checklist/:token" element={<SharedChecklistPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/budget" element={<BudgetPage />} />
               <Route path="/community" element={<CommunityPage />} />

@@ -13,6 +13,23 @@ export interface TodoItem {
   isCompleted: boolean;
 }
 
+export type ChecklistCategoryEnum = 'BASIC' | 'CEREMONY' | 'SHOOTING' | 'JEWELRY' | 'HOUSING' | 'TRAVEL';
+
+export interface ChecklistItemResponse {
+  itemId: number;
+  title: string;
+  category: ChecklistCategoryEnum;
+  completed: boolean;
+}
+
+export interface ChecklistOverviewResponseData {
+  totalCount: number;
+  completedCount: number;
+  remainingCount: number;
+  progressPercentage: number;
+  items: ChecklistItemResponse[];
+}
+
 export const RECOMMENDED_TODOS: Record<CategoryType, string[]> = {
   기본: ['결혼식 날짜 정하기', '청첩장 제작'],
   예식: ['예식장 투어 및 계약', '본식 메이크업 예약', '웨딩 케이크 주문', '부케 선택'],
@@ -66,13 +83,14 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error('체크리스트 로드 실패');
       
       const body = await res.json();
-      const items = body.data?.items || [];
+      const overviewData: ChecklistOverviewResponseData | null = body.data;
+      const items = overviewData?.items || [];
       
-      const mappedTodos: TodoItem[] = items.map((item: any) => ({
-        id: String(item.itemId || item.id), // 백엔드 DTO 필드명에 맞게 조정 (예: itemId)
-        text: item.title || item.content || '', // 텍스트 필드명에 맞게 조정
+      const mappedTodos: TodoItem[] = items.map((item) => ({
+        id: String(item.itemId),
+        text: item.title,
         category: ENUM_TO_CATEGORY[item.category] || '기본',
-        isCompleted: item.isCompleted || item.completed || false,
+        isCompleted: item.completed,
       }));
 
       setTodos(mappedTodos);
@@ -106,10 +124,10 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       });
       if (!res.ok) throw new Error('체크리스트 저장 실패');
       const body = await res.json();
-      const saved = body.data;
+      const saved: ChecklistItemResponse = body.data;
 
       setTodos((prev) => prev.map((todo) => 
-        todo.id === tempId ? { ...todo, id: String(saved.itemId || saved.id) } : todo
+        todo.id === tempId ? { ...todo, id: String(saved.itemId || saved.itemId) } : todo
       ));
     } catch (error) {
       console.error('할 일 추가 에러:', error);
@@ -143,6 +161,9 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
 
   // 4. 삭제 (DELETE)
   const deleteTodo = async (id: string) => {
+    const targetItem = todos.find((todo) => todo.id === id);
+    if (!targetItem) return;
+
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
 
   try {
@@ -150,7 +171,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error('삭제 실패');
     } catch (error) {
       console.error('할 일 삭제 에러:', error);
-      fetchTodos(); 
+      setTodos((prev) => [targetItem, ...prev]);
     }
   };
 
