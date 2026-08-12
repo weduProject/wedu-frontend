@@ -32,10 +32,16 @@ import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
 import AuthCallbackPage from './pages/Login/AuthCallbackPage';
+
+import InvitationPage from './pages/invitation/InvitationPage';
+import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
+import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
+
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
 import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
 import SharedChecklistPage from './pages/Checklist/SharedChecklistPage';
+
 
 function OnboardingRoutes() {
   return (
@@ -46,7 +52,6 @@ function OnboardingRoutes() {
 }
 
 export default function App() {
-
   return (
     <BudgetProvider>
       <ChecklistProvider>
@@ -56,6 +61,7 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
               <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
@@ -108,6 +114,9 @@ export default function App() {
               <Route path="/community/:id" element={<CommunityDetailPage />} />
               <Route path="/community/write" element={<CommunityWritePage />} />
               <Route path="/mypage" element={<MypagePage />} />
+              <Route path="/invitation" element={<InvitationPage />} />
+              <Route path="/invitation/create" element={<InvitationCreatePage />} />
+              <Route path="/invitation/:id" element={<InvitationDetailPage />} />
             </Route>
           </Routes>
         </ScheduleProvider>

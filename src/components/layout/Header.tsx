@@ -20,6 +20,14 @@ const WEDDING_LINKS = [
   // { label: '파트너 연결', path: '/connect' },
 ] as const;
 
+const WEDDING_LINKS = [
+  { label: '웨딩 룩북', path: '/wedding-shop' },
+  // { label: '웨딩 견적', path: '/wedding-estimate' },
+  // { label: '웨딩 매거진', path: '/wedding-fair' },
+  { label: '모바일 청첩장', path: '/invitation' },
+  // { label: '파트너 연결', path: '/connect' },
+] as const;
+
 const TOOL_LINKS = [
   { label: '나만의 프로포즈', path: '/builder-start', Icon: Sparkles },
   { label: 'D-day 관리', path: '/dday', Icon: Heart },
@@ -99,6 +107,14 @@ export default function Header() {
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex" aria-label="주 메뉴">
           {PRIMARY_LINKS.map((item) => (
+            <NavLink key={item.path} to={item.path} className={navLinkClass}>
+              {item.label}
+            </NavLink>
+          ))}
+
+
+          {/* WEDDING_LINKS 출력 부분 추가 */}
+          {WEDDING_LINKS.map((item) => (
             <NavLink key={item.path} to={item.path} className={navLinkClass}>
               {item.label}
             </NavLink>
@@ -253,6 +269,24 @@ export default function Header() {
             <div className="flex h-full flex-col">
               <div className="flex-1 overflow-y-auto px-4 pb-2 pt-4">
                 {PRIMARY_LINKS.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={({ isActive }) =>
+                      clsx(
+                        'block py-3 text-base font-medium no-underline transition-colors',
+                        isActive ? 'text-primary' : 'text-text',
+                      )
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+
+
+                {/* 모바일 메뉴에도 WEDDING_LINKS 출력 추가 */}
+                {WEDDING_LINKS.map((item) => (
                   <NavLink
                     key={item.path}
                     to={item.path}
