@@ -128,7 +128,7 @@ export default function MypagePage() {
       <div className="flex justify-center pt-2 pb-4">
         <button
           type="button"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate('/mypage/dashboard')}
           className="btn-primary flex items-center gap-2"
         >
           <LayoutDashboard className="h-4 w-4" strokeWidth={1.8} />

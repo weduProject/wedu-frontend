@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CircleDollarSign, ListChecks, CalendarDays, Heart } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useDDay } from '../../contexts/DDayContext';
-import { useSchedules } from '../Calendar/hooks/useSchedules';
-import type { ScheduleItem } from '../Calendar/CalendarPage';
-import ScheduleDetailModal from '../Calendar/components/ScheduleDetailModal';
-import ScheduleModal from '../Calendar/components/ScheduleModal';
-import { useBudget } from '../Budget/hooks/useBudget';
-import { useChecklist } from '../Checklist/hooks/useChecklist';
-import BaseCard from '../../components/ui/BaseCard';
-import ProgressBar from '../../components/ui/ProgressBar';
-import QuickMenu from './components/QuickMenu';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useDDay } from '../../../contexts/DDayContext';
+import { useSchedules } from '../../Calendar/hooks/useSchedules';
+import type { ScheduleItem } from '../../Calendar/CalendarPage';
+import ScheduleDetailModal from '../../Calendar/components/ScheduleDetailModal';
+import ScheduleModal from '../../Calendar/components/ScheduleModal';
+import { useBudget } from '../../Budget/hooks/useBudget';
+import { useChecklist } from '../../Checklist/hooks/useChecklist';
+import BaseCard from '../../../components/ui/BaseCard';
+import ProgressBar from '../../../components/ui/ProgressBar';
+import QuickMenu from '../../Dashboard/components/QuickMenu';
 
-export default function HomePage() {
+export default function DashboardSection() {
   const { user } = useAuth();
   const { dday } = useDDay();
   const navigate = useNavigate();
@@ -274,7 +274,6 @@ export default function HomePage() {
           }}
         />
       )}
-      
 
       {editSchedule && (
         <ScheduleModal
