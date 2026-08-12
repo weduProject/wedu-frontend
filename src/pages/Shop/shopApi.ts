@@ -4,7 +4,6 @@ import {
   DECORATIONS_BY_ID,
   DEFAULT_DECORATION_BY_CATEGORY,
   CATEGORY_LABEL,
-  CATEGORY_BY_ID,
 } from './shopData';
 import type { ProductCategory, ProductDecoration } from './shopData';
 
@@ -83,18 +82,15 @@ export async function fetchProductDetail(productId: number): Promise<DisplayProd
 
 export interface PopularProductRaw {
   id: number;
+  productId: number;
   name: string;
   price: number;
   sourceName: string;
   thumbnailUrl: string;
   rank: number;
-}
-
-// thumbnailUrl(예: https://.../products/4.jpg)에서 실제 상품 id를 뽑아냄
-// (popular 응답의 id는 실제 상품 id가 아니라 랭킹 테이블 id라서 이렇게 우회함)
-function extractRealProductId(thumbnailUrl: string): number | null {
-  const match = thumbnailUrl.match(/products\/(\d+)\.jpg/);
-  return match ? Number(match[1]) : null;
+  category: ProductCategory;
+  rating: number | null;
+  reviewCount: number;
 }
 
 // GET /api/products/popular
@@ -104,21 +100,23 @@ export async function fetchPopularProducts(): Promise<DisplayProduct[]> {
   if (!body.success || !body.data) throw new Error(body.error?.message ?? '인기 상품 조회 실패');
 
   return body.data.map((product) => {
-    const realId = extractRealProductId(product.thumbnailUrl) ?? product.id;
-    const category = CATEGORY_BY_ID[realId] ?? 'ETC';
-    const decoration = DECORATIONS_BY_ID[realId] ?? DEFAULT_DECORATION_BY_CATEGORY[category];
+    const decoration = DECORATIONS_BY_ID[product.productId] ?? DEFAULT_DECORATION_BY_CATEGORY[product.category];
+    // thumbnailUrl이 상대경로(/products/1.jpg)로 오면 API 서버 도메인을 붙여줌
+    const absoluteThumbnailUrl = product.thumbnailUrl.startsWith('http')
+      ? product.thumbnailUrl
+      : `https://api.wedu.io.kr${product.thumbnailUrl}`;
 
     return {
-      id: realId,
+      id: product.productId,
       name: product.name,
-      category,
+      category: product.category,
       price: product.price,
       vendorName: product.sourceName,
-      thumbnailUrl: product.thumbnailUrl,
+      thumbnailUrl: absoluteThumbnailUrl,
       ...decoration,
-      categoryType: CATEGORY_LABEL[category],
+      categoryType: CATEGORY_LABEL[product.category],
       title: product.name,
-      image: product.thumbnailUrl || decoration.image,
+      image: decoration.image ?? absoluteThumbnailUrl,
     };
   });
 }
