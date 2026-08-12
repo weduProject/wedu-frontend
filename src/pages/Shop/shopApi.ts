@@ -4,11 +4,14 @@ import {
   DECORATIONS_BY_ID,
   DEFAULT_DECORATION_BY_CATEGORY,
   CATEGORY_LABEL,
+  CATEGORY_BY_ID,
 } from './shopData';
 import type { ProductCategory, ProductDecoration } from './shopData';
 
-
+// ============================================================
 // Product
+// ============================================================
+
 export interface ProductSummary {
   id: number;
   name: string;
@@ -22,14 +25,12 @@ export interface ProductDetailRaw extends ProductSummary {
   description: string;
 }
 
-// 화면에서 실제로 쓰는 타입: 백엔드 응답 + 프론트 장식 데이터
 export interface DisplayProduct extends ProductSummary, ProductDecoration {
-  categoryType: string; 
-  title: string;        
-  description?: string; 
+  categoryType: string;
+  title: string;
+  description?: string;
 }
 
-// 백엔드 상품 + 프론트 장식 데이터를 합쳐서 기존 컴포넌트가 쓰던 모양으로 변환
 function decorate<T extends ProductSummary & { description?: string }>(product: T): DisplayProduct {
   const decoration = DECORATIONS_BY_ID[product.id] ?? DEFAULT_DECORATION_BY_CATEGORY[product.category];
   return {
@@ -59,21 +60,12 @@ export async function fetchProducts(params: FetchProductsParams = {}): Promise<D
   if (params.minPrice != null) query.set('minPrice', String(params.minPrice));
   if (params.maxPrice != null) query.set('maxPrice', String(params.maxPrice));
   query.set('page', String(params.page ?? 0));
-  query.set('size', String(params.size ?? 20));
+  query.set('size', String(params.size ?? 100));
   (params.sort ?? []).forEach((s) => query.append('sort', s));
-  // TODO: pageable 직렬화 방식(단일 query vs 중첩 객체)은 실제 요청 예시로 확인 후 수정
 
   const res = await apiFetch(`/api/products?${query.toString()}`);
   const body: ApiEnvelope<ProductSummary[]> = await res.json();
   if (!body.success || !body.data) throw new Error(body.error?.message ?? '상품 목록 조회 실패');
-  return body.data.map(decorate);
-}
-
-// GET /api/products/popular
-export async function fetchPopularProducts(): Promise<DisplayProduct[]> {
-  const res = await apiFetch('/api/products/popular');
-  const body: ApiEnvelope<ProductSummary[]> = await res.json();
-  if (!body.success || !body.data) throw new Error(body.error?.message ?? '인기 상품 조회 실패');
   return body.data.map(decorate);
 }
 
@@ -85,7 +77,56 @@ export async function fetchProductDetail(productId: number): Promise<DisplayProd
   return decorate(body.data);
 }
 
+// ============================================================
+// PopularProduct
+// ============================================================
+
+export interface PopularProductRaw {
+  id: number;
+  name: string;
+  price: number;
+  sourceName: string;
+  thumbnailUrl: string;
+  rank: number;
+}
+
+// thumbnailUrl(예: https://.../products/4.jpg)에서 실제 상품 id를 뽑아냄
+// (popular 응답의 id는 실제 상품 id가 아니라 랭킹 테이블 id라서 이렇게 우회함)
+function extractRealProductId(thumbnailUrl: string): number | null {
+  const match = thumbnailUrl.match(/products\/(\d+)\.jpg/);
+  return match ? Number(match[1]) : null;
+}
+
+// GET /api/products/popular
+export async function fetchPopularProducts(): Promise<DisplayProduct[]> {
+  const res = await apiFetch('/api/products/popular');
+  const body: ApiEnvelope<PopularProductRaw[]> = await res.json();
+  if (!body.success || !body.data) throw new Error(body.error?.message ?? '인기 상품 조회 실패');
+
+  return body.data.map((product) => {
+    const realId = extractRealProductId(product.thumbnailUrl) ?? product.id;
+    const category = CATEGORY_BY_ID[realId] ?? 'ETC';
+    const decoration = DECORATIONS_BY_ID[realId] ?? DEFAULT_DECORATION_BY_CATEGORY[category];
+
+    return {
+      id: realId,
+      name: product.name,
+      category,
+      price: product.price,
+      vendorName: product.sourceName,
+      thumbnailUrl: product.thumbnailUrl,
+      ...decoration,
+      categoryType: CATEGORY_LABEL[category],
+      title: product.name,
+      image: product.thumbnailUrl || decoration.image,
+    };
+  });
+}
+
+// ============================================================
 // Cart
+// ============================================================
+
 export interface CartItem {
   productId: number;
   name: string;
@@ -109,7 +150,6 @@ export async function fetchCart(): Promise<Cart> {
 }
 
 // POST /api/carts/items
-// 주의: 서버가 productId만으로 상품 정보를 조회하는 게 아니라, name/price를 클라이언트가 같이 보내야 함
 export async function addCartItem(
   product: { id: number; title: string; price: number },
   quantity = 1,
@@ -147,17 +187,15 @@ export async function removeCartItem(productId: number): Promise<Cart> {
   return body.data;
 }
 
+// ============================================================
 // Wishlist
-// TODO: 실제 응답이 number[]인지 {productId: number}[]인지 확인 후 파싱 부분만 조정
-export interface WishlistItem {
-  productId: number;
-}
+// ============================================================
 
-// GET /api/wishlists/me
 export interface WishlistResponse {
   productIds: number[];
 }
 
+// GET /api/wishlists/me
 export async function fetchWishlist(): Promise<number[]> {
   const res = await apiFetch('/api/wishlists/me');
   const body: ApiEnvelope<WishlistResponse> = await res.json();

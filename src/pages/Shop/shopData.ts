@@ -412,3 +412,14 @@ export const CATEGORY_LABEL: Record<ProductCategory, string> = {
   LETTER: '편지/레터',
   ETC: '기타',
 };
+
+// popular API 응답엔 category가 없어서, id 기준으로 역매핑할 때 씀
+export const CATEGORY_BY_ID: Record<number, ProductCategory> = {
+  1: 'EVENT', 2: 'EVENT', 3: 'EVENT', 4: 'EVENT', 5: 'EVENT', 6: 'EVENT', 7: 'EVENT',
+  8: 'PHOTO', 9: 'EVENT', 10: 'PHOTO',
+  11: 'FLOWER', 12: 'FLOWER', 13: 'FLOWER', 14: 'FLOWER', 15: 'FLOWER',
+  16: 'PHOTO', 17: 'PHOTO', 18: 'PHOTO',
+  19: 'ETC', 20: 'ETC',
+  21: 'EVENT', 22: 'EVENT',
+  23: 'RING', 24: 'RING',
+};
