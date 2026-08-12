@@ -1,12 +1,13 @@
 import DDayCard from "./components/DDayCard";
 import BaseCard from "../../components/ui/BaseCard";
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown, Luggage } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown, Luggage, Check } from 'lucide-react';
 import { useChecklist } from "../Checklist/hooks/useChecklist";
+import { useAuth } from "../../contexts/AuthContext";
+import { useDDay } from "./hooks/useDDay";
 
 
-// 더미 데이터 배열
 const ANNIVERSARIES = [
   { id: 1, title: '처음 만난 날', desc: '운명적인 첫 만남, 모든 것이 시작된 순간.', icon: <Heart className="h-4 w-4" /> },
   { id: 2, title: '프로포즈', desc: '평생 잊지 못할 가장 특별한 순간.', icon: <Gift className="h-4 w-4" /> },
@@ -16,29 +17,33 @@ const ANNIVERSARIES = [
 
 export default function DDayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetDate, setTargetDate] = useState(() => {
-    return localStorage.getItem('weddingDate') || "2026-11-18";
-  });
+  const { targetDate, saveDDay } = useDDay();
+  const [tempDate, setTempDate] = useState('');
 
-  const [tempDate, setTempDate] = useState(targetDate);
-
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { todos, toggleTodo } = useChecklist();
   const previewTodos = todos.slice(0, 5);
 
+  const handleSaveDate = async () => {
+    if (!tempDate) return;
+
+    const success = await saveDDay(tempDate); 
+    if (success) {
+      setIsModalOpen(false);
+    } else {
+      alert("디데이 설정에 실패했습니다.");
+    }
+  };
+
   const handleOpenModal = () => {
-    setTempDate(targetDate);
+    const defaultDate = targetDate || new Date().toISOString().split('T')[0];
+    setTempDate(defaultDate);
     setIsModalOpen(true);
   };
 
-  const handleSaveDate = () => {
-    setTargetDate(tempDate);
-    localStorage.setItem('weddingDate', tempDate);
-    setIsModalOpen(false);
-  };
-
   return (
-    <div className="mx-auto max-w-[1024px] pb-20">
-      {/* 1. 상단 D-day 카드 (버튼 활성화) */}
+    <div className="mx-auto max-w-5xl pb-20">
       <DDayCard 
         targetDate={targetDate}
         showEditButton={true} 
@@ -70,7 +75,7 @@ export default function DDayPage() {
               </div>
             ))}
           </div>
-        </BaseCard>
+        </BaseCard>          
 
         {/* 2-2. 웨딩 체크리스트 섹션 (실제 데이터 연동) */}
         <BaseCard className="flex h-full flex-col p-6 md:p-8">
@@ -84,38 +89,59 @@ export default function DDayPage() {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-5">
-            {previewTodos.map((item) => (
-              <div 
-                key={item.id} 
-                onClick={() => toggleTodo(item.id)} // ✨ 클릭 시 체크 상태 토글 연동!
-                className="flex cursor-pointer items-center justify-between border-b border-gray-50 pb-3 transition-opacity hover:opacity-70 last:border-0 last:pb-0"
-              >
-                <div className="flex items-center gap-4">
-                  {/* ✨ 기존 D-Day 대신 '카테고리'를 뱃지에 표시 */}
-                  <span className="flex w-12 shrink-0 items-center justify-center rounded-full bg-red-50 py-1 text-[11px] font-bold text-primary">
-                    {item.category}
-                  </span>
-                  <p className={`text-sm ${item.isCompleted ? 'text-gray-400 line-through' : 'font-medium text-text'}`}>
-                    {item.text}
-                  </p>
+          {!user ? (
+            <div className="flex h-full flex-col p-6">
+              <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
+                  <Check className="h-6 w-6 text-primary" />
                 </div>
-                {/* 체크박스 아이콘 렌더링 */}
-                {item.isCompleted ? (
-                  <CheckCircle2 className="h-5 w-5 text-primary" fill="currentColor" color="white" />
-                ) : (
-                  <Circle className="h-5 w-5 text-gray-300" />
-                )}
+                <p className="text-sm text-text-muted">할 일을 등록하고<br />진행률을 확인하세요</p>
               </div>
-            ))}
-          </div>
+              <div className="mt-4 border-t border-border pt-4 text-center">
+                <button onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/login')}} className="text-sm font-semibold text-primary hover:underline">
+                  로그인하고 시작하기
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+            <div className="flex flex-1 flex-col gap-5">
+              {previewTodos.map((item) => (
+                <div 
+                  key={item.id} 
+                  onClick={() => toggleTodo(item.id)} // ✨ 클릭 시 체크 상태 토글 연동!
+                  className="flex cursor-pointer items-center justify-between border-b border-gray-50 pb-3 transition-opacity hover:opacity-70 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-4">
+                    {/* ✨ 기존 D-Day 대신 '카테고리'를 뱃지에 표시 */}
+                    <span className="flex w-12 shrink-0 items-center justify-center rounded-full bg-red-50 py-1 text-[11px] font-bold text-primary">
+                      {item.category}
+                    </span>
+                    <p className={`text-sm ${item.isCompleted ? 'text-gray-400 line-through' : 'font-medium text-text'}`}>
+                      {item.text}
+                    </p>
+                  </div>
+                  {/* 체크박스 아이콘 렌더링 */}
+                  {item.isCompleted ? (
+                    <CheckCircle2 className="h-5 w-5 text-primary" fill="currentColor" color="white" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-gray-300" />
+                  )}
+                </div>
+              ))}
+            </div>
 
-          {/* 전체 체크리스트 보기 하단 링크 */}
-          <div className="mt-8 border-t border-gray-100 pt-5">
-            <Link to= "/checklist" className="flex items-center gap-1 text-sm font-semibold text-primary transition-opacity hover:opacity-80">
-              전체 체크리스트 보기 <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+            {/* 전체 체크리스트 보기 하단 링크 */}
+            <div className="mt-8 border-t border-gray-100 pt-5">
+              <Link to= "/checklist" className="flex items-center gap-1 text-sm font-semibold text-primary transition-opacity hover:opacity-80">
+                전체 체크리스트 보기 <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            </>
+          )}
+          
         </BaseCard>
 
       </div>

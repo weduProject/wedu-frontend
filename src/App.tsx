@@ -32,9 +32,16 @@ import BuilderStartPage from './pages/Builder/BuilderStartPage';
 import BuilderCartPage from './pages/Builder/BuilderCartPage';
 import ScrollToTop from './components/ScrollToTop';
 import AuthCallbackPage from './pages/Login/AuthCallbackPage';
+
 import InvitationPage from './pages/invitation/InvitationPage';
 import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
 import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
+
+import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
+import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
+import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
+import SharedChecklistPage from './pages/Checklist/SharedChecklistPage';
+
 
 function OnboardingRoutes() {
   return (
@@ -78,6 +85,9 @@ export default function App() {
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/shop/:id" element={<ShopDetailPage />} />
               <Route path="/shop/wishlist" element={<WishlistPage />} />
+              <Route path="/wedding-shop" element={<WeddingShopPage />} />
+              <Route path="/wedding-shop/:id" element={<WeddingShopDetailPage />} />
+              <Route path="/wedding-estimate" element={<WeddingEstimatePage />} />
               <Route path="/shop/cart" element={<CartPage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
@@ -97,6 +107,7 @@ export default function App() {
                 }
               />
               <Route path="/checklist" element={<ChecklistPage />} />
+              <Route path="/shared/checklist/:token" element={<SharedChecklistPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/budget" element={<BudgetPage />} />
               <Route path="/community" element={<CommunityPage />} />

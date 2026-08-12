@@ -1,13 +1,18 @@
-import { PRODUCTS, type Product } from "../Shop/shopData";
-import type { BuilderState } from "./BuilderContext"; 
+import { BUILDER_PRODUCTS, type BuilderProduct } from "./builderProducts";
+import type { BuilderState } from "./BuilderContext";
 
 export interface RecommendedItem {
   id: number;
   title: string;
   category: string;
   price: number;
-  displayPrice: string;
+  displayPrice: number;
   icon: string;
+}
+
+interface ScoredProduct extends BuilderProduct {
+  score: number;
+  priceNum: number;
 }
 
 export function getRecommendedProducts(builder: BuilderState): RecommendedItem[] {
@@ -32,10 +37,10 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
   else if (budgetId === 4) { minBudget = 3000000; maxBudget = 5000000; }
   else if (budgetId === 5) { minBudget = 5000000; }
 
-  const scoredProducts = PRODUCTS.map((product: Product) => {
+  const scoredProducts: ScoredProduct[] = BUILDER_PRODUCTS.map((product) => {
     let score = 0;
-    product.tags.forEach((tag) => { if (userString.includes(tag)) score += 3; });
-    product.styles.forEach((style) => { if (userString.includes(style)) score += 2; });
+    product.tags.forEach((tag: string) => { if (userString.includes(tag)) score += 3; });
+    product.styles.forEach((style: string) => { if (userString.includes(style)) score += 2; });
 
     const placeName = builder.weddingHall?.name || "";
     const vibeName = builder.seudeume?.name || "";
@@ -50,13 +55,13 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
     if (foodName.includes("다이닝") && product.title.includes("다이닝")) score += 15;
     if (foodName.includes("오마카세") && product.title.includes("커스텀")) score += 10;
 
-    const priceNum = parseInt(product.price.replace(/[^0-9]/g, "")) * 10000;
+    const priceNum = product.price;
     return { ...product, score, priceNum };
   });
 
-  let bestCombo: typeof scoredProducts | null = null;
+  let bestCombo: ScoredProduct[] | null = null;
   let maxComboScore = -1;
-  let closestCombo: typeof scoredProducts | null = null;
+  let closestCombo: ScoredProduct[] | null = null;
   let minPriceDiff = Infinity;
 
   for (let i = 0; i < scoredProducts.length - 2; i++) {
@@ -64,11 +69,11 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
       for (let k = j + 1; k < scoredProducts.length; k++) {
         const combo = [scoredProducts[i], scoredProducts[j], scoredProducts[k]];
         const totalPrice = combo[0].priceNum + combo[1].priceNum + combo[2].priceNum;
-        
+
         let comboScore = combo[0].score + combo[1].score + combo[2].score;
-        const categories = new Set(combo.map(c => c.categoryType));
-        if (categories.size === 3) comboScore += 20; 
-        comboScore += Math.random(); 
+        const categories = new Set(combo.map((c) => c.categoryType));
+        if (categories.size === 3) comboScore += 20;
+        comboScore += Math.random();
 
         if (totalPrice >= minBudget && totalPrice <= maxBudget) {
           if (comboScore > maxComboScore) {
@@ -84,7 +89,7 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
         if (diff < minPriceDiff) {
           minPriceDiff = diff;
           closestCombo = combo;
-        } else if (diff === minPriceDiff && comboScore > (closestCombo ? closestCombo.reduce((a,c)=>a+c.score,0) : 0)) {
+        } else if (diff === minPriceDiff && comboScore > (closestCombo ? closestCombo.reduce((a: number, c: ScoredProduct) => a + c.score, 0) : 0)) {
           closestCombo = combo;
         }
       }
@@ -93,7 +98,7 @@ export function getRecommendedProducts(builder: BuilderState): RecommendedItem[]
 
   const finalCombo = bestCombo || closestCombo || scoredProducts.slice(0, 3);
 
-  return finalCombo.sort((a,b) => b.score - a.score).map((p) => {
+  return finalCombo.sort((a: ScoredProduct, b: ScoredProduct) => b.score - a.score).map((p: ScoredProduct) => {
     const icon = p.category.split(" ")[0] || "✨";
     return {
       id: p.id,

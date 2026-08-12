@@ -10,6 +10,7 @@ import ScheduleDetailModal from '../Calendar/components/ScheduleDetailModal';
 import DDayCard from './components/DDayCard';
 import ScheduleModal from '../Calendar/components/ScheduleModal';
 import BudgetSummaryCard from './components/BudgetSummaryCard';
+import { useDDay } from './hooks/useDDay';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -27,6 +28,8 @@ export default function HomePage() {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
 
+  const { targetDate } = useDDay();
+
   return (
     <main className="flex flex-col gap-8">
       <section>
@@ -40,11 +43,11 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {user ? (
             <Link to="/dday" className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18" />
+              <DDayCard targetDate={targetDate} />
             </Link>
           ) : (
             <div onClick={() => navigate('/dday')} className="block transition-transform cursor-pointer hover:scale-[1.01]">
-              <DDayCard targetDate="2026-11-18"/>
+              <DDayCard targetDate={targetDate}/>
             </div>
           )}
           {user ? (
@@ -77,7 +80,6 @@ export default function HomePage() {
         <div className="md:col-span-1 flex flex-col">
           <UpcomingList
             schedules={upcomingSchedules}
-            onDelete={deleteSchedule}
             onScheduleClick={(schedule) => setViewSchedule(schedule)}
           />
         </div>
@@ -136,14 +138,19 @@ export default function HomePage() {
 
       {viewSchedule && (
         <ScheduleDetailModal
-          schedule={viewSchedule}
+          schedules={[viewSchedule]}
           onClose={() => setViewSchedule(null)}
-          onEdit={() => {
-            setEditSchedule(viewSchedule); 
+          onEdit={(scheduleToEdit) => {
+            setEditSchedule(scheduleToEdit); 
             setViewSchedule(null); 
+          }}
+          onDelete={(id) => {
+            deleteSchedule(id);
+            setViewSchedule(null);
           }}
         />
       )}
+      
 
       {editSchedule && (
         <ScheduleModal
