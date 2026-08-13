@@ -141,7 +141,7 @@ export default function InvitationPage() {
               <div className="flex items-center gap-4">
                 <a
                   href="#templates"
-                  className="px-8 py-4 bg-[#C9A96E] hover:bg-[#B8985D] text-white rounded-full text-sm font-bold shadow-lg shadow-[#C9A96E]/30 transition-all whitespace-nowrap hover:-translate-y-0.5"
+                  className="px-8 py-4 bg-[#B76E79] hover:bg-[#B8985D] text-white rounded-full text-sm font-bold shadow-lg shadow-[#C9A96E]/30 transition-all whitespace-nowrap hover:-translate-y-0.5"
                 >
                   템플릿 둘러보기
                 </a>

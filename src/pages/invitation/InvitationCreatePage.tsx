@@ -240,7 +240,7 @@ export default function InvitationCreatePage() {
                     onClick={() => setActiveSection(section.key)}
                     className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer whitespace-nowrap ${
                       activeSection === section.key
-                        ? "bg-[#C9A96E] text-white shadow-md shadow-[#C9A96E]/20 transform scale-[1.02]"
+                        ? "bg-[#B76E79] text-white shadow-md shadow-[#B76E79]/20 transform scale-[1.02]"
                         : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                     }`}
                   >
@@ -476,7 +476,7 @@ export default function InvitationCreatePage() {
                     />
                     <Button
                       type="button"
-                      variant="roseGold"
+                      
                       onClick={handleAddImage}
                       disabled={isUploadingImage || !newImageUrl.trim()}
                     >
@@ -583,7 +583,7 @@ export default function InvitationCreatePage() {
                         const nextIdx = currentSectionIdx + 1;
                         if (nextIdx < sections.length) setActiveSection(sections[nextIdx].key);
                       }}
-                      className="px-8 py-3 rounded-full text-sm font-bold bg-[#C9A96E] hover:bg-[#B8985D] text-white shadow-md shadow-[#C9A96E]/20 cursor-pointer transition-all hover:-translate-y-0.5"
+                      className="px-8 py-3 rounded-full text-sm font-bold bg-[#B76E79] hover:bg-[#B8985D] text-white shadow-md shadow-[#C9A96E]/20 cursor-pointer transition-all hover:-translate-y-0.5"
                     >
                       다음
                     </button>
@@ -600,7 +600,7 @@ export default function InvitationCreatePage() {
                     <button
                       onClick={handlePublish}
                       disabled={saving}
-                      className="px-8 py-3 rounded-full text-sm font-bold bg-[#C9A96E] hover:bg-[#B8985D] text-white shadow-md shadow-[#C9A96E]/20 cursor-pointer transition-all hover:-translate-y-0.5"
+                      className="px-8 py-3 rounded-full text-sm font-bold bg-[#B76E79] hover:bg-[#B8985D] text-white shadow-md shadow-[#C9A96E]/20 cursor-pointer transition-all hover:-translate-y-0.5"
                     >
                       발행하기
                     </button>
@@ -635,7 +635,7 @@ export default function InvitationCreatePage() {
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={handlePublish}
-                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-[#C9A96E] text-white hover:bg-[#B8985D] transition-colors shadow-md shadow-[#C9A96E]/20"
+                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-[#B76E79] text-white hover:bg-[#B8985D] transition-colors shadow-md shadow-[#C9A96E]/20"
                   >
                     다시 시도
                   </button>
@@ -649,7 +649,7 @@ export default function InvitationCreatePage() {
               </div>
             ) : isPublished ? (
               <div className="py-4 animate-fade-in">
-                <div className="w-16 h-16 bg-[#C9A96E]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#C9A96E] shadow-inner">
+                <div className="w-16 h-16 bg-[#B76E79]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#C9A96E] shadow-inner">
                   <Check className="h-7 w-7" strokeWidth={3} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">발행이 완료되었습니다!</h3>
@@ -667,7 +667,7 @@ export default function InvitationCreatePage() {
                       setShowPublishModal(false);
                       navigate("/invitation");
                     }}
-                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-[#C9A96E] text-white hover:bg-[#B8985D] transition-colors shadow-md shadow-[#C9A96E]/20"
+                    className="w-full py-3.5 rounded-full text-[15px] font-bold bg-[#B76E79] text-white hover:bg-[#B8985D] transition-colors shadow-md shadow-[#C9A96E]/20"
                   >
                     목록으로 돌아가기
                   </button>
