@@ -8,7 +8,6 @@ import ProgressBar from '../../components/ui/ProgressBar';
 import TextField from '../../components/ui/TextField';
 import Button from '../../components/ui/Button';
 import { useChecklist, RECOMMENDED_TODOS, type CategoryType } from './hooks/useChecklist';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 import EmptyState from '../../components/ui/EmptyState';
@@ -16,7 +15,6 @@ import EmptyState from '../../components/ui/EmptyState';
 const CATEGORIES: CategoryType[] = ['기본', '예식', '촬영', '예물', '주거', '여행'];
 
 export default function ChecklistPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { todos:rawTodos, addTodo, toggleTodo, deleteTodo, updateTodo } = useChecklist();
