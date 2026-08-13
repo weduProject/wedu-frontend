@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useOnboarding } from './OnboardingContext';
 import { apiFetch } from '../../lib/apiClient';
+import { Button } from '../../components';
 
 const MBTI_STEPS = [
   {
@@ -114,7 +115,7 @@ export default function PartnerMbtiPage() {
         </div>
 
         {/* 제목 */}
-        <h1 className="mb-3 text-center text-3xl font-bold text-text" style={{ fontFamily: 'var(--font-serif)' }}>
+        <h1 className="mb-3 text-center text-3xl font-bold text-text font-serif">
           파트너의 MBTI는 무엇인가요?
         </h1>
         <p className="mb-8 text-center text-sm leading-relaxed text-text-muted">
@@ -218,24 +219,14 @@ export default function PartnerMbtiPage() {
 
         {/* 하단 버튼 */}
         <div className="mt-6 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => navigate('/onboarding/quiz')}
-            className="flex items-center gap-1.5 rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-text transition-colors hover:bg-gray-50 cursor-pointer"
-          >
+          <Button variant="secondary" className="flex items-center gap-1.5" onClick={() => navigate('/onboarding/quiz')}>
             <ArrowLeft className="h-4 w-4" strokeWidth={2} />
             이전
-          </button>
-
-          <button
-            type="button"
-            disabled={!isReady || loading}
-            onClick={handleSubmit}
-            className="flex items-center gap-1.5 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          </Button>
+          <Button className="flex items-center gap-1.5" disabled={!isReady || loading} onClick={handleSubmit}>
             {loading ? '제출 중...' : '결과 확인하기'}
             {!loading && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

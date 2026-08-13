@@ -4,24 +4,31 @@ import clsx from 'clsx';
 interface SelectableCardProps {
   isSelected?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
   children: ReactNode;
   className?: string;
-  disabled?: boolean;
 }
 
-export default function SelectableCard({ isSelected = false, onClick, children, className, disabled = false }: SelectableCardProps) {
+export default function SelectableCard({
+  isSelected = false,
+  onClick,
+  disabled = false,
+  children,
+  className,
+}: SelectableCardProps) {
   return (
     <button
       type="button"
-      disabled={disabled}
       className={clsx(
-        'block w-full text-left bg-white border-2 rounded-xl p-4 cursor-pointer transition-colors hover:border-primary/40',
+        'block w-full text-left bg-white border-2 rounded-xl p-4 transition-colors',
+        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:border-primary/40',
         isSelected ? 'border-primary bg-primary-light' : 'border-border',
-        disabled && 'opacity-40 cursor-not-allowed',
         className,
       )}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       aria-pressed={isSelected}
+      aria-disabled={disabled}
     >
       {children}
     </button>

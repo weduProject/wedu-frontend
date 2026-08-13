@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, HeartPlus, Star, ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from './OnboardingContext';
+import { Button } from '../../components';
 
 const STEPS = [
   {
@@ -65,13 +66,9 @@ export default function OnboardingStartPage() {
                 <CheckCircle className="h-4 w-4" strokeWidth={2} />
                 테스트 완료
               </div>
-              <button
-                type="button"
-                onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}
-                className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
-              >
+              <Button variant="secondary" onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}>
                 다시 하기
-              </button>
+              </Button>
             </>
           ) : (
             <>
@@ -82,22 +79,18 @@ export default function OnboardingStartPage() {
               >
                 무료 테스트 시작하기
               </button>
-              <button
-                type="button"
-                onClick={() => navigate('/shop')}
-                className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
-              >
+              <Button variant="secondary" onClick={() => navigate('/shop')}>
                 프로포즈 둘러보기
-              </button>
+              </Button>
             </>
           )}
         </div>
 
         {/* 3단계 프로세스 */}
-        <div className="flex w-full max-w-3xl items-start gap-3">
+        <div className="flex w-full max-w-3xl items-stretch gap-3">
           {STEPS.map(({ step, title, desc, Icon }, idx) => (
             <Fragment key={step}>
-              <div className="flex flex-1 flex-col items-center rounded-2xl border border-border bg-white/80 p-6 text-center shadow-sm">
+              <div className="flex flex-1 flex-col items-center justify-start rounded-2xl border border-border bg-white/80 p-6 text-center shadow-sm">
                 <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-light">
                   <Icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
                 </span>
@@ -106,7 +99,7 @@ export default function OnboardingStartPage() {
                 <p className="text-xs leading-relaxed text-text-muted">{desc}</p>
               </div>
               {idx < STEPS.length - 1 && (
-                <ArrowRight className="mt-10 h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} />
+                <ArrowRight className="h-5 w-5 shrink-0 self-center text-text-muted" strokeWidth={1.5} />
               )}
             </Fragment>
           ))}
