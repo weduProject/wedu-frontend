@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Image as ImageIcon, Heart } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { CATEGORIES, MOCK_PRODUCTS } from './mockProducts';
 import { formatPrice } from './utils/formatPrice';
 import { IMAGE_PLACEHOLDER_BG, CARD_BORDER } from './styles';
 import weddingShopHeroBg from '../../assets/wedding-shop/hero.jpg';
 import weddingShopCtaBg from '../../assets/wedding-shop/cta.jpg';
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../styles/categoryTab';
 
 export default function WeddingShopPage() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -31,11 +32,26 @@ export default function WeddingShopPage() {
       <section className="sticky top-16 z-30 border-b border-[#E7E4E3]/60 bg-[#FAF8F8]/80 backdrop-blur-[12px] md:top-20">
         <div className="mx-auto max-w-5xl px-5 md:px-8">
           <div className="flex items-center gap-3 overflow-x-auto py-4 scrollbar-hide">
-            <button type="button" onClick={() => setActiveCategory(null)} className={clsx('shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors', activeCategory === null ? 'bg-text text-white' : 'bg-[#F0EEED] text-text-muted hover:bg-[#E7E4E3]')}>
+            <button
+              type="button"
+              onClick={() => setActiveCategory(null)}
+              className={clsx(
+                'shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors',
+                activeCategory === null ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              )}
+            >
               전체
             </button>
             {CATEGORIES.map((cat) => (
-              <button key={cat.id} type="button" onClick={() => setActiveCategory(cat.id)} className={clsx('shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors', activeCategory === cat.id ? 'bg-text text-white' : 'bg-[#F0EEED] text-text-muted hover:bg-[#E7E4E3]')}>
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                className={clsx(
+                  'shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors',
+                  activeCategory === cat.id ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+                )}
+              >
                 {cat.name}
               </button>
             ))}
@@ -63,9 +79,6 @@ export default function WeddingShopPage() {
                         {Math.round(((product.price - product.discountPrice!) / product.price) * 100)}% OFF
                       </span>
                     ) : null}
-                    <button type="button" onClick={(e) => e.preventDefault()} className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 opacity-0 backdrop-blur-[2px] transition-opacity group-hover:opacity-100" aria-label="찜하기">
-                      <Heart className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.8} />
-                    </button>
                   </div>
                   <div className="p-5">
                     <span className="text-xs font-medium tracking-[0.3px] text-text-muted">{CATEGORIES.find((c) => c.id === product.categoryId)?.name}</span>
