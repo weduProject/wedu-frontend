@@ -86,7 +86,7 @@ export default function QuizPage() {
   const orderedSelected = (Array.isArray(currentAnswer) ? currentAnswer : []) as string[];
 
   return (
-    <div className="bg-[#FDFBF9] -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
     <div className="flex flex-col h-[calc(100svh-80px)] md:h-[calc(100svh-96px)] overflow-hidden px-5 md:px-8">
       {/* 고정 타이틀 영역 */}
       <div className="shrink-0 text-center pt-4 pb-3 px-4">
@@ -103,23 +103,23 @@ export default function QuizPage() {
       </div>
 
       {/* 퀴즈 카드 */}
-      <div className="flex-1 flex items-center justify-center px-4 py-6">
-        <div className="w-full max-w-4xl flex flex-col gap-2">
+      <div className="flex-1 flex flex-col px-4 py-6">
+        <div className="w-full max-w-xl mx-auto flex flex-col gap-2 my-auto">
           <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
-        <div className="w-full bg-[#FDFBF9] rounded-2xl shadow-sm border border-border/60 p-10 flex flex-col gap-4 overflow-y-auto max-h-[65vh]">
+        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-5 flex flex-col gap-2 overflow-y-auto max-h-[65vh]">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">
             문항 {current + 1} / {QUIZ_QUESTIONS.length}
           </p>
 
           {/* 질문 */}
-          <div className="text-center py-2">
-            <p className="text-2xl font-bold text-text leading-snug mb-1" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
+          <div className="text-center py-1">
+            <p className="text-2xl font-bold text-text leading-snug mb-0.5" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
             {question.hint && <p className="text-sm text-text-muted">{question.hint}</p>}
           </div>
 
           {/* 선택지 */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {question.answers.map((answer) => {
               const isSelected =
                 question.type === 'single'
@@ -144,7 +144,7 @@ export default function QuizPage() {
                     else handleOrdered(answer.value);
                   }}
                   className={clsx(
-                    'flex items-center gap-4 w-full px-5 py-5 rounded-2xl border text-left transition-all cursor-pointer',
+                    'flex items-center gap-3 w-full px-4 py-3 rounded-2xl border text-left transition-all cursor-pointer',
                     isSelected
                       ? 'border-primary bg-primary/10 text-primary font-semibold'
                       : 'border-gray-200 bg-white text-text hover:border-primary/40 hover:bg-primary/5',
@@ -158,7 +158,7 @@ export default function QuizPage() {
                   )}>
                     {isSelected && <span className="w-2.5 h-2.5 rounded-full bg-white" />}
                   </span>
-                  <span className="text-base">{answer.label}</span>
+                  <span className="text-sm">{answer.label}</span>
                   {question.type === 'ordered' && orderIndex !== -1 && (
                     <span className="ml-auto w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0 font-bold">
                       {orderIndex + 1}
@@ -194,7 +194,7 @@ export default function QuizPage() {
           )}
 
           {/* 이전 / 도트 / 다음 */}
-          <div className="flex items-center justify-between gap-3 mt-1">
+          <div className="flex items-center justify-between gap-3 mt-0">
             <Button variant="secondary" className="flex-none" disabled={current === 0} onClick={goPrev}>
               ← 이전
             </Button>

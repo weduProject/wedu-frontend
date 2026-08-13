@@ -69,7 +69,7 @@ export default function BuilderPage() {
     currentStep === 3 ? builder.honeymoon : null;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-32">
+    <div className="min-h-screen bg-surface pt-20 pb-32">
       <div className="max-w-[900px] mx-auto px-4">
         {/* 상단 프로그레스 바 */}
         <div className="flex items-center justify-center mb-10">

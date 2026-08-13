@@ -104,7 +104,7 @@ export default function PartnerMbtiPage() {
   }
 
   return (
-    <div className="bg-[#FDFBF9] -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       <div className="mx-auto w-full max-w-2xl px-5 py-10 md:px-8">
         {/* STEP 배지 */}
         <div className="flex justify-center mb-6">

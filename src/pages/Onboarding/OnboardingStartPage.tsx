@@ -39,7 +39,7 @@ export default function OnboardingStartPage() {
   return (
     <div className="-mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       {/* 히어로 섹션 */}
-      <section className="flex flex-col items-center justify-center bg-[#FDFBF9] px-4 py-20 text-center">
+      <section className="flex flex-col items-center justify-center bg-surface px-4 py-20 text-center">
         <span className="mb-6 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white">
           심리테스트
         </span>
@@ -112,7 +112,7 @@ export default function OnboardingStartPage() {
       </section>
 
       {/* 통계 섹션 */}
-      <section className="bg-[#FDFBF9] px-4 py-16 text-center">
+      <section className="bg-surface px-4 py-16 text-center">
         <h2 className="mb-10 text-xl font-bold text-text">이미 많은 커플이 WEDU와 함께했어요</h2>
         <div className="mx-auto flex max-w-2xl justify-around">
           {STATS.map(({ value, label }) => (

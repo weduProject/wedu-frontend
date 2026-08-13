@@ -23,7 +23,7 @@ export default function OnboardingIntroPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="min-h-screen bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
     <div className="mx-auto w-full max-w-2xl px-5 py-8 md:px-8">
         {/* 상단 내비 */}
         <div className="mb-8 flex items-center justify-between">
