@@ -13,6 +13,8 @@ import {
   Clock3,
 } from "lucide-react";
 
+import { Button } from "../../components";
+
 const templates = [
   {
     name: "로맨틱 아이보리",
@@ -87,20 +89,13 @@ function ShineButton({
   variant?: "primary" | "light";
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant={variant === "primary" ? "main" : "secondary"}
+      size="lg"
       onClick={onClick}
-      className={`
-        group relative overflow-hidden rounded-full
-        px-7 py-3.5 text-sm font-bold
-        transition-all duration-300
-        hover:-translate-y-0.5 hover:shadow-lg
-        ${
-          variant === "primary"
-            ? "bg-[#f28b8c] text-white shadow-[0_8px_24px_rgba(242,139,140,0.25)]"
-            : "bg-white/90 text-[#b76e79] shadow-[0_8px_24px_rgba(255,255,255,0.25)]"
-        }
-      `}
+      className={`group relative overflow-hidden hover:-translate-y-0.5 hover:shadow-lg ${
+        variant === "light" ? "border-0 bg-white/90 text-primary" : ""
+      }`}
     >
       {/* 계속 지나가는 반짝임 */}
       <span
@@ -114,7 +109,7 @@ function ShineButton({
       <span className="relative z-10 flex items-center justify-center gap-2">
         {children}
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -122,7 +117,7 @@ export default function InvitationPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#fcfaf9] text-[#292525]">
+    <div className="bg-surface text-text -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       {/* 반짝임 애니메이션 */}
       <style>
         {`
@@ -173,66 +168,9 @@ export default function InvitationPage() {
       </style>
 
       {/* =========================
-          HEADER
-      ========================= */}
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/40 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-5 md:px-8">
-          {/* 로고 */}
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="text-xl font-black tracking-[-0.04em] text-[#f08386]"
-          >
-            WEDU
-          </button>
-
-          {/* 메뉴 */}
-          <nav className="hidden items-center gap-7 text-[12px] font-medium text-gray-600 md:flex">
-            <button
-              onClick={() => navigate("/invitation")}
-              className="font-bold text-[#b76e79]"
-            >
-              청첩장
-            </button>
-
-            <button
-              onClick={() => navigate("/invitation/create")}
-              className="transition-colors hover:text-[#b76e79]"
-            >
-              청첩장 만들기
-            </button>
-
-            <button className="transition-colors hover:text-[#b76e79]">
-              샘플 보기
-            </button>
-
-            <button className="transition-colors hover:text-[#b76e79]">
-              이용 안내
-            </button>
-
-            <button className="transition-colors hover:text-[#b76e79]">
-              고객센터
-            </button>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button className="hidden text-xs font-medium text-gray-600 sm:block">
-              로그인
-            </button>
-
-            <ShineButton
-              onClick={() => navigate("/invitation/create")}
-            >
-              회원가입
-            </ShineButton>
-          </div>
-        </div>
-      </header>
-
-      {/* =========================
           HERO
       ========================= */}
-      <section className="relative min-h-[720px] overflow-hidden pt-[68px]">
+      <section className="relative min-h-[720px] overflow-hidden">
         {/* 배경 */}
         <div
           className="
@@ -325,7 +263,7 @@ export default function InvitationPage() {
                 "
               >
                 <div className="flex h-full flex-col items-center justify-center border border-[#c9b49c]/50">
-                  <p className="text-[9px] tracking-[0.35em] text-[#b76e79]">
+                  <p className="text-[9px] tracking-[0.35em] text-primary">
                     MY INVITATION
                   </p>
 
@@ -336,7 +274,7 @@ export default function InvitationPage() {
                   </p>
 
                   <Heart
-                    className="my-5 h-5 w-5 fill-[#ed9a9b] text-[#ed9a9b]"
+                    className="my-5 h-5 w-5 fill-primary text-primary"
                   />
 
                   <p className="text-2xl font-semibold text-[#393333]">
@@ -347,11 +285,11 @@ export default function InvitationPage() {
                     인준
                   </p>
 
-                  <p className="mt-5 text-[10px] tracking-[0.12em] text-gray-500">
+                  <p className="mt-5 text-[10px] tracking-[0.12em] text-text-muted">
                     2026. 05. 24
                   </p>
 
-                  <p className="mt-2 text-[9px] text-gray-400">
+                  <p className="mt-2 text-[9px] text-text-muted">
                     더채플앳청담 그랜드홀
                   </p>
                 </div>
@@ -367,11 +305,11 @@ export default function InvitationPage() {
                   animate-[invitationFloat_4s_ease-in-out_1s_infinite]
                 "
               >
-                <Heart className="mx-auto mb-2 h-5 w-5 text-[#f08c8d]" />
-                <p className="text-[10px] font-semibold text-gray-700">
+                <Heart className="mx-auto mb-2 h-5 w-5 text-primary" />
+                <p className="text-[10px] font-semibold text-text">
                   참여해요
                 </p>
-                <p className="mt-1 text-[9px] text-gray-400">
+                <p className="mt-1 text-[9px] text-text-muted">
                   마음 전하기
                 </p>
               </div>
@@ -384,10 +322,10 @@ export default function InvitationPage() {
                   shadow-xl backdrop-blur-md
                 "
               >
-                <p className="text-[8px] uppercase tracking-[0.15em] text-[#e28a8d]">
+                <p className="text-[8px] uppercase tracking-[0.15em] text-primary">
                   Wedding Day
                 </p>
-                <p className="mt-1 text-xs font-bold text-gray-700">
+                <p className="mt-1 text-xs font-bold text-text">
                   2026.05.24
                 </p>
               </div>
@@ -406,7 +344,7 @@ export default function InvitationPage() {
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-12 flex items-end justify-between">
             <div>
-              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-[#e18a8d]">
+              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-primary">
                 TEMPLATE
               </p>
 
@@ -415,7 +353,7 @@ export default function InvitationPage() {
               </h2>
             </div>
 
-            <button className="hidden items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-[#b76e79] sm:flex">
+            <button className="hidden items-center gap-1 text-xs font-medium text-text-muted transition-colors hover:text-primary sm:flex">
               전체 보기
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
@@ -432,7 +370,7 @@ export default function InvitationPage() {
                 md:flex
               "
             >
-              <ChevronLeft className="h-5 w-5 text-gray-500" />
+              <ChevronLeft className="h-5 w-5 text-text-muted" />
             </button>
 
             <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-7">
@@ -442,7 +380,7 @@ export default function InvitationPage() {
                     className="
                       relative aspect-[0.66]
                       overflow-hidden rounded-[22px]
-                      border border-gray-100
+                      border border-border
                       p-3 shadow-[0_10px_35px_rgba(0,0,0,.07)]
                       transition-all duration-500
                       group-hover:-translate-y-2
@@ -469,24 +407,24 @@ export default function InvitationPage() {
                         style={{ color: template.accent }}
                       />
 
-                      <p className="text-[8px] tracking-widest text-gray-500">
+                      <p className="text-[8px] tracking-widest text-text-muted">
                         2026.05.24
                       </p>
 
                       <div className="mt-5 h-14 w-14 rounded-full bg-white/40 blur-[1px]" />
                     </div>
 
-                    <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[7px] font-bold text-gray-500 shadow-sm">
+                    <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[7px] font-bold text-text-muted shadow-sm">
                       NEW
                     </span>
                   </div>
 
                   <div className="mt-4 text-center">
-                    <p className="text-sm font-bold text-gray-800">
+                    <p className="text-sm font-bold text-text">
                       {template.name}
                     </p>
 
-                    <p className="mt-2 text-xs text-gray-400">
+                    <p className="mt-2 text-xs text-text-muted">
                       <span className="text-[#e3a34e]">★</span>{" "}
                       {template.rating}
                     </p>
@@ -505,16 +443,16 @@ export default function InvitationPage() {
                 md:flex
               "
             >
-              <ChevronRight className="h-5 w-5 text-gray-500" />
+              <ChevronRight className="h-5 w-5 text-text-muted" />
             </button>
           </div>
 
           <div className="mt-10 flex justify-center gap-2">
-            <span className="h-1.5 w-5 rounded-full bg-[#ef8d90]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
+            <span className="h-1.5 w-5 rounded-full bg-primary" />
+            <span className="h-1.5 w-1.5 rounded-full bg-border" />
+            <span className="h-1.5 w-1.5 rounded-full bg-border" />
+            <span className="h-1.5 w-1.5 rounded-full bg-border" />
+            <span className="h-1.5 w-1.5 rounded-full bg-border" />
           </div>
         </div>
       </section>
@@ -522,12 +460,12 @@ export default function InvitationPage() {
       {/* =========================
           FEATURES + DDAY
       ========================= */}
-      <section className="bg-[#f8f6f5] px-6 py-24 md:px-12">
+      <section className="bg-surface px-6 py-24 md:px-12">
         <div className="mx-auto max-w-[1120px]">
           <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
             {/* 왼쪽 */}
             <div>
-              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-[#e18a8d]">
+              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-primary">
                 FEATURE
               </p>
 
@@ -551,16 +489,16 @@ export default function InvitationPage() {
                         hover:-translate-y-1 hover:shadow-md
                       "
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fff0ef]">
-                        <Icon className="h-4.5 w-4.5 text-[#ec898d]" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light">
+                        <Icon className="h-4.5 w-4.5 text-primary" />
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-bold text-gray-800">
+                        <h3 className="text-sm font-bold text-text">
                           {feature.title}
                         </h3>
 
-                        <p className="mt-2 whitespace-pre-line text-[11px] leading-5 text-gray-400">
+                        <p className="mt-2 whitespace-pre-line text-[11px] leading-5 text-text-muted">
                           {feature.description}
                         </p>
                       </div>
@@ -578,19 +516,19 @@ export default function InvitationPage() {
                 shadow-[0_15px_45px_rgba(0,0,0,.06)]
               "
             >
-              <p className="text-center text-[10px] font-bold tracking-[0.3em] text-[#e68a8e]">
+              <p className="text-center text-[10px] font-bold tracking-[0.3em] text-primary">
                 D-DAY
               </p>
 
-              <p className="mt-3 text-center text-xs text-gray-400">
+              <p className="mt-3 text-center text-xs text-text-muted">
                 우리의 특별한 날까지
               </p>
 
               <h3 className="mt-3 text-center text-3xl font-bold">
-                수지 <span className="text-[#ef9294]">&</span> 인준
+                수지 <span className="text-primary">&</span> 인준
               </h3>
 
-              <p className="mt-2 text-center text-xs text-gray-500">
+              <p className="mt-2 text-center text-xs text-text-muted">
                 2026.05.24 SAT 2:00PM
               </p>
 
@@ -603,12 +541,12 @@ export default function InvitationPage() {
                 ].map(([number, label]) => (
                   <div
                     key={label}
-                    className="rounded-xl bg-[#faf9f8] px-2 py-4 text-center"
+                    className="rounded-xl bg-surface px-2 py-4 text-center"
                   >
-                    <p className="text-xl font-bold text-gray-800">
+                    <p className="text-xl font-bold text-text">
                       {number}
                     </p>
-                    <p className="mt-1 text-[8px] text-gray-400">
+                    <p className="mt-1 text-[8px] text-text-muted">
                       {label}
                     </p>
                   </div>
@@ -616,11 +554,11 @@ export default function InvitationPage() {
               </div>
 
               <div className="mt-7 text-center">
-                <p className="text-xs font-medium text-gray-600">
+                <p className="text-xs font-medium text-text-muted">
                   더채플앳청담 그랜드홀
                 </p>
 
-                <p className="mt-1 text-[10px] text-gray-400">
+                <p className="mt-1 text-[10px] text-text-muted">
                   서울특별시 강남구 도산대로 327
                 </p>
               </div>
@@ -646,24 +584,24 @@ export default function InvitationPage() {
           className="
             relative mx-auto max-w-[1120px]
             overflow-hidden rounded-[30px]
-            border border-[#f3d6d2]
+            border border-primary-light
             bg-gradient-to-br from-[#fff2f0] via-[#fffafa] to-[#fce9e8]
             px-6 py-16 text-center
           "
         >
           {/* 장식 */}
-          <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full border border-[#f1c5c4]/60" />
-          <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full border border-[#f1c5c4]/60" />
+          <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full border border-primary-light/60" />
+          <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full border border-primary-light/60" />
 
           <div className="relative">
-            <Heart className="mx-auto mb-5 h-6 w-6 text-[#ed999b]" />
+            <Heart className="mx-auto mb-5 h-6 w-6 text-primary" />
 
             <h2 className="text-2xl font-bold tracking-[-0.04em] md:text-3xl">
               지금 바로 나만의 청첩장을
               <br className="sm:hidden" /> 만들어보세요
             </h2>
 
-            <p className="mt-4 text-xs leading-6 text-gray-500 md:text-sm">
+            <p className="mt-4 text-xs leading-6 text-text-muted md:text-sm">
               수많은 커플들이 선택한 WEDU와 함께
               <br />
               특별한 순간을 더 특별하게 만들어보세요.
@@ -681,60 +619,6 @@ export default function InvitationPage() {
         </div>
       </section>
 
-      {/* =========================
-          FOOTER
-      ========================= */}
-      <footer className="border-t border-gray-100 bg-[#f7f5f4] px-6 py-12 md:px-12">
-        <div className="mx-auto max-w-[1120px]">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            <div>
-              <p className="text-xs font-bold text-gray-700">서비스</p>
-              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
-                <p>청첩장</p>
-                <p>청첩장 만들기</p>
-                <p>템플릿</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold text-gray-700">이용 안내</p>
-              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
-                <p>서비스 이용방법</p>
-                <p>자주 묻는 질문</p>
-                <p>고객센터</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold text-gray-700">WEDU</p>
-              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
-                <p>서비스 소개</p>
-                <p>이용약관</p>
-                <p>개인정보처리방침</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold text-gray-700">고객센터</p>
-              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
-                <p>평일 09:00 - 18:00</p>
-                <p>주말 및 공휴일 휴무</p>
-                <p>support@wedu.com</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 border-t border-gray-200 pt-7">
-            <p className="text-xl font-black tracking-[-0.04em] text-[#ed8589]">
-              WEDU
-            </p>
-
-            <p className="mt-2 text-[9px] text-gray-400">
-              당신의 특별한 순간을 위한 웨딩 플랫폼
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
