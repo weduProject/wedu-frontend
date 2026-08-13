@@ -93,7 +93,7 @@ export default function Header() {
       <div className="relative mx-auto flex h-16 max-w-360 items-center gap-6 px-4 md:h-20 md:px-8">
         <Link
           to={user ? '/home' : '/'}
-          className="shrink-0 bg-[linear-gradient(90deg,#F79689_0%,#C4675D_100%)] bg-clip-text text-[30px] font-bold leading-9 tracking-[-0.75px] text-transparent no-underline"
+          className="text-rosegold shrink-0 text-[30px] font-bold leading-9 tracking-[-0.75px] no-underline"
         >
           WEDU
         </Link>

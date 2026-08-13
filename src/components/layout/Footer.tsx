@@ -115,7 +115,7 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-6 border-t border-[rgba(231,228,227,0.6)] pt-[33px] sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="bg-[linear-gradient(90deg,#E8796C_0%,#C588B0_100%)] bg-clip-text text-[48px] font-bold leading-[48px] text-transparent">
+            <span className="text-rosegold text-[48px] font-bold leading-[48px]">
               WEDU
             </span>
             <p className="mt-2 text-sm text-[#6F6765]">당신의 특별한 순간을 함께 준비합니다.</p>

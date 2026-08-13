@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
 /* 정적 그라디언트 배경 — 섹션·비버튼 요소에 사용 */
 /* 로즈골드 그라디언트 텍스트 */
 .text-rosegold {
-  background: linear-gradient(135deg, var(--color-rosegold-2), var(--color-rosegold-3), var(--color-rosegold-4), var(--color-rosegold-2));
+  background: linear-gradient(135deg, var(--color-rosegold-1) 0%, var(--color-rosegold-2) 25%, var(--color-rosegold-3) 50%, var(--color-rosegold-4) 75%, var(--color-rosegold-1) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
