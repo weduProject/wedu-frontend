@@ -6,6 +6,7 @@ import { useDDay } from '../../contexts/DDayContext';
 import { apiFetch } from '../../lib/apiClient';
 import type { ApiEnvelope } from '../../lib/apiClient';
 import BaseCard from '../../components/ui/BaseCard';
+import Button from '../../components/ui/Button';
 
 function formatWeddingDate(dateStr: string): string {
   const [year, month, day] = dateStr.split('-');
@@ -130,14 +131,13 @@ export default function MypageEditPage() {
                 placeholder="닉네임 입력"
                 className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm text-text focus:border-primary focus:outline-none"
               />
-              <button
-                type="button"
+              <Button
                 onClick={handleSaveNickname}
                 disabled={isSavingNickname || !nicknameInput.trim() || nicknameInput.trim() === user?.name}
-                className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+                className="whitespace-nowrap"
               >
                 {isSavingNickname ? '저장 중...' : '저장'}
-              </button>
+              </Button>
             </div>
             {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
             {nicknameSuccess && <p className="text-xs text-primary flex items-center gap-1"><Check className="h-3 w-3" strokeWidth={2.5} /> 닉네임이 변경됐어요.</p>}
@@ -244,11 +244,10 @@ export default function MypageEditPage() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <button
-              type="button"
+            <Button
               onClick={handleCopyShareLink}
               disabled={isCopyingLink}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-40 cursor-pointer"
+              className="flex w-full items-center justify-center gap-2"
             >
               {linkCopied
                 ? <><CheckCheck className="h-4 w-4" strokeWidth={2} /> 복사됐어요!</>
@@ -256,7 +255,7 @@ export default function MypageEditPage() {
                   ? <><Link2 className="h-4 w-4" strokeWidth={1.8} /> 링크 생성 중...</>
                   : <><Copy className="h-4 w-4" strokeWidth={1.8} /> 공유 링크 복사</>
               }
-            </button>
+            </Button>
             {linkError && <p className="text-xs text-red-500 text-center">{linkError}</p>}
           </div>
         </BaseCard>
