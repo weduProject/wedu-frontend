@@ -1,8 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
-import { PRIMARY_GRADIENT_BG, PRIMARY_GLOW_SHADOW } from '../../styles/gradients';
-
 type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -12,14 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const PRIMARY_GRADIENT = `${PRIMARY_GRADIENT_BG} ${PRIMARY_GLOW_SHADOW}`;
+const PRIMARY_GRADIENT = 'gradient-primary-bg shadow-gradient-primary';
 
 const variantClasses: Record<ButtonVariant, string> = {
-  main: `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
+  main:      `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
   secondary: 'bg-white text-text border border-border hover:enabled:bg-primary-light/40',
-  wishlist:
-    `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
-  pill: `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
+  wishlist:  `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
+  pill:      `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

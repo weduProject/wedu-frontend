@@ -1,18 +1,44 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { PenLine, MessageCircle, Heart, Bookmark, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-const WEDDING_DATE = '2026-11-18';
-const WEDDING_DATE_TEXT = '2026년 11월 18일';
+const MENU_ITEMS = [
+  {
+    icon: <Heart className="h-4 w-4 text-primary" strokeWidth={1.8} />,
+    bg: 'bg-primary-light',
+    title: '심리테스트 결과',
+    desc: '나의 프로포즈 스타일 확인',
+    to: '/onboarding',
+  },
+  {
+    icon: <Bookmark className="h-4 w-4 text-amber-500" strokeWidth={1.8} />,
+    bg: 'bg-amber-50',
+    title: '저장한 상품',
+    desc: '원한 프로포즈 상품 보기',
+    to: '/shop/wishlist',
+  },
+  {
+    icon: <PenLine className="h-4 w-4 text-blue-500" strokeWidth={1.8} />,
+    bg: 'bg-blue-50',
+    title: '내 게시글',
+    desc: '커뮤니티 작성 글',
+    to: '/community',
+  },
+  {
+    icon: <MessageCircle className="h-4 w-4 text-text-muted" strokeWidth={1.8} />,
+    bg: 'bg-gray-100',
+    title: '프로필 수정',
+    desc: '이름, 결혼식 날짜 변경',
+    to: '/mypage/edit',
+  },
+];
 
-function getDday(targetDate: string) {
-  const diff = +new Date(targetDate) - +new Date();
-  return diff > 0 ? Math.floor(diff / (1000 * 60 * 60 * 24)) : 0;
-}
-
-const PROVIDER_LABEL: Record<string, string> = {
-  kakao: '카카오 로그인',
-  google: '구글 로그인',
-};
+const STATS = [
+  { icon: <PenLine className="h-4 w-4" strokeWidth={1.8} />, label: '게시글', value: 0 },
+  { icon: <MessageCircle className="h-4 w-4" strokeWidth={1.8} />, label: '댓글', value: 0 },
+  { icon: <Heart className="h-4 w-4" strokeWidth={1.8} />, label: '테스트', value: 0 },
+  { icon: <Bookmark className="h-4 w-4" strokeWidth={1.8} />, label: '저장', value: 0 },
+];
 
 export default function MypagePage() {
   const { user, logout } = useAuth();
@@ -23,72 +49,93 @@ export default function MypagePage() {
     navigate('/');
   }
 
-  const dday = getDday(WEDDING_DATE);
-
   return (
-    <main className="max-w-lg mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">마이페이지</h1>
+    <div className="mx-auto max-w-lg flex flex-col gap-3">
 
       {/* 프로필 카드 */}
-      <section className="bg-white rounded-2xl border border-border p-6 flex items-center gap-4">
-        <span className="w-14 h-14 rounded-full bg-primary-light text-primary text-xl font-bold flex items-center justify-center shrink-0">
-          {user ? user.name.charAt(0) : '?'}
-        </span>
-        <div className="flex flex-col gap-0.5">
-          <p className="font-semibold text-text">{user ? `${user.name}님` : '비회원'}</p>
-          {user?.email && <p className="text-sm text-text-muted">{user.email}</p>}
-          {user?.provider && (
-            <p className="text-xs text-text-muted">{PROVIDER_LABEL[user.provider] ?? user.provider}</p>
+      <div className="rounded-2xl border border-border bg-white px-6 py-5">
+        <div className="flex items-center gap-4">
+          {/* 아바타 */}
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-xl font-bold text-white shadow-sm">
+            {user ? user.name.charAt(0) : '?'}
+          </div>
+
+          {/* 이름 + 서브텍스트 */}
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-text text-base truncate">
+              {user ? `${user.name}님` : '비회원'}
+            </p>
+            <p className="text-xs text-text-muted mt-0.5">
+              {user ? 'WEDU와 함께 특별한 날을 준비 중이에요' : '로그인 후 이용해보세요'}
+            </p>
+          </div>
+
+          {/* 로그아웃 */}
+          {user ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs text-text-muted hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              로그아웃
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              로그인
+            </button>
           )}
         </div>
-      </section>
+      </div>
 
-      {/* 웨딩 정보 — 로그인 시에만 표시 */}
-      {user && (
-        <section className="bg-white rounded-2xl border border-border p-6 flex flex-col gap-4">
-          <h2 className="text-sm font-semibold text-text-muted">웨딩 정보</h2>
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-text">웨딩일</span>
-              <span className="text-sm font-medium text-text">{WEDDING_DATE_TEXT}</span>
+      {/* 통계 */}
+      <div className="rounded-2xl border border-border bg-white px-2 py-4">
+        <div className="grid grid-cols-4 divide-x divide-border">
+          {STATS.map(({ icon, label, value }) => (
+            <div key={label} className="flex flex-col items-center gap-1.5 py-1">
+              <span className="text-text-muted">{icon}</span>
+              <span className="text-lg font-bold text-text leading-none">{value}</span>
+              <span className="text-[11px] text-text-muted">{label}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-text">D-day</span>
-              <span className="text-sm font-semibold text-primary">D-{dday}</span>
-            </div>
-          </div>
-        </section>
-      )}
+          ))}
+        </div>
+      </div>
 
-      {/* 계정 관리 */}
-      {user ? (
-        <section className="bg-white rounded-2xl border border-border overflow-hidden">
-          <h2 className="text-sm font-semibold text-text-muted px-6 pt-5 pb-3">계정 관리</h2>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="w-full text-left px-6 py-4 text-sm text-text hover:bg-gray-50 transition-colors border-t border-border cursor-pointer bg-transparent"
+      {/* 메뉴 목록 */}
+      <div className="rounded-2xl border border-border bg-white overflow-hidden divide-y divide-border">
+        {MENU_ITEMS.map(({ icon, bg, title, desc, to }) => (
+          <Link
+            key={title}
+            to={to}
+            className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors no-underline"
           >
-            로그아웃
-          </button>
-          <button
-            type="button"
-            className="w-full text-left px-6 py-4 text-sm text-error hover:bg-gray-50 transition-colors border-t border-border cursor-pointer bg-transparent"
-          >
-            회원탈퇴
-          </button>
-        </section>
-      ) : (
-        <section className="bg-white rounded-2xl border border-border overflow-hidden">
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="w-full text-left px-6 py-4 text-sm text-primary font-semibold hover:bg-gray-50 transition-colors cursor-pointer bg-transparent"
-          >
-            로그인하러 가기 →
-          </button>
-        </section>
-      )}
-    </main>
+            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${bg}`}>
+              {icon}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-text">{title}</p>
+              <p className="text-xs text-text-muted mt-0.5">{desc}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.8} />
+          </Link>
+        ))}
+      </div>
+
+      {/* 대시보드로 이동 */}
+      <div className="flex justify-center pt-2 pb-4">
+        <button
+          type="button"
+          onClick={() => navigate('/mypage/dashboard')}
+          className="btn-primary flex items-center gap-2"
+        >
+          <LayoutDashboard className="h-4 w-4" strokeWidth={1.8} />
+          대시보드로 이동
+        </button>
+      </div>
+
+    </div>
   );
 }
