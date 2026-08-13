@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
 import ShopPage from './pages/Shop/ShopPage';
@@ -18,6 +18,7 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+import ResultPage from './pages/Onboarding/ResultPage';
 import CommunityDetailPage from './pages/Community/CommunityDetailPage';
 import CommunityWritePage from './pages/Community/CommunityWritePage';
 import DDayPage from './pages/Dashboard/DDayPage';
@@ -50,7 +51,7 @@ import DashboardSection from './pages/Mypage/components/DashboardSection';
 function OnboardingRoutes() {
   return (
     <OnboardingProvider>
-      <Outlet />
+      <PageLayout />
     </OnboardingProvider>
   );
 }
@@ -75,6 +76,7 @@ export default function App() {
                       <Route path="/onboarding/intro" element={<OnboardingIntroPage />} />
                       <Route path="/onboarding/quiz" element={<QuizPage />} />
                       <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
+                      <Route path="/onboarding/result" element={<ResultPage />} />
                     </Route>
 
                     <Route element={<PageLayout />}>

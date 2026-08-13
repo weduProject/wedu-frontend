@@ -59,7 +59,7 @@ export default function CommunityPage() {
   const pagedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-16">
+    <div className="min-h-screen bg-surface pt-20 pb-16">
       <div className="mx-auto max-w-5xl px-4">
         {/* 상단 타이틀 및 글쓰기 버튼 */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
