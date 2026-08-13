@@ -1,12 +1,14 @@
+import { Check } from "lucide-react";
+import { BuilderIcon } from "./builderIcons";
+
 interface Props {
   title: string;
   description: string;
   tags: string[];
   icon: string;
-  price?: number;
-  showPrice?: boolean;
   selected: boolean;
   onClick: () => void;
+  showPrice?: boolean;
 }
 
 export default function BuilderOptionCard({
@@ -14,65 +16,55 @@ export default function BuilderOptionCard({
   description,
   tags,
   icon,
-  price,
-  showPrice = true,
   selected,
   onClick,
+  showPrice = false,
 }: Props) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`
-        group relative w-full rounded-3xl border overflow-hidden text-left transition-all duration-300
-        ${selected
-          ? "border-[#F48171] bg-[#FFF9F8] ring-1 ring-[#F48171]"
-          : "border-gray-200 bg-white hover:border-[#F48171]/50 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-1"
-        }
-      `}
+      aria-pressed={selected}
+      className={`relative w-full rounded-3xl border p-6 text-left transition-all duration-200 ${
+        selected
+          ? "border-[#F48171] bg-[#FFF8F5] shadow-md shadow-[#F48171]/10"
+          : "border-gray-100 bg-white hover:border-[#F48171]/40 hover:shadow-md"
+      }`}
     >
-      <div className="p-7">
-        {selected && (
-          <div className="absolute top-5 right-5 w-6 h-6 rounded-full bg-[#F48171] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-            ✓
-          </div>
-        )}
-
-        <div className="flex flex-col h-full justify-between">
-          <div>
-            <div className="w-12 h-12 flex items-center justify-start text-3xl mb-4 transition-transform duration-300 group-hover:scale-110">
-              {icon}
-            </div>
-            <h3 className="font-bold text-[17px] text-gray-900 mb-2">
-              {title}
-            </h3>
-            <p className="text-[#888888] text-[13px] leading-relaxed line-clamp-2">
-              {description}
-            </p>
-          </div>
-
-          <div className="mt-5">
-            {showPrice && price !== undefined && (
-              <p className="text-[15px] font-bold text-gray-900 mb-4">
-                {price.toLocaleString()}원
-              </p>
-            )}
-
-            {tags && tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-gray-100/80 px-3 py-1.5 text-[11px] font-bold text-gray-500"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+      {selected && (
+        <div className="absolute right-5 top-5 flex h-6 w-6 items-center justify-center rounded-full bg-[#F48171] text-white">
+          <Check className="h-4 w-4" strokeWidth={3} />
         </div>
+      )}
+
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FFF0E8] text-[#E27D5F]">
+        <BuilderIcon icon={icon} className="h-7 w-7" strokeWidth={2} />
       </div>
+
+      <h3 className="mb-2 text-lg font-bold text-gray-900">
+        {title}
+      </h3>
+
+      <p className="mb-4 text-sm leading-relaxed text-gray-500">
+        {description}
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-gray-500"
+          >
+            #{tag}
+          </span>
+        ))}
+      </div>
+
+      {showPrice && (
+        <div className="mt-5 text-sm font-bold text-[#F48171]">
+          선택하기
+        </div>
+      )}
     </button>
   );
 }

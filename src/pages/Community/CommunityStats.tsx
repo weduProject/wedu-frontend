@@ -1,19 +1,23 @@
-import { communityPosts } from "./communityDummy";
+import { useCommunity } from "./CommunityContext";
 
 export default function CommunityStats() {
-  const totalPosts = communityPosts.length;
+  const { posts } = useCommunity();
 
-  const hotPosts = communityPosts.filter(
+  const totalPosts = posts.length;
+
+  const hotPosts = posts.filter(
     (post) => post.likes >= 10
   ).length;
 
-  const totalComments = communityPosts.reduce(
+  const totalComments = posts.reduce(
     (sum, post) => sum + post.comments,
     0
   );
 
-  const todayPosts = communityPosts.filter(
-    (post) => post.date === "오늘"
+  const today = new Date().toLocaleDateString();
+
+  const todayPosts = posts.filter(
+    (post) => post.date === today
   ).length;
 
   const stats = [
