@@ -133,32 +133,33 @@ export default function BuilderCartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface pt-20 pb-32">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+      <div className="max-w-4xl mx-auto px-5 py-16 md:px-8">
 
         {/* 뒤로가기 */}
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => navigate("/builder")}
-          className="mb-8 flex items-center gap-2 rounded-full border border-gray-100 bg-white px-5 py-2.5 text-[13px] font-bold text-gray-500 shadow-sm transition hover:text-gray-900"
+          className="mb-8 flex items-center gap-2 rounded-full"
         >
           <ArrowLeft className="h-4 w-4" />
           빌더로 돌아가기
-        </button>
+        </Button>
 
         {/* 제목 */}
         <div className="mb-10">
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF0E8] text-[#F2705C]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-light text-primary">
               <ShoppingCart className="h-6 w-6" />
             </div>
 
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-text">
                 맞춤 추천 결과
               </h1>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-text-muted">
                 선택하신 스타일과 예산에 맞춰 추천된 상품이에요. 마음에 드는 상품을 찜해보세요.
               </p>
             </div>
@@ -166,40 +167,40 @@ export default function BuilderCartPage() {
         </div>
 
         {/* 추천 상품 */}
-        <div className="rounded-[2rem] border border-[#FFE0DC] bg-[#FFF8F6] p-6 md:p-8">
+        <div className="rounded-[2rem] border border-primary-light bg-surface p-6 md:p-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-text">
                 빌더 추천 상품
               </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-text-muted">
                 선택하신 조건에 맞춰 추천된 상품입니다.
               </p>
             </div>
 
             {!isLoading && recommendedProducts.length > 0 && (
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#F2705C]">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-primary">
                 {recommendedProducts.length}개
               </span>
             )}
           </div>
 
           {isLoading ? (
-            <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-gray-400">
+            <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-text-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
               추천 상품을 불러오는 중...
             </div>
           ) : loadError ? (
             <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center">
-              <p className="text-sm text-gray-400">{loadError}</p>
+              <p className="text-sm text-text-muted">{loadError}</p>
               <Button variant="secondary" size="sm" onClick={loadData}>
                 다시 시도
               </Button>
             </div>
           ) : recommendedProducts.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-gray-400">
-              <Sparkles className="h-8 w-8 text-gray-300" />
+            <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-text-muted">
+              <Sparkles className="h-8 w-8 text-text-muted" />
               <p className="text-sm">선택한 조건에 맞는 추천 상품이 없습니다.</p>
             </div>
           ) : (
@@ -215,23 +216,23 @@ export default function BuilderCartPage() {
                       className="flex items-center justify-between gap-4 rounded-2xl border border-white bg-white p-4 shadow-sm"
                     >
                       <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#FFF5F4] text-[#F48171]">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary">
                           <BuilderIcon icon={product.iconKey} className="h-5 w-5" />
                         </div>
 
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-gray-900">
+                          <p className="truncate text-sm font-bold text-text">
                             {product.title}
                           </p>
 
-                          <p className="mt-1 text-xs text-gray-400">
+                          <p className="mt-1 text-xs text-text-muted">
                             {product.category}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex shrink-0 items-center gap-3">
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="text-sm font-bold text-text">
                           {product.price.toLocaleString()}원
                         </span>
 
@@ -242,8 +243,8 @@ export default function BuilderCartPage() {
                           aria-pressed={isWishlisted}
                           className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${
                             isWishlisted
-                              ? "border-[#F48171] bg-[#FFF0EE] text-[#F48171]"
-                              : "border-gray-200 text-gray-300 hover:text-[#F48171]"
+                              ? "border-primary bg-primary-light text-primary"
+                              : "border-border text-text-muted hover:text-primary"
                           } ${isPending ? "opacity-50" : ""}`}
                         >
                           {isPending ? (
@@ -259,20 +260,19 @@ export default function BuilderCartPage() {
               </div>
 
               <Button
-                type="button"
                 onClick={handleAddAllToWishlist}
-                className="w-full rounded-full border-none bg-gradient-to-r from-[#F89685] to-[#F2705C] py-3.5 font-bold text-white shadow-md"
+                className="w-full py-3.5"
               >
                 추천 상품 모두 찜하기
                 <Heart className="ml-2 inline h-4 w-4" />
               </Button>
 
               <div className="mt-6 flex items-center justify-between border-t border-white pt-6">
-                <span className="font-bold text-gray-700">
+                <span className="font-bold text-text">
                   추천 상품 합계
                 </span>
 
-                <span className="text-2xl font-bold text-[#F2705C]">
+                <span className="text-2xl font-bold text-primary">
                   {totalPrice.toLocaleString()}원
                 </span>
               </div>
