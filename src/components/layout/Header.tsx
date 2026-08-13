@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User } from 'lucide-react';
+import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User, BookOpen, Newspaper, Calculator, Mail, Users } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../pages/Shop/utils/useWishlist';
@@ -13,11 +13,11 @@ const PRIMARY_LINKS = [
 ] as const;
 
 const WEDDING_LINKS = [
-  { label: '웨딩 룩북', path: '/wedding-shop' },
-  { label: '웨딩 매거진', path: '/magazine' },
-  { label: '웨딩 견적', path: '/wedding-estimate' },
-  { label: '모바일 청첩장', path: '/invitation' },
-  { label: '파트너 연결', path: '/connect' },
+  { label: '웨딩 룩북', path: '/wedding-shop', Icon: BookOpen },
+  { label: '웨딩 매거진', path: '/magazine', Icon: Newspaper },
+  { label: '웨딩 견적', path: '/wedding-estimate', Icon: Calculator },
+  { label: '모바일 청첩장', path: '/invitation', Icon: Mail },
+  { label: '파트너 연결', path: '/connect', Icon: Users },
 ] as const;
 
 const TOOL_LINKS = [
@@ -128,23 +128,24 @@ export default function Header() {
             {isWeddingOpen && (
               <div className="absolute left-0 top-full w-44 pt-2">
                 <div className="rounded-xl border border-border bg-white p-1.5 shadow-lg">
-                  {WEDDING_LINKS.map(({ label, path }) => (
-                    <NavLink
-                      key={path}
-                      to={path}
-                      onClick={() => setIsWeddingOpen(false)}
-                      className={({ isActive }) =>
-                        clsx(
-                          'block rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
-                          isActive
-                            ? 'bg-primary-light font-semibold text-primary'
-                            : 'text-text hover:bg-primary-light hover:text-primary',
-                        )
-                      }
-                    >
-                      {label}
-                    </NavLink>
-                  ))}
+                  {WEDDING_LINKS.map(({ label, path, Icon }) => (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    onClick={() => setIsWeddingOpen(false)}
+                    className={({ isActive }) =>
+                      clsx(
+                        'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
+                        isActive
+                          ? 'bg-primary-light font-semibold text-primary'
+                          : 'text-text hover:bg-primary-light hover:text-primary',
+                      )
+                    }
+                  >
+                    <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                    {label}
+                  </NavLink>
+                ))}
                 </div>
               </div>
             )}
@@ -286,21 +287,22 @@ export default function Header() {
                 >
                   <div className="min-h-0 overflow-hidden">
                     <div className="flex flex-col">
-                      {WEDDING_LINKS.map(({ label, path }) => (
-                        <NavLink
-                          key={path}
-                          to={path}
-                          onClick={() => setIsMobileOpen(false)}
-                          className={({ isActive }) =>
-                            clsx(
-                              'py-2.5 pl-4 text-sm no-underline transition-colors',
-                              isActive ? 'font-semibold text-primary' : 'text-text',
-                            )
-                          }
-                        >
-                          {label}
-                        </NavLink>
-                      ))}
+                      {WEDDING_LINKS.map(({ label, path, Icon }) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={({ isActive }) =>
+                          clsx(
+                            'flex items-center gap-2.5 py-2.5 pl-4 text-sm no-underline transition-colors',
+                            isActive ? 'font-semibold text-primary' : 'text-text',
+                          )
+                        }
+                      >
+                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                        {label}
+                      </NavLink>
+                    ))}
                     </div>
                   </div>
                 </div>
