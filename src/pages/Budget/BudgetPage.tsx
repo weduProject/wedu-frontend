@@ -1,25 +1,20 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { 
-  Building2, 
-  Camera, 
-  Plane, 
-  Heart, 
-  MoreHorizontal, 
-  Check, 
-  Wallet, 
-  Receipt, 
-  CheckCircle2 
+  Building2, Camera, Plane, Heart, MoreHorizontal, Check, Wallet, Receipt, 
+  CheckCircle2, Edit2, Trash2
 } from 'lucide-react';
 
 import BaseCard from '../../components/ui/BaseCard';
 import ProgressBar from '../../components/ui/ProgressBar';
 import Button from '../../components/ui/Button';
+import EmptyState from '../../components/ui/EmptyState';
 
 import { useBudget } from './hooks/useBudget';
 import type { BudgetCategory, BudgetItem } from './hooks/useBudget';
 import BudgetModal from './components/BudgetModal';
 import BudgetEditModal from './components/BudgetEditModal';
+import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -48,6 +43,7 @@ export default function BudgetPage() {
   const [editBudgetValue, setEditBudgetValue] = useState(targetBudget.toString());
 
   const [editingItem, setEditingItem] = useState<BudgetItem | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   // 📊 전체 통계 계산
   const totalPaid = items.reduce((acc, item) => acc + item.paidAmount, 0);
@@ -81,10 +77,10 @@ export default function BudgetPage() {
         };
 
   return (
-    <div className="mx-auto max-w-[1024px] pb-20">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text md:text-3xl">예산 관리</h2>
+          <h2 className="text-2xl font-bold font-serif text-text md:text-3xl">예산 관리</h2>
           <p className="mt-2 text-sm text-text-muted">예산을 설정하고 지출을 추적하세요</p>
         </div>
         <Button onClick={handleAddClick} className="px-5 py-2.5 text-sm">
@@ -93,7 +89,7 @@ export default function BudgetPage() {
       </div>
 
       {/* 1. 상단 요약 카드 3개 */}
-      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         
         {/* 1. 전체 예산 카드 */}
         <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
@@ -104,7 +100,7 @@ export default function BudgetPage() {
           <div className="mt-5 flex items-end justify-between">
             <div className="flex flex-col gap-1">
               <p className="text-xs font-medium text-text-muted">전체 예산</p>
-              <p className="text-xl font-bold leading-none text-text">{targetBudget}만원</p>
+              <p className="text-xl font-bold font-serif leading-none text-text">{targetBudget}만원</p>
             </div>
             
             <button 
@@ -119,12 +115,12 @@ export default function BudgetPage() {
         {/* 2. 집행 금액 카드 */}
         <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/50">
-            <Receipt className="h-5 w-5 text-primary" />
+            <Receipt className="h-5 w-5 text-[#d29b53]" />
           </div>
           <div className="mt-5 flex items-end justify-between">
             <div className="flex flex-col gap-1">
               <p className="text-xs font-medium text-text-muted">집행 금액</p>
-              <p className="text-xl font-bold leading-none text-text">{totalPaid}만원</p>
+              <p className="text-xl font-bold font-serif leading-none text-text">{totalPaid}만원</p>
             </div>
           </div>
         </BaseCard>
@@ -132,12 +128,12 @@ export default function BudgetPage() {
         {/* 3. 결제 완료 카드 */}
         <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/50">
-            <CheckCircle2 className="h-5 w-5 text-primary" />
+            <CheckCircle2 className="h-5 w-5 text-[#c382a4]" />
           </div>
           <div className="mt-5 flex items-end justify-between">
             <div className="flex flex-col gap-1">
               <p className="text-xs font-medium text-text-muted">결제 완료</p>
-              <p className="text-xl font-bold leading-none text-text">{paidCount}/{totalCount}건</p>
+              <p className="text-xl font-bold font-serif leading-none text-text">{paidCount}/{totalCount}건</p>
             </div>
           </div>
         </BaseCard>
@@ -145,7 +141,7 @@ export default function BudgetPage() {
       </div>
 
       {/* 2. 전체 집행률 프로그레스 바 */}
-      <BaseCard className="mb-10 p-6 shadow-sm">
+      <BaseCard className="mb-6 p-6 shadow-sm">
         <div className="mb-3 flex items-end justify-between">
           <span className="text-sm font-bold text-text">전체 집행률</span>
           <span className="text-lg font-bold text-primary">{overallProgress}%</span>
@@ -163,16 +159,11 @@ export default function BudgetPage() {
       <div className="flex flex-col gap-6">
         {/* 비회원일 때 보여줄 빈 화면 멘트 */}
         {!user && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
-              <Wallet className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-bold text-text">나만의 예산을 계획해보세요</h3>
-            <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별 예산을 관리하고 결제 내역을 기록할 수 있습니다.</p>
-            <Button onClick={() => navigate('/login')} className="px-6">
-              로그인하러 가기
-            </Button>
-          </div>
+          <EmptyState
+            icon={Wallet}
+            title="나만의 예산을 계획해보세요"
+            description="로그인 후 카테고리별 예산을 관리하고 결제 내역을 기록할 수 있습니다."
+          />
         )}
 
         {CATEGORIES.map(category => {
@@ -193,7 +184,7 @@ export default function BudgetPage() {
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-text">{category}</h3>
+                    <h3 className="text-base font-bold font-serif text-text">{category}</h3>
                     <p className="text-xs text-text-muted">{categoryItems.length}개 항목 · {catPaidCount}건 결제 완료</p>
                   </div>
                 </div>
@@ -211,31 +202,42 @@ export default function BudgetPage() {
                 {categoryItems.map(item => (
                   <div 
                     key={item.id} 
-                    onClick={() => setEditingItem(item)}
-                    className="group flex cursor-pointer items-center justify-between rounded-xl p-3 transition-colors hover:bg-primary-light/10"
+                    className="group flex items-center justify-between rounded-xl p-3 transition-colors hover:bg-gray-50"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        onClick={(e) => {
-                            e.stopPropagation(); 
-                            togglePaidStatus(item.id);
-                          }}
+                      <button
+                        onClick={() => togglePaidStatus(item.id)}
                         className={clsx(
-                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors',
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors cursor-pointer',
                         item.isPaid ? 'border-primary bg-primary' : 'border-gray-300 bg-white group-hover:border-primary'
                       )}>
                         {item.isPaid && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}
-                      </div>
-                      <span className={clsx(
-                        'text-sm transition-all',
-                        item.isPaid ? 'font-medium text-text' : 'text-text-muted'
-                      )}>
+                      </button>
+                      <span className={clsx('text-sm transition-all', item.isPaid ? 'font-medium text-text' : 'text-text-muted')}>
                         {item.title}
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-text">
-                      {item.paidAmount === 0 ? '0원' : `${item.paidAmount}만원`} / {item.budgetAmount}만원
-                    </span>
+
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-bold text-text">
+                        {item.paidAmount === 0 ? '0원' : `${item.paidAmount}만원`} / {item.budgetAmount}만원
+                      </span>
+                      
+                      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          onClick={() => setEditingItem(item)}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f4f4f4] text-[#8e8e8e] transition-colors hover:bg-gray-200"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setItemToDelete(item.id)}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-[#F04444] transition-colors hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -259,7 +261,7 @@ export default function BudgetPage() {
               <span className="font-bold text-text">만원</span>
             </div>
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setIsEditBudgetModalOpen(false)} className="bg-gray-200 text-text hover:bg-gray-300">취소</Button>
+              <Button onClick={() => setIsEditBudgetModalOpen(false)} variant='secondary' className="bg-gray-200 text-text hover:bg-gray-300">취소</Button>
               <Button onClick={handleSaveBudget}>저장</Button>
             </div>
           </div>
@@ -282,12 +284,10 @@ export default function BudgetPage() {
         <BudgetEditModal 
           item={editingItem}
           onClose={() => setEditingItem(null)}
-          onSave={(id, paidAmount, budgetAmount) => {
+          onSave={(id, updates) => {
             updateBudgetItem(id, {
-              paidAmount,
-              budgetAmount,
-              // 3. 입력된 결제 금액이 0보다 크면 자동으로 체크표시 활성화
-              isPaid: paidAmount > 0 
+              ...updates,
+              isPaid: (updates.paidAmount ?? 0) > 0 
             });
             setEditingItem(null);
           }}
@@ -297,6 +297,18 @@ export default function BudgetPage() {
           }}
         />
       )}
+
+      {/* 삭제 확인 모달 연동 */}
+      <ConfirmDeleteModal 
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={() => {
+          if (itemToDelete) {
+            deleteBudgetItem(itemToDelete);
+            setItemToDelete(null);
+          }
+        }}
+      />
 
     </div>
   );

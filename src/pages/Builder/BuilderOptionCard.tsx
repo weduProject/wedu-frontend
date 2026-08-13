@@ -1,164 +1,70 @@
+import { Check } from "lucide-react";
+import { BuilderIcon } from "./builderIcons";
+
 interface Props {
   title: string;
   description: string;
   tags: string[];
   icon: string;
-  price?: number;
-  showPrice?: boolean;
   selected: boolean;
   onClick: () => void;
-  showCheckmark?: boolean;
+  showPrice?: boolean;
 }
-
-const iconColors: Record<string, string> = {
-  "🏙️": "bg-blue-100",
-  "🏨": "bg-purple-100",
-  "🌅": "bg-orange-100",
-  "🌹": "bg-pink-100",
-  "✨": "bg-violet-100",
-  "☕": "bg-amber-100",
-  "🍽️": "bg-green-100",
-  "🥩": "bg-red-100",
-  "🍣": "bg-cyan-100",
-  "🌿": "bg-green-100",
-  "🎡": "bg-yellow-100",
-  "🧺": "bg-orange-100",
-  "🌃": "bg-indigo-100",
-  "🏡": "bg-emerald-100",
-  "🕯️": "bg-amber-100",
-  "🎉": "bg-pink-100",
-  "💖": "bg-rose-100",
-  "🍷": "bg-red-100",
-  "🍚": "bg-yellow-100",
-  "🍰": "bg-pink-100",
-};
 
 export default function BuilderOptionCard({
   title,
   description,
   tags,
   icon,
-  price,
-  showPrice = true,
   selected,
   onClick,
-  showCheckmark = true,
+  showPrice = false,
 }: Props) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`
-        group
-        w-full
-        rounded-2xl
-        border
-        overflow-hidden
-        bg-white
-        text-left
-        transition-all
-        duration-300
-        ${
-          selected
-            ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.02] shadow-lg"
-            : "border-gray-200 hover:border-primary hover:shadow-lg hover:-translate-y-1"
-        }
-      `}
+      aria-pressed={selected}
+      className={`relative w-full rounded-3xl border p-6 text-left transition-all duration-200 ${
+        selected
+          ? "border-[#F48171] bg-[#FFF8F5] shadow-md shadow-[#F48171]/10"
+          : "border-gray-100 bg-white hover:border-[#F48171]/40 hover:shadow-md"
+      }`}
     >
-
-      <div className="p-6">
-
-        <div className="flex justify-between items-start">
-
-          <div className="flex gap-4">
-
-            <div
-              className={`
-                w-14
-                h-14
-                rounded-2xl
-                flex
-                items-center
-                justify-center
-                text-3xl
-                transition
-                group-hover:scale-110
-                ${iconColors[icon] ?? "bg-gray-100"}
-              `}
-            >
-              {icon}
-            </div>
-
-            <div>
-
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-xl">
-                  {title}
-                </h3>
-
-              </div>
-
-              <p className="text-gray-500 mt-2 leading-6">
-                {description}
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="text-right">
-
-            {showPrice && price !== undefined && (
-              <p className="text-xl font-bold text-primary">
-                {price.toLocaleString()}원
-              </p>
-            )}
-
-            {selected && showCheckmark && (
-              <div
-                className="
-                  mt-3
-                  inline-flex
-                  items-center
-                  rounded-full
-                  bg-primary
-                  text-white
-                  px-3
-                  py-1
-                  text-xs
-                  font-semibold
-                "
-              >
-                ✓
-              </div>
-            )}
-
-          </div>
-
+      {selected && (
+        <div className="absolute right-5 top-5 flex h-6 w-6 items-center justify-center rounded-full bg-[#F48171] text-white">
+          <Check className="h-4 w-4" strokeWidth={3} />
         </div>
+      )}
 
-        <div className="flex flex-wrap gap-2 mt-6">
-
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="
-                rounded-full
-                bg-gray-100
-                px-3
-                py-1.5
-                text-xs
-                font-medium
-                text-gray-600
-              "
-            >
-              #{tag}
-            </span>
-          ))}
-
-        </div>
-
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FFF0E8] text-[#E27D5F]">
+        <BuilderIcon icon={icon} className="h-7 w-7" strokeWidth={2} />
       </div>
+
+      <h3 className="mb-2 text-lg font-bold text-gray-900">
+        {title}
+      </h3>
+
+      <p className="mb-4 text-sm leading-relaxed text-gray-500">
+        {description}
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-gray-500"
+          >
+            #{tag}
+          </span>
+        ))}
+      </div>
+
+      {showPrice && (
+        <div className="mt-5 text-sm font-bold text-[#F48171]">
+          선택하기
+        </div>
+      )}
     </button>
   );
 }

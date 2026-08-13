@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,9 +8,21 @@ import { useCart } from '../../pages/Shop/CartContext';
 
 const PRIMARY_LINKS = [
   { label: '홈', path: '/home' },
-  { label: '심리테스트', path: '/onboarding/quiz' },
+  { label: '심리테스트', path: '/onboarding' },
   { label: '프로포즈 플래닝', path: '/shop' },
-  { label: '커뮤니티', path: '/community' },
+] as const;
+
+const WEDDING_LINKS = [
+  { label: '웨딩 룩북', path: '/wedding-shop' },
+
+  // { label: '웨딩 견적', path: '/wedding-estimate' },
+  // { label: '웨딩 매거진', path: '/wedding-fair' },
+
+  { label: '웨딩 매거진', path: '/magazine' },
+  { label: '웨딩 견적', path: '/wedding-estimate' },
+
+  { label: '모바일 청첩장', path: '/invitation' },
+  { label: '파트너 연결', path: '/connect' },
 ] as const;
 
 const TOOL_LINKS = [
@@ -31,14 +43,17 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [scrolled, setScrolled] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [isWeddingOpen, setIsWeddingOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(true);
+  const [mobileWeddingOpen, setMobileWeddingOpen] = useState(true);
   const toolsRef = useRef<HTMLDivElement>(null);
+  const weddingRef = useRef<HTMLDivElement>(null);
 
-  // 스크롤 시 헤더 배경 진하게 (Navbar.tsx 패턴 반영)
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 50);
@@ -52,12 +67,14 @@ export default function Header() {
       if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
         setIsToolsOpen(false);
       }
+      if (weddingRef.current && !weddingRef.current.contains(e.target as Node)) {
+        setIsWeddingOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 모바일 메뉴 열려있을 때 배경 스크롤 잠금 (Navbar.tsx 패턴 반영)
   useEffect(() => {
     document.body.style.overflow = isMobileOpen ? 'hidden' : '';
     return () => {
@@ -93,54 +110,101 @@ export default function Header() {
             </NavLink>
           ))}
 
-          {user && (
-            <>
-              <span className="h-5 w-px bg-[rgba(171,162,161,0.4)]" aria-hidden />
+          {/* 웨딩 플래닝 드롭다운 — 버튼과 메뉴 사이 gap을 pt-2(패딩)로 감싸서 마우스 이탈 방지 */}
+          <div
+            ref={weddingRef}
+            className="relative"
+            onMouseEnter={() => setIsWeddingOpen(true)}
+            onMouseLeave={() => setIsWeddingOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsWeddingOpen((prev) => !prev)}
+              aria-expanded={isWeddingOpen}
+              className="flex items-center gap-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
+            >
+              웨딩 플래닝
+              <ChevronDown
+                className={clsx('h-4 w-4 transition-transform duration-200', isWeddingOpen && 'rotate-180')}
+                strokeWidth={1.8}
+              />
+            </button>
 
-              <div
-                ref={toolsRef}
-                className="relative"
-                onMouseEnter={() => setIsToolsOpen(true)}
-                onMouseLeave={() => setIsToolsOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsToolsOpen((prev) => !prev)}
-                  aria-expanded={isToolsOpen}
-                  className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
-                >
-                  관리도구
-                  <ChevronDown
-                    className={clsx('h-4 w-4 transition-transform duration-200', isToolsOpen && 'rotate-180')}
-                    strokeWidth={1.8}
-                  />
-                </button>
-
-                {isToolsOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-52 rounded-xl border border-border bg-white p-1.5 shadow-lg">
-                    {TOOL_LINKS.map(({ label, path, Icon }) => (
-                      <NavLink
-                        key={path}
-                        to={path}
-                        onClick={() => setIsToolsOpen(false)}
-                        className={({ isActive }) =>
-                          clsx(
-                            'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
-                            isActive
-                              ? 'bg-primary-light font-semibold text-primary'
-                              : 'text-text hover:bg-primary-light hover:text-primary',
-                          )
-                        }
-                      >
-                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
-                        {label}
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
+            {isWeddingOpen && (
+              <div className="absolute left-0 top-full w-44 pt-2">
+                <div className="rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                  {WEDDING_LINKS.map(({ label, path }) => (
+                    <NavLink
+                      key={path}
+                      to={path}
+                      onClick={() => setIsWeddingOpen(false)}
+                      className={({ isActive }) =>
+                        clsx(
+                          'block rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
+                          isActive
+                            ? 'bg-primary-light font-semibold text-primary'
+                            : 'text-text hover:bg-primary-light hover:text-primary',
+                        )
+                      }
+                    >
+                      {label}
+                    </NavLink>
+                  ))}
+                </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
+
+          <NavLink to="/community" className={navLinkClass}>
+            커뮤니티
+          </NavLink>
+
+          <span className="h-5 w-px bg-[rgba(171,162,161,0.4)]" aria-hidden />
+
+          <div
+            ref={toolsRef}
+            className="relative"
+            onMouseEnter={() => setIsToolsOpen(true)}
+            onMouseLeave={() => setIsToolsOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsToolsOpen((prev) => !prev)}
+              aria-expanded={isToolsOpen}
+              className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
+            >
+              관리도구
+              <ChevronDown
+                className={clsx('h-4 w-4 transition-transform duration-200', isToolsOpen && 'rotate-180')}
+                strokeWidth={1.8}
+              />
+            </button>
+
+            {isToolsOpen && (
+              <div className="absolute left-0 top-full w-52 pt-2">
+                <div className="rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                  {TOOL_LINKS.map(({ label, path, Icon }) => (
+                    <NavLink
+                      key={path}
+                      to={path}
+                      onClick={() => setIsToolsOpen(false)}
+                      className={({ isActive }) =>
+                        clsx(
+                          'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
+                          isActive
+                            ? 'bg-primary-light font-semibold text-primary'
+                            : 'text-text hover:bg-primary-light hover:text-primary',
+                        )
+                      }
+                    >
+                      <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                      {label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="ml-auto flex items-center gap-4">
@@ -162,13 +226,15 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="hidden bg-transparent text-sm font-semibold text-primary transition-opacity hover:opacity-80 sm:inline"
-            >
-              로그인
-            </button>
+            location.pathname !== '/login' && (
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="hidden bg-transparent text-sm font-semibold text-primary transition-opacity hover:opacity-80 sm:inline"
+              >
+                로그인
+              </button>
+            )
           )}
 
           <button
@@ -184,13 +250,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* 모바일 메뉴 — Navbar.tsx의 오버레이 + 아코디언 패턴 반영 */}
       {isMobileOpen && (
         <>
-          <div
-            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
-            onClick={() => setIsMobileOpen(false)}
-          />
+          <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setIsMobileOpen(false)} />
           <div className="fixed inset-x-0 top-16 z-40 h-[calc(100dvh-4rem)] overflow-hidden border-t border-border bg-white shadow-xl md:top-20 lg:hidden">
             <div className="flex h-full flex-col">
               <div className="flex-1 overflow-y-auto px-4 pb-2 pt-4">
@@ -210,48 +272,95 @@ export default function Header() {
                   </NavLink>
                 ))}
 
-                {user && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setMobileToolsOpen((prev) => !prev)}
-                      className="flex w-full items-center justify-between bg-transparent py-3 text-left text-base font-medium text-text"
-                    >
-                      <span>관리도구</span>
-                      <ChevronDown
-                        className={clsx('h-5 w-5 transition-transform duration-300', mobileToolsOpen && 'rotate-180')}
-                        strokeWidth={1.8}
-                      />
-                    </button>
-                    <div
-                      className={clsx(
-                        'grid transition-[grid-template-rows] duration-300 ease-out',
-                        mobileToolsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-                      )}
-                    >
-                      <div className="min-h-0 overflow-hidden">
-                        <div className="flex flex-col">
-                          {TOOL_LINKS.map(({ label, path, Icon }) => (
-                            <NavLink
-                              key={path}
-                              to={path}
-                              onClick={() => setIsMobileOpen(false)}
-                              className={({ isActive }) =>
-                                clsx(
-                                  'flex items-center gap-2.5 py-2.5 pl-4 text-sm no-underline transition-colors',
-                                  isActive ? 'font-semibold text-primary' : 'text-text',
-                                )
-                              }
-                            >
-                              <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
-                              {label}
-                            </NavLink>
-                          ))}
-                        </div>
-                      </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileWeddingOpen((prev) => !prev)}
+                  className="flex w-full items-center justify-between bg-transparent py-3 text-left text-base font-medium text-text"
+                >
+                  <span>웨딩 플래닝</span>
+                  <ChevronDown
+                    className={clsx('h-5 w-5 transition-transform duration-300', mobileWeddingOpen && 'rotate-180')}
+                    strokeWidth={1.8}
+                  />
+                </button>
+                <div
+                  className={clsx(
+                    'grid transition-[grid-template-rows] duration-300 ease-out',
+                    mobileWeddingOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="flex flex-col">
+                      {WEDDING_LINKS.map(({ label, path }) => (
+                        <NavLink
+                          key={path}
+                          to={path}
+                          onClick={() => setIsMobileOpen(false)}
+                          className={({ isActive }) =>
+                            clsx(
+                              'py-2.5 pl-4 text-sm no-underline transition-colors',
+                              isActive ? 'font-semibold text-primary' : 'text-text',
+                            )
+                          }
+                        >
+                          {label}
+                        </NavLink>
+                      ))}
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
+
+                <NavLink
+                  to="/community"
+                  onClick={() => setIsMobileOpen(false)}
+                  className={({ isActive }) =>
+                    clsx(
+                      'block py-3 text-base font-medium no-underline transition-colors',
+                      isActive ? 'text-primary' : 'text-text',
+                    )
+                  }
+                >
+                  커뮤니티
+                </NavLink>
+
+                <button
+                  type="button"
+                  onClick={() => setMobileToolsOpen((prev) => !prev)}
+                  className="flex w-full items-center justify-between bg-transparent py-3 text-left text-base font-medium text-text"
+                >
+                  <span>관리도구</span>
+                  <ChevronDown
+                    className={clsx('h-5 w-5 transition-transform duration-300', mobileToolsOpen && 'rotate-180')}
+                    strokeWidth={1.8}
+                  />
+                </button>
+                <div
+                  className={clsx(
+                    'grid transition-[grid-template-rows] duration-300 ease-out',
+                    mobileToolsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="flex flex-col">
+                      {TOOL_LINKS.map(({ label, path, Icon }) => (
+                        <NavLink
+                          key={path}
+                          to={path}
+                          onClick={() => setIsMobileOpen(false)}
+                          className={({ isActive }) =>
+                            clsx(
+                              'flex items-center gap-2.5 py-2.5 pl-4 text-sm no-underline transition-colors',
+                              isActive ? 'font-semibold text-primary' : 'text-text',
+                            )
+                          }
+                        >
+                          <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                          {label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="shrink-0 border-t border-border px-4 pb-6 pt-4">
@@ -321,7 +430,7 @@ function HeaderIconButton({ icon, label, count, onClick }: HeaderIconButtonProps
 function HeaderIconButtons() {
   const navigate = useNavigate();
   const { wishedIds } = useWishlist();
-  const { cartIds } = useCart();
+  const { cart } = useCart();
 
   return (
     <>
@@ -334,7 +443,7 @@ function HeaderIconButtons() {
       <HeaderIconButton
         icon={<ShoppingBag className="h-5 w-5" strokeWidth={1.8} />}
         label="장바구니"
-        count={cartIds.length}
+        count={cart?.items.length ?? 0}
         onClick={() => navigate('/shop/cart')}
       />
     </>

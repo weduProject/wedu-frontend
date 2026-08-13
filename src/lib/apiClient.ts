@@ -43,3 +43,53 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
 
   return response;
 }
+
+/**
+ * apiFetch + ApiEnvelope 언래핑을 한 번에 처리하는 공용 헬퍼.
+ * success: false 이거나 네트워크/HTTP 에러가 나면 Error를 throw 한다.
+ *
+ * 사용 예)
+ *   const proposal = await apiRequest<ProposalResponse>('/api/proposals/me');
+ *   const item = await apiRequest<CartItem>('/api/carts/items', {
+ *     method: 'POST',
+ *     body: JSON.stringify({ productId, quantity }),
+ *   });
+ */
+export async function apiRequest<T>(
+  path: string,
+  options: RequestInit = {},
+  fallbackErrorMessage = '요청에 실패했습니다.',
+): Promise<T> {
+  let response: Response;
+
+  try {
+    response = await apiFetch(path, options);
+  } catch {
+    // 네트워크 자체가 끊긴 경우 (오프라인 등)
+    throw new Error('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.');
+  }
+
+  // 204 No Content 등 body가 없는 응답
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  let body: ApiEnvelope<T> | null;
+
+  try {
+    body = await response.json();
+  } catch {
+    // JSON이 아닌 응답 (예: 500 HTML 에러 페이지)
+    if (!response.ok) {
+      throw new Error(`${fallbackErrorMessage} (${response.status})`);
+    }
+    return undefined as T;
+  }
+
+  if (!response.ok || !body || body.success === false) {
+    const message = body?.error?.message || fallbackErrorMessage;
+    throw new Error(message);
+  }
+
+  return body.data as T;
+}

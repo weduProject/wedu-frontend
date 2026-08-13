@@ -1,5 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { apiFetch } from '../../../lib/apiClient';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export type BudgetCategory = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';
 
@@ -12,37 +14,22 @@ export interface BudgetItem {
   isPaid: boolean;
 }
 
-export const INITIAL_BUDGETS: BudgetItem[] = [
-  // 1. 웨딩홀/예식장 (총 약 2,150만원 / 결제 진행중)
-  { id: '1', category: '웨딩홀/예식장', title: '예식장 계약금', paidAmount: 200, budgetAmount: 200, isPaid: true },
-  { id: '2', category: '웨딩홀/예식장', title: '웨딩홀 대관료 및 식대 잔금', paidAmount: 0, budgetAmount: 1800, isPaid: false },
-  { id: '3', category: '웨딩홀/예식장', title: '본식 음향/전문 사회자', paidAmount: 30, budgetAmount: 30, isPaid: true },
-  { id: '4', category: '웨딩홀/예식장', title: '플라워 샤워 및 생화 연출', paidAmount: 0, budgetAmount: 120, isPaid: false },
+const CATEGORY_TO_ENUM: Record<BudgetCategory, string> = {
+  '웨딩홀/예식장': 'VENUE',
+  '스튜디오/드레스': 'DRESS',
+  '허니문': 'HONEYMOON',
+  '예물/예단': 'JEWELRY',
+  '기타': 'ETC',
+};
 
-  // 2. 스튜디오/드레스/메이크업 (총 약 545만원 / 일부 결제 완료)
-  { id: '5', category: '스튜디오/드레스', title: '스튜디오 촬영 패키지', paidAmount: 150, budgetAmount: 150, isPaid: true },
-  { id: '6', category: '스튜디오/드레스', title: '드레스 투어 피팅비', paidAmount: 15, budgetAmount: 15, isPaid: true },
-  { id: '7', category: '스튜디오/드레스', title: '본식 드레스 추가금 및 대여', paidAmount: 0, budgetAmount: 200, isPaid: false },
-  { id: '8', category: '스튜디오/드레스', title: '본식 헤어 & 메이크업 (신랑신부)', paidAmount: 80, budgetAmount: 80, isPaid: true },
-  { id: '9', category: '스튜디오/드레스', title: '촬영/본식 헬퍼 이모님 수고비', paidAmount: 0, budgetAmount: 50, isPaid: false },
-  { id: '10', category: '스튜디오/드레스', title: '본식 원판 & 스냅 촬영', paidAmount: 50, budgetAmount: 50, isPaid: true },
+const ENUM_TO_CATEGORY: Record<string, BudgetCategory> = {
+  VENUE: '웨딩홀/예식장',
+  DRESS: '스튜디오/드레스',
+  HONEYMOON: '허니문',
+  JEWELRY: '예물/예단',
+  ETC: '기타',
+};
 
-  // 3. 허니문 (총 약 750만원)
-  { id: '11', category: '허니문', title: '왕복 항공권 예약', paidAmount: 350, budgetAmount: 350, isPaid: true },
-  { id: '12', category: '허니문', title: '리조트 & 호텔 숙박비', paidAmount: 250, budgetAmount: 250, isPaid: true },
-  { id: '13', category: '허니문', title: '현지 투어 및 경비', paidAmount: 0, budgetAmount: 150, isPaid: false },
-
-  // 4. 예물/예단 (총 약 470만원)
-  { id: '14', category: '예물/예단', title: '웨딩밴드(커플링)', paidAmount: 250, budgetAmount: 250, isPaid: true },
-  { id: '15', category: '예물/예단', title: '신랑 예복 맞춤(맞춤정장/수제화)', paidAmount: 120, budgetAmount: 120, isPaid: true },
-  { id: '16', category: '예물/예단', title: '양가 혼주 한복 대여', paidAmount: 0, budgetAmount: 100, isPaid: false },
-
-  // 5. 기타 (총 약 135만원)
-  { id: '17', category: '기타', title: '모바일 및 종이 청첩장 제작', paidAmount: 35, budgetAmount: 35, isPaid: true },
-  { id: '18', category: '기타', title: '식전 영상 제작', paidAmount: 10, budgetAmount: 10, isPaid: true },
-  { id: '19', category: '기타', title: '하객 답례품', paidAmount: 0, budgetAmount: 60, isPaid: false },
-  { id: '20', category: '기타', title: '웨딩 부케 & 코사지 세트', paidAmount: 0, budgetAmount: 30, isPaid: false },
-];
 interface BudgetContextType {
   items: BudgetItem[];
   targetBudget: number;
@@ -53,41 +40,172 @@ interface BudgetContextType {
   deleteBudgetItem: (id: string) => void;
 }
 
+interface BackendBudgetItem {
+  itemId: number;
+  title: string;
+  category: string;
+  plannedAmount: number;
+  spentAmount: number;
+  completed: boolean;
+}
+
+interface BackendBudgetCategory {
+  category: string;
+  summary: {
+    plannedAmount: number;
+    spentAmount: number;
+    balance: number;
+    completedCount: number;
+    totalCount: number;
+    executionRatePercentage: number;
+  };
+  items: BackendBudgetItem[];
+}
+
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export function BudgetProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<BudgetItem[]>(INITIAL_BUDGETS);
-  const [targetBudget, setTargetBudget] = useState<number>(2360); // 초기 전체 예산 설정
+  const { user } = useAuth();
+  const [items, setItems] = useState<BudgetItem[]>([]);
+  const [targetBudget, setTargetBudget] = useState<number>((0));
 
-  const updateTargetBudget = (amount: number) => setTargetBudget(amount);
+  // 1. 전체 예산 및 항목 조회 (GET)
+  const fetchBudgetData = useCallback(async () => {
+    if (!user) {
+      setItems([]);
+      setTargetBudget(0);
+      return;
+    }
 
-  const addBudgetItem = (newItem: Omit<BudgetItem, 'id'>) => {
-    setItems((prev) => [{ ...newItem, id: Date.now().toString() }, ...prev]);
+    try {
+      const res = await apiFetch('/api/budget-items');
+      if (!res.ok) throw new Error('예산 데이터 로드 실패');
+      
+      const body = await res.json();
+      if (body.success && body.data) {
+        setTargetBudget(body.data.totalBudget);
+        
+        const parsedItems: BudgetItem[] = [];
+        body.data.categories.forEach((cat: BackendBudgetCategory) => {
+          cat.items.forEach((item: BackendBudgetItem) => {
+            parsedItems.push({
+              id: String(item.itemId),
+              title: item.title,
+              category: ENUM_TO_CATEGORY[item.category] || '기타',
+              budgetAmount: item.plannedAmount,
+              paidAmount: item.spentAmount,
+              isPaid: item.completed
+            });
+          });
+        });
+        
+        setItems(parsedItems);
+      }
+    } catch (error) {
+      console.error('API 호출 에러:', error);
+      setItems([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchBudgetData();
+  }, [fetchBudgetData]);
+
+  // 2. 목표 예산 설정 (PUT)
+  const updateTargetBudget = async (amount: number) => {
+    setTargetBudget(amount);
+    try {
+      await apiFetch('/api/budgets/me', {
+        method: 'PUT',
+        body: JSON.stringify({ totalBudget: amount }),
+      });
+    } catch (error) {
+      console.error('목표 예산 업데이트 실패:', error);
+      fetchBudgetData();
+    }
   };
 
-  const togglePaidStatus = (id: string) => {
+  // 3. 예산 항목 생성 (POST)
+  const addBudgetItem = async (newItem: Omit<BudgetItem, 'id'>) => {
+    const tempId = Date.now().toString();
+    setItems((prev) => [{ ...newItem, id: tempId }, ...prev]);
+
+    try {
+      const res = await apiFetch('/api/budget-items', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: newItem.title,
+          category: CATEGORY_TO_ENUM[newItem.category],
+          plannedAmount: newItem.budgetAmount,
+          spentAmount: newItem.paidAmount,
+        }),
+      });
+      const body = await res.json();
+      if (body.success && body.data) {
+        setItems((prev) => prev.map((item) => 
+          item.id === tempId ? { ...item, id: String(body.data.itemId) } : item
+        ));
+      }
+    } catch (error) {
+      console.error('항목 생성 실패:', error);
+      fetchBudgetData(); 
+    }
+  };
+
+  // 4. 결제 완료 상태 변경 (PATCH)
+  const togglePaidStatus = async (id: string) => {
+    const target = items.find(item => item.id === id);
+    if (!target) return;
+
+    const newIsPaid = !target.isPaid;
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const newIsPaid = !item.isPaid;
-          return {
-            ...item,
-            isPaid: newIsPaid,
-            // ✨ 핵심: 체크되면 예산 전액 집행 처리, 체크 해제되면 0원으로 롤백
-            paidAmount: newIsPaid ? item.budgetAmount : 0, 
-          };
-        }
-        return item;
-      })
+      prev.map((item) =>
+        item.id === id ? { ...item, isPaid: newIsPaid, paidAmount: newIsPaid ? item.budgetAmount : 0 } : item
+      )
     );
+
+    try {
+      await apiFetch(`/api/budget-items/${id}/completion`, {
+        method: 'PATCH',
+      });
+    } catch (error) {
+      console.error('상태 변경 에러:', error);
+      fetchBudgetData();
+    }
   };
 
-  const updateBudgetItem = (id: string, updates: Partial<BudgetItem>) => {
+  // 5. 항목 수정 (PUT)
+  const updateBudgetItem = async (id: string, updates: Partial<BudgetItem>) => {
+    const currentItem = items.find(i => i.id === id);
+    if (!currentItem) return;
+
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+
+    try {
+      await apiFetch(`/api/budget-items/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: updates.title ?? currentItem.title,
+          category: updates.category ? CATEGORY_TO_ENUM[updates.category] : CATEGORY_TO_ENUM[currentItem.category],
+          plannedAmount: updates.budgetAmount ?? currentItem.budgetAmount,
+          spentAmount: updates.paidAmount ?? currentItem.paidAmount,
+        }),
+      });
+    } catch (error) {
+      console.error('항목 수정 에러:', error);
+      fetchBudgetData();
+    }
   };
 
-  const deleteBudgetItem = (id: string) => {
+  // 6. 삭제 (DELETE)
+  const deleteBudgetItem = async (id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
+    try {
+      await apiFetch(`/api/budget-items/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('삭제 에러:', error);
+      fetchBudgetData();
+    }
   };
 
   return (

@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { PRIMARY_GRADIENT_BG } from '../../../styles/gradients';
 
 export default function ShopCTA() {
   const navigate = useNavigate();
 
   return (
-    <section className={`flex flex-col items-center rounded-3xl ${PRIMARY_GRADIENT_BG} px-12 py-12 text-center`}>
+    <section className="flex flex-col items-center rounded-3xl gradient-primary-bg px-12 py-12 text-center">
       <h2 className="mb-3 text-3xl font-bold text-white">
         원하는 게 없으신가요?
       </h2>

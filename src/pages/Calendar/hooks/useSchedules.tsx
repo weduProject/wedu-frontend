@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { ScheduleItem } from '../CalendarPage';
 import { apiFetch, getToken } from '../../../lib/apiClient';
+import { fromBackendEvent, toBackendPayload } from '../utils/apiMapping';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface ScheduleContextType {
   schedules: ScheduleItem[];
@@ -8,16 +10,23 @@ interface ScheduleContextType {
   addSchedule: (newSchedule: Omit<ScheduleItem, 'id'>) => void;
   deleteSchedule: (id: string) => void;
   updateSchedule: (id: string, data: Partial<ScheduleItem>) => void;
+  year: number;
+  month: number;
+  goToPrevMonth: () => void;
+  goToNextMonth: () => void;
 }
 
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth() + 1);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchSchedules = useCallback(async () => {
-    // 로그인 안 된 상태면 API 호출 자체를 스킵 (불필요한 401 방지)
     if (!getToken()) {
       setIsLoading(false);
       return;
@@ -25,10 +34,13 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      const res = await apiFetch('/api/schedules');
+      const res = await apiFetch(`/api/calendar-events?year=${year}&month=${month}`);
       if (!res.ok) throw new Error('데이터 로드 실패');
-      const data = await res.json();
-      setSchedules(data);
+      const body = await res.json();
+      const list = Array.isArray(body) ? body : body.data;
+      if (!Array.isArray(list)) throw new Error('예상치 못한 응답 형식');
+
+      setSchedules(list.map(fromBackendEvent));
     } catch (error) {
       console.warn('API 호출 실패, 임시 더미데이터를 유지합니다.', error);
       setSchedules([
@@ -38,11 +50,31 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [year, month]);
 
   useEffect(() => {
-    fetchSchedules();
-  }, [fetchSchedules]);
+    if (user) {
+      fetchSchedules();
+    }
+  }, [fetchSchedules, user]);
+
+  const goToPrevMonth = () => {
+    if (month === 1) {
+      setYear((y) => y - 1);
+      setMonth(12);
+    } else {
+      setMonth((m) => m - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (month === 12) {
+      setYear((y) => y + 1);
+      setMonth(1);
+    } else {
+      setMonth((m) => m + 1);
+    }
+  };
 
   const addSchedule = async (newSchedule: Omit<ScheduleItem, 'id'>) => {
     const tempId = String(Date.now());
@@ -50,12 +82,19 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setSchedules((prev) => [...prev, addedItem]);
 
     try {
-      await apiFetch('/api/schedules', {
+      const res = await apiFetch('/api/calendar-events', {
         method: 'POST',
-        body: JSON.stringify(newSchedule),
+        body: JSON.stringify(toBackendPayload(newSchedule)),
       });
+      if (!res.ok) throw new Error('일정 저장 실패');
+      const body = await res.json();
+      const saved = fromBackendEvent(body.data ?? body);
+
+      // 임시 id를 서버가 준 진짜 eventId로 교체
+      setSchedules((prev) => prev.map((item) => (item.id === tempId ? saved : item)));
     } catch (error) {
       console.error('일정 추가 에러:', error);
+      setSchedules((prev) => prev.filter((item) => item.id !== tempId));
     }
   };
 
@@ -63,30 +102,36 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setSchedules((prev) => prev.filter((item) => item.id !== id));
 
     try {
-      await apiFetch(`/api/schedules/${id}`, { method: 'DELETE' });
+      await apiFetch(`/api/calendar-events/${id}`, { method: 'DELETE' });
     } catch (error) {
       console.error('일정 삭제 에러:', error);
     }
   };
 
   const updateSchedule = async (id: string, updatedData: Partial<ScheduleItem>) => {
+    const prevItem = schedules.find((item) => item.id === id);
     setSchedules((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...updatedData } : item))
     );
 
+    if (!prevItem) return;
+
     try {
-      // TODO: 백엔드 API 연동 시 주석 해제
-      // await apiFetch(`/api/schedules/${id}`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify(updatedData),
-      // });
+      const merged = { ...prevItem, ...updatedData };
+      const res = await apiFetch(`/api/calendar-events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(toBackendPayload(merged)),
+      });
+      if (!res.ok) throw new Error('일정 수정 실패');
     } catch (error) {
       console.error('일정 수정 에러:', error);
     }
   };
 
   return (
-    <ScheduleContext.Provider value={{ schedules, isLoading, addSchedule, deleteSchedule, updateSchedule }}>
+    <ScheduleContext.Provider
+      value={{ schedules, isLoading, addSchedule, deleteSchedule, updateSchedule, year, month, goToPrevMonth, goToNextMonth }}
+    >
       {children}
     </ScheduleContext.Provider>
   );
