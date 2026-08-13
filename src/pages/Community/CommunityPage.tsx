@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, PenLine } from "lucide-react"; 
+import { Search, PenLine, MessageCircle } from "lucide-react";
 import clsx from "clsx";
+import { Button } from "../../components";
 import CommunityCard from "./CommunityCard";
 import { useCommunity } from "./CommunityContext";
 
@@ -38,17 +39,12 @@ export default function CommunityPage() {
 
   const filteredPosts = posts
     .filter((post) => {
-      const matchCategory =
-        selectedCategory === "전체" ||
-        post.category.includes(selectedCategory) ||
-        selectedCategory.includes(post.category);
+      const matchCategory = selectedCategory === "전체" || post.category === selectedCategory;
       const matchKeyword = post.title.includes(keyword) || post.content.includes(keyword);
       return matchCategory && matchKeyword;
     })
     .sort((a, b) => {
-      if (sortType === "popular") {
-        if (b.likes !== a.likes) return b.likes - a.likes;
-      }
+      if (sortType === "popular" && b.likes !== a.likes) return b.likes - a.likes;
       const timeA = parseDate(a.date);
       const timeB = parseDate(b.date);
       if (timeA !== timeB) return timeB - timeA;
@@ -59,30 +55,25 @@ export default function CommunityPage() {
   const pagedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-surface pt-20 pb-16">
-      <div className="mx-auto max-w-5xl px-4">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+      <div className="mx-auto w-full max-w-5xl px-5 py-10 md:px-8">
         {/* 상단 타이틀 및 글쓰기 버튼 */}
-        <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+        <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl md:text-[32px] font-bold text-gray-900 tracking-tight">커뮤니티</h1>
-            <p className="mt-2 text-gray-500 text-[15px]">
-              예비 신랑신부들과 경험과 정보를 나눠보세요
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-text font-serif">커뮤니티</h1>
+            <p className="mt-2 text-sm text-text-muted">예비 신랑신부들과 경험과 정보를 나눠보세요</p>
           </div>
 
-          <button
-            onClick={() => navigate("/community/write")}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-[#F89685] to-[#F2705C] text-white font-bold text-[15px] shadow-[0_8px_16px_rgba(242,112,92,0.25)] hover:shadow-[0_12px_20px_rgba(242,112,92,0.35)] hover:-translate-y-0.5 transition-all"
-          >
-            <PenLine className="w-4 h-4" />
+          <Button className="flex items-center gap-2" onClick={() => navigate("/community/write")}>
+            <PenLine className="h-4 w-4" />
             글쓰기
-          </button>
+          </Button>
         </div>
 
-        {/* 자동 검색창 (검색 버튼 제거) */}
-        <div className="mb-8 animate-fade-in">
+        {/* 검색창 */}
+        <div className="mb-8">
           <div className="relative w-full">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted">
               <Search className="h-5 w-5" strokeWidth={2} />
             </span>
             <input
@@ -92,13 +83,13 @@ export default function CommunityPage() {
                 setCurrentPage(1);
               }}
               placeholder="검색어를 입력하세요"
-              className="w-full rounded-full border border-gray-200 bg-white py-4 pl-14 pr-6 text-[15px] outline-none transition-all focus:border-[#F48171] focus:ring-4 focus:ring-[#F48171]/10 shadow-sm"
+              className="w-full rounded-full border border-border bg-white py-4 pl-14 pr-6 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
             />
           </div>
         </div>
 
         {/* 카테고리 탭 및 정렬 버튼 */}
-        <div className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 animate-fade-in">
+        <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <button
@@ -108,10 +99,8 @@ export default function CommunityPage() {
                   setCurrentPage(1);
                 }}
                 className={clsx(
-                  "rounded-full px-5 py-2.5 text-[14px] font-bold transition-all duration-300",
-                  selectedCategory === category
-                    ? "bg-gradient-to-r from-[#F89685] to-[#F2705C] text-white shadow-[0_4px_12px_rgba(242,112,92,0.3)] scale-[1.02]"
-                    : "bg-white text-gray-500 border border-gray-100 shadow-sm hover:border-[#F48171]/40"
+                  "rounded-full px-5 py-2.5 text-sm font-bold transition-all",
+                  selectedCategory === category ? "category-tab-active" : "category-tab-inactive",
                 )}
               >
                 {category}
@@ -119,12 +108,12 @@ export default function CommunityPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 self-end lg:self-auto bg-white rounded-full p-1 border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-2 self-end rounded-full border border-border bg-white p-1 lg:self-auto">
             <button
               onClick={() => handleSortChange("latest")}
               className={clsx(
-                "rounded-full px-4 py-2 text-[13px] font-bold transition-colors",
-                sortType === "latest" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900"
+                "rounded-full px-4 py-2 text-xs font-bold transition-colors",
+                sortType === "latest" ? "bg-primary-light text-primary" : "text-text-muted hover:text-text",
               )}
             >
               최신순
@@ -132,8 +121,8 @@ export default function CommunityPage() {
             <button
               onClick={() => handleSortChange("popular")}
               className={clsx(
-                "rounded-full px-4 py-2 text-[13px] font-bold transition-colors",
-                sortType === "popular" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-900"
+                "rounded-full px-4 py-2 text-xs font-bold transition-colors",
+                sortType === "popular" ? "bg-primary-light text-primary" : "text-text-muted hover:text-text",
               )}
             >
               인기순
@@ -144,24 +133,17 @@ export default function CommunityPage() {
         {/* 게시글 리스트 */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {pagedPosts.length > 0 ? (
-            pagedPosts.map((post) => (
-              <CommunityCard
-                key={post.id}
-                post={post}
-              />
-            ))
+            pagedPosts.map((post) => <CommunityCard key={post.id} post={post} />)
           ) : (
-            <div className="col-span-1 mt-4 flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-gray-200 bg-white py-32 text-center shadow-sm md:col-span-2">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-300">
-                <span className="text-4xl">💬</span>
+            <div className="col-span-1 mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-white py-32 text-center md:col-span-2">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-light text-primary">
+                <MessageCircle className="h-8 w-8" strokeWidth={1.5} />
               </div>
-
-              <p className="mb-6 text-gray-500 font-medium">
-                아직 해당하는 게시글이 없어요
-              </p>
+              <p className="mb-6 font-medium text-text-muted">아직 해당하는 게시글이 없어요</p>
             </div>
           )}
         </div>
+
         {/* 페이지네이션 */}
         {totalPages > 1 && (
           <div className="mt-12 flex justify-center gap-2">
@@ -170,10 +152,10 @@ export default function CommunityPage() {
                 key={index}
                 onClick={() => setCurrentPage(index + 1)}
                 className={clsx(
-                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300",
+                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all",
                   currentPage === index + 1
-                    ? "bg-[#F48171] text-white shadow-md shadow-[#F48171]/20"
-                    : "bg-white text-gray-500 border border-gray-200 hover:border-[#F48171] hover:text-[#F48171]"
+                    ? "bg-primary text-white shadow-md"
+                    : "border border-border bg-white text-text-muted hover:border-primary hover:text-primary",
                 )}
               >
                 {index + 1}
