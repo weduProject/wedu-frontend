@@ -30,7 +30,7 @@ export default function CommunityDetailPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFBF9] text-gray-500">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface text-gray-500">
         게시글을 찾을 수 없습니다.
         <br />
         <Button className="mt-4 rounded-full px-8 bg-gradient-to-r from-[#F89685] to-[#F2705C] border-none text-white" onClick={() => navigate("/community")}>
@@ -65,7 +65,7 @@ export default function CommunityDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-24">
+    <div className="min-h-screen bg-surface pt-20 pb-24">
       <div className="mx-auto max-w-4xl px-4">
         <button
           onClick={() => navigate("/community")}

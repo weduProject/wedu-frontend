@@ -29,7 +29,7 @@ export default function BuilderCartPage() {
   const maxPrice = Math.floor(totalPrice * 1.3);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-32">
+    <div className="min-h-screen bg-surface pt-20 pb-32">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex justify-between items-end mb-10 px-2">
           <div>

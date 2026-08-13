@@ -50,13 +50,14 @@ export default function MypagePage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg flex flex-col gap-3">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8 min-h-[calc(100dvh-80px)] md:min-h-[calc(100dvh-96px)] flex flex-col px-5 md:px-8 py-10 md:py-14">
+    <div className="mx-auto w-full max-w-2xl flex flex-col gap-3 my-auto">
 
       {/* 프로필 카드 */}
-      <div className="rounded-2xl border border-border bg-white px-6 py-5">
+      <div className="rounded-2xl border border-border bg-surface px-6 py-5">
         <div className="flex items-center gap-4">
           {/* 아바타 */}
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-xl font-bold text-white shadow-sm">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl gradient-primary-bg text-xl font-bold text-white shadow-sm">
             {user ? user.name.charAt(0) : '?'}
           </div>
 
@@ -92,7 +93,7 @@ export default function MypagePage() {
       </div>
 
       {/* 통계 */}
-      <div className="rounded-2xl border border-border bg-white px-2 py-4">
+      <div className="rounded-2xl border border-border bg-surface px-2 py-4">
         <div className="grid grid-cols-4 divide-x divide-border">
           {STATS.map(({ icon, label, value }) => (
             <div key={label} className="flex flex-col items-center gap-1.5 py-1">
@@ -105,12 +106,12 @@ export default function MypagePage() {
       </div>
 
       {/* 메뉴 목록 */}
-      <div className="rounded-2xl border border-border bg-white overflow-hidden divide-y divide-border">
+      <div className="flex flex-col gap-3">
         {MENU_ITEMS.map(({ icon, bg, title, desc, to }) => (
           <Link
             key={title}
             to={to}
-            className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors no-underline"
+            className="flex items-center gap-4 rounded-2xl border border-border bg-surface px-6 py-4 hover:bg-gray-50 transition-colors no-underline"
           >
             <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${bg}`}>
               {icon}
@@ -136,6 +137,7 @@ export default function MypagePage() {
         </button>
       </div>
 
+    </div>
     </div>
   );
 }
