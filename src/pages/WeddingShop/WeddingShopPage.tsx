@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Image as ImageIcon, Heart } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { CATEGORIES, MOCK_PRODUCTS } from './mockProducts';
 import { formatPrice } from './utils/formatPrice';
@@ -63,9 +63,6 @@ export default function WeddingShopPage() {
                         {Math.round(((product.price - product.discountPrice!) / product.price) * 100)}% OFF
                       </span>
                     ) : null}
-                    <button type="button" onClick={(e) => e.preventDefault()} className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 opacity-0 backdrop-blur-[2px] transition-opacity group-hover:opacity-100" aria-label="찜하기">
-                      <Heart className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.8} />
-                    </button>
                   </div>
                   <div className="p-5">
                     <span className="text-xs font-medium tracking-[0.3px] text-text-muted">{CATEGORIES.find((c) => c.id === product.categoryId)?.name}</span>
