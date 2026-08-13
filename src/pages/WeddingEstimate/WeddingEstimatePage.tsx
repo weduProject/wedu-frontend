@@ -5,7 +5,6 @@ import { Check, Edit2, Trash2, Plus, X } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
-import { PageLayout } from '../../components';
 
 type CategoryTab = '예식장' | '예물' | '신혼여행';
 

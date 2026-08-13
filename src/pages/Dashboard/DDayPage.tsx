@@ -6,7 +6,6 @@ import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown,
 import { useChecklist } from "../Checklist/hooks/useChecklist";
 import { useDDay } from "../../contexts/DDayContext";
 import { useAuth } from "../../contexts/AuthContext";
-import { PageLayout } from "../../components";
 
 const ANNIVERSARIES = [
   { id: 1, title: '처음 만난 날', desc: '운명적인 첫 만남, 모든 것이 시작된 순간.', icon: <Heart className="h-4 w-4" /> },
