@@ -15,7 +15,11 @@ export default function ShopHero() {
             Proposal Studio
           </span>
           <h1 className="max-w-3xl text-[60px] font-semibold leading-15 tracking-[-1.5px] text-white">프로포즈 편집실</h1>
-          <p className="mt-6 max-w-xl text-lg leading-7 text-white/70">장소부터 선물, 특별한 경험까지. 당신의 완벽한 프로포즈를 위한 모든 것을 둘러보세요.</p>
+          <p className="mt-6 max-w-xl text-lg leading-7 text-white/70">
+            장소부터 선물, 특별한 경험까지.
+            <br />
+            당신의 완벽한 프로포즈를 위한 모든 것을 둘러보세요.
+          </p>
         </div>
       </div>
     </section>
