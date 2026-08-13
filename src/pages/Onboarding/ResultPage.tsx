@@ -116,7 +116,7 @@ function computeCompatibility(moodType: string, partnerMbti: string) {
 // ──────────────────────────────────────────────────────────────
 export default function ResultPage() {
   const navigate = useNavigate();
-  const { quizAnswers, partnerMbti } = useOnboarding();
+  const { quizAnswers, partnerMbti, resetQuiz } = useOnboarding();
 
   const moodType = (quizAnswers.q1 as string) || 'UNDECIDED';
   const style = STYLE_DATA[moodType] ?? STYLE_DATA.UNDECIDED;
@@ -242,7 +242,7 @@ export default function ResultPage() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/onboarding/intro')}
+            onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}
             className="rounded-full border border-border bg-white px-5 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50 whitespace-nowrap"
           >
             다시 테스트하기

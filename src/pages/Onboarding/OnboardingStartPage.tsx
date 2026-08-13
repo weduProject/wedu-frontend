@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, HeartPlus, Star, ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from './OnboardingContext';
 
 const STEPS = [
   {
@@ -34,6 +35,7 @@ const STATS = [
 export default function OnboardingStartPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { resetQuiz } = useOnboarding();
   const isCompleted = user?.onboardingCompleted ?? false;
 
   return (
@@ -65,7 +67,7 @@ export default function OnboardingStartPage() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/onboarding/intro')}
+                onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}
                 className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
               >
                 다시 하기

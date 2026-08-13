@@ -25,6 +25,7 @@ interface OnboardingState {
   partnerMbti: string;
   setQuizAnswers: (answers: QuizAnswers) => void;
   setPartnerMbti: (mbti: string) => void;
+  resetQuiz: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingState | null>(null);
@@ -60,8 +61,14 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     saveToStorage(quizAnswers, mbti);
   }
 
+  function resetQuiz() {
+    setQuizAnswersState({});
+    setPartnerMbtiState('');
+    saveToStorage({}, '');
+  }
+
   return (
-    <OnboardingContext.Provider value={{ quizAnswers, partnerMbti, setQuizAnswers, setPartnerMbti }}>
+    <OnboardingContext.Provider value={{ quizAnswers, partnerMbti, setQuizAnswers, setPartnerMbti, resetQuiz }}>
       {children}
     </OnboardingContext.Provider>
   );
