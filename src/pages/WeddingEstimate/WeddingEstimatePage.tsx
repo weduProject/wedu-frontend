@@ -5,6 +5,7 @@ import { Check, Edit2, Trash2, Plus, X } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
+import { PageLayout } from '../../components';
 
 type CategoryTab = '예식장' | '예물' | '신혼여행';
 
@@ -120,7 +121,7 @@ export default function WeddingEstimatePage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl pb-20">
+    <div className="mx-auto max-w-5xl p-5 pt-20 md:p-8 md:pt-24">
       
       {/* 1. 페이지 헤더 */}
       <div className="mb-10 text-center">
