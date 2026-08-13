@@ -34,7 +34,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const MOCK_PRODUCTS: Product[] = [
-  { id: 1, name: '한강 뷰 프라이빗 다이닝', categoryId: 8, price: 800000, discountPrice: null, imageUrl: getLookbookImage(1), description: '한강 야경이 내려다보이는 프라이빗 룸에서 둘만의 로맨틱 디너. 셰프가 직접 준비하는 7코스 디너와 프리미엄 와인 페어링을 즐기실 수 있습니다.', instagramUrl: 'https://instagram.com', address: '서울 용산구 한강대로 100 노들라운지' },
+  { id: 1, name: '한강뷰 프라이빗 다이닝', categoryId: 8, price: 800000, discountPrice: null, imageUrl: getLookbookImage(1), description: '한강 야경이 내려다보이는 프라이빗 룸에서 둘만의 로맨틱 디너. 셰프가 직접 준비하는 7코스 디너와 프리미엄 와인 페어링을 즐기실 수 있습니다.', instagramUrl: 'https://instagram.com', address: '서울 용산구 한강대로 100 노들라운지' },
   { id: 2, name: '프리미엄 플라워 데코', categoryId: 9, price: 300000, discountPrice: null, imageUrl: getLookbookImage(2), description: '최고급 플로리스트가 당신의 공간을 로맨틱 파라다이스로 완성해 드립니다.', instagramUrl: 'https://instagram.com', address: '서울 마포구 양화로 45 플로리스트 스튜디오' },
   { id: 3, name: '현악 4중주 라이브', categoryId: 10, price: 600000, discountPrice: null, imageUrl: getLookbookImage(3), description: '비올리스트, 첼리스트로 구성된 정통 클래식 현악 4중주 라이브 공연.', instagramUrl: 'https://instagram.com', address: null },
   { id: 4, name: '커스텀 프로포즈 링', categoryId: 11, price: 2000000, discountPrice: null, imageUrl: getLookbookImage(4), description: '세상에 하나뿐인 디자인으로 완성하는 커스텀 프로포즈 링.', instagramUrl: 'https://instagram.com', address: '서울 종로구 인사동길 12 주얼리 아뜰리에' },

@@ -10,8 +10,9 @@ export default function ShopCTA() {
       </h2>
 
       <p className="mb-6 max-w-md text-sm text-white/80">
-        장소, 분위기, 음식, 예산까지 단계별로 선택하는 나만의 프로포즈 플래너로
-        완벽한 프로포즈를 직접 설계해보세요.
+        장소, 분위기, 음식, 예산까지 단계별로 선택하는
+        <br />
+        나만의 프로포즈 플래너로 완벽한 프로포즈를 직접 설계해보세요.
       </p>
 
       <button
