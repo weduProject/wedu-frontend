@@ -29,9 +29,36 @@ interface OnboardingState {
 
 const OnboardingContext = createContext<OnboardingState | null>(null);
 
+const STORAGE_KEY = 'wedu_onboarding';
+
+function loadFromStorage(): { quizAnswers: QuizAnswers; partnerMbti: string } {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { quizAnswers: {}, partnerMbti: '' };
+    return JSON.parse(raw);
+  } catch {
+    return { quizAnswers: {}, partnerMbti: '' };
+  }
+}
+
+function saveToStorage(quizAnswers: QuizAnswers, partnerMbti: string) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ quizAnswers, partnerMbti }));
+}
+
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>({});
-  const [partnerMbti, setPartnerMbti] = useState('');
+  const initial = loadFromStorage();
+  const [quizAnswers, setQuizAnswersState] = useState<QuizAnswers>(initial.quizAnswers);
+  const [partnerMbti, setPartnerMbtiState] = useState(initial.partnerMbti);
+
+  function setQuizAnswers(answers: QuizAnswers) {
+    setQuizAnswersState(answers);
+    saveToStorage(answers, partnerMbti);
+  }
+
+  function setPartnerMbti(mbti: string) {
+    setPartnerMbtiState(mbti);
+    saveToStorage(quizAnswers, mbti);
+  }
 
   return (
     <OnboardingContext.Provider value={{ quizAnswers, partnerMbti, setQuizAnswers, setPartnerMbti }}>

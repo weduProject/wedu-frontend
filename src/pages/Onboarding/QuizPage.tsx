@@ -86,7 +86,8 @@ export default function QuizPage() {
   const orderedSelected = (Array.isArray(currentAnswer) ? currentAnswer : []) as string[];
 
   return (
-    <div className="flex flex-col h-[calc(100svh-80px)] md:h-[calc(100svh-96px)] overflow-hidden">
+    <div className="bg-[#FDFBF9] -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="flex flex-col h-[calc(100svh-80px)] md:h-[calc(100svh-96px)] overflow-hidden px-5 md:px-8">
       {/* 고정 타이틀 영역 */}
       <div className="shrink-0 text-center pt-4 pb-3 px-4">
         <button
@@ -97,29 +98,28 @@ export default function QuizPage() {
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.8} />
           테스트 안내로 돌아가기
         </button>
-        <h1 className="text-2xl font-bold text-text mb-1">나의 성향 테스트</h1>
-        <p className="text-xs text-text-muted mb-4">솔직하게 답변할수록 더 정확한 결과를 얻을 수 있어요</p>
-        <div className="max-w-md mx-auto">
-          <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
-        </div>
+        <h1 className="text-3xl font-black text-text mb-1" style={{ fontFamily: 'var(--font-serif)' }}>나의 성향 테스트</h1>
+        <p className="text-xs text-text-muted">솔직하게 답변할수록 더 정확한 결과를 얻을 수 있어요</p>
       </div>
 
       {/* 퀴즈 카드 */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-4 pb-6 overflow-y-auto">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border/60 p-5 flex flex-col gap-3">
+      <div className="flex-1 flex items-center justify-center px-4 py-6">
+        <div className="w-full max-w-4xl flex flex-col gap-2">
+          <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
+        <div className="w-full bg-[#FDFBF9] rounded-2xl shadow-sm border border-border/60 p-10 flex flex-col gap-4 overflow-y-auto max-h-[65vh]">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">
             문항 {current + 1} / {QUIZ_QUESTIONS.length}
           </p>
 
           {/* 질문 */}
-          <div>
-            <p className="text-base font-bold text-text leading-snug mb-0.5">{question.text}</p>
-            <p className="text-xs text-text-muted">{question.hint}</p>
+          <div className="text-center py-2">
+            <p className="text-2xl font-bold text-text leading-snug mb-1" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
+            {question.hint && <p className="text-sm text-text-muted">{question.hint}</p>}
           </div>
 
           {/* 선택지 */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {question.answers.map((answer) => {
               const isSelected =
                 question.type === 'single'
@@ -144,19 +144,25 @@ export default function QuizPage() {
                     else handleOrdered(answer.value);
                   }}
                   className={clsx(
-                    'flex items-center justify-between w-full px-4 py-2.5 rounded-xl border text-sm text-left transition-colors cursor-pointer bg-white',
-                    isSelected ? 'border-primary bg-primary/[.06] text-primary font-medium' : 'border-border text-text hover:bg-gray-50',
+                    'flex items-center gap-4 w-full px-5 py-5 rounded-2xl border text-left transition-all cursor-pointer',
+                    isSelected
+                      ? 'border-primary bg-primary/10 text-primary font-semibold'
+                      : 'border-gray-200 bg-white text-text hover:border-primary/40 hover:bg-primary/5',
                     isDisabled && 'opacity-40 cursor-not-allowed'
                   )}
                 >
-                  <span>{answer.label}</span>
+                  {/* 라디오/체크 인디케이터 */}
+                  <span className={clsx(
+                    'flex-none w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all',
+                    isSelected ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
+                  )}>
+                    {isSelected && <span className="w-2.5 h-2.5 rounded-full bg-white" />}
+                  </span>
+                  <span className="text-base">{answer.label}</span>
                   {question.type === 'ordered' && orderIndex !== -1 && (
-                    <span className="w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0">
+                    <span className="ml-auto w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0 font-bold">
                       {orderIndex + 1}
                     </span>
-                  )}
-                  {question.type === 'multi' && isSelected && (
-                    <span className="text-primary text-base leading-none shrink-0">✓</span>
                   )}
                 </button>
               );
@@ -215,7 +221,9 @@ export default function QuizPage() {
             </button>
           </div>
         </div>
+        </div>
       </div>
+    </div>
     </div>
   );
 }

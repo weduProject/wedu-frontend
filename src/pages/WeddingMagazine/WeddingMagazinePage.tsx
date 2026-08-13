@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, UserRound, Lightbulb, Heart, MessageCircle, Clock } from 'lucide-react';
+import { CalendarDays, UserRound, Lightbulb, Heart, MessageCircle, Clock, LayoutGrid } from 'lucide-react';
 import { apiFetch } from '../../lib/apiClient';
 
 interface MagazinePost {
@@ -14,11 +14,12 @@ interface MagazinePost {
   date: string;
 }
 
-type CategoryKey = '박람회' | '플래너' | '웨딩팁';
+type CategoryKey = '전체' | '박람회' | '플래너' | '웨딩팁';
 
 const CATEGORIES = ['전체', '박람회', '플래너', '웨딩팁'] as const;
 
 const CATEGORY_META: Record<CategoryKey, { Icon: React.ElementType; color: string }> = {
+  전체:   { Icon: LayoutGrid,  color: 'bg-pink-50 text-[#E8796C]' },
   박람회: { Icon: CalendarDays, color: 'bg-pink-50 text-[#E8796C]' },
   플래너: { Icon: UserRound,   color: 'bg-pink-50 text-[#E8796C]' },
   웨딩팁: { Icon: Lightbulb,   color: 'bg-pink-50 text-[#E8796C]' },
@@ -151,9 +152,9 @@ export default function WeddingMagazinePage() {
   }
 
   return (
-    <div>
+    <div className="-mx-5 md:-mx-8 -mt-5 md:-mt-8 -mb-5 md:-mb-8">
       {/* ── Hero (full bleed) ── */}
-      <section className="-mt-5 md:-mt-8 -mx-5 md:-mx-8 relative h-[460px] md:h-[520px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[460px] md:h-[520px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-stone-300 via-amber-100 to-stone-200" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/5 to-black/35" />
         <div className="relative z-10 text-center px-6 max-w-2xl">
@@ -172,8 +173,8 @@ export default function WeddingMagazinePage() {
       </section>
 
       {/* ── Sticky category tabs (full bleed) ── */}
-      <div className="sticky top-16 md:top-20 z-30 -mx-5 md:-mx-8 bg-white/90 backdrop-blur-md border-b border-border">
-        <div className="px-5 md:px-8 flex items-center gap-2 py-3 overflow-x-auto">
+      <div className="sticky top-16 md:top-20 z-30 bg-white/90 backdrop-blur-md border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 md:px-8 flex items-center gap-2 py-3 overflow-x-auto">
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
@@ -182,15 +183,10 @@ export default function WeddingMagazinePage() {
                 type="button"
                 onClick={() => setActiveCategory(cat)}
                 className={`flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#221A18] text-white'
-                    : 'bg-white border border-border text-text hover:bg-primary-light hover:text-primary hover:border-primary/20'
+                  isActive ? 'category-tab-active' : 'category-tab-inactive'
                 }`}
               >
-                {cat !== '전체' && (() => {
-                  const { Icon } = CATEGORY_META[cat as CategoryKey];
-                  return <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />;
-                })()}
+                {(() => { const { Icon } = CATEGORY_META[cat]; return <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />; })()}
                 {cat}
               </button>
             );
@@ -199,7 +195,7 @@ export default function WeddingMagazinePage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="max-w-5xl mx-auto py-8 md:py-10">
+      <div className="max-w-5xl mx-auto px-5 md:px-8 py-8 md:py-10">
         {loading && (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -282,7 +278,7 @@ export default function WeddingMagazinePage() {
       </div>
 
       {/* ── CTA ── */}
-      <div className="-mx-5 md:-mx-8 px-5 md:px-8 pb-8">
+      <div className="mx-auto max-w-5xl px-5 md:px-8 pb-8 md:pb-14">
         <div className="rounded-2xl bg-[#FAF8F4] border border-border px-6 md:px-12 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <h2 className="text-xl md:text-2xl font-bold text-text mb-2">

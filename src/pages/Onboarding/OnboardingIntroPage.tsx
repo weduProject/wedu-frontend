@@ -23,7 +23,8 @@ export default function OnboardingIntroPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-auto w-full max-w-2xl py-4">
+    <div className="min-h-screen bg-[#FDFBF9] -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="mx-auto w-full max-w-2xl px-5 py-8 md:px-8">
         {/* 상단 내비 */}
         <div className="mb-8 flex items-center justify-between">
           <button
@@ -77,6 +78,7 @@ export default function OnboardingIntroPage() {
             로그인하지 않아도 테스트는 가능하지만, 결과 저장은 로그인이 필요해요.
           </p>
         </div>
+    </div>
     </div>
   );
 }
