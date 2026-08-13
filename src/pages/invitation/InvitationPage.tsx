@@ -1,419 +1,741 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Image,
+  MessageCircleHeart,
+  Palette,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  WandSparkles,
+  Clock3,
+} from "lucide-react";
 
-interface InvitationTemplate {
-  id: string;
-  name: string;
-  style: string;
-  styleLabel: string;
-  description: string;
-  previewImage: string;
-  detailImage: string;
-  colors: string[];
-  features: string[];
-}
-
-const invitationTemplates: InvitationTemplate[] = [
+const templates = [
   {
-    id: 'classic-ivory',
-    name: '클래식 아이보리',
-    style: 'classic',
-    styleLabel: '클래식',
-    description: '시간이 지나도 변하지 않는 우아함. 아이보리 톤의 전통적인 레이아웃에 금박 포인트로 품격을 더한 클래식 청첩장입니다.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Elegant%20classic%20ivory%20wedding%20invitation%20card%20design%20with%20gold%20foil%20accents%20delicate%20calligraphy%20and%20pressed%20cream%20roses%20flat%20lay%20on%20soft%20linen%20fabric%20background%20warm%20natural%20lighting%20editorial%20stationery%20photography%20with%20refined%20luxurious%20feel&width=800&height=1200&seq=invite-classic-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Luxurious%20classic%20ivory%20wedding%20invitation%20suite%20displayed%20on%20marble%20surface%20with%20gold%20foil%20details%20cream%20silk%20ribbon%20wax%20seal%20and%20delicate%20floral%20arrangement%20of%20white%20garden%20roses%20and%20eucalyptus%20editorial%20flat%20lay%20photography%20with%20soft%20golden%20hour%20lighting%20elegant%20and%20timeless%20stationery%20design&width=1200&height=800&seq=invite-classic-detail-01&orientation=landscape',
-    colors: ['#F5F0E8', '#D4C5A9', '#C9A96E', '#8B7355'],
-    features: ['금박 엠보싱', '코튼 페이퍼', '실크 리본', '왁스씰 포함'],
+    name: "로맨틱 아이보리",
+    rating: "4.9",
+    type: "ROMANTIC",
+    bg: "linear-gradient(145deg, #eee5d8 0%, #d8c5ad 45%, #f7f1e8 100%)",
+    accent: "#b76e79",
   },
   {
-    id: 'modern-minimal',
-    name: '모던 미니멀',
-    style: 'modern',
-    styleLabel: '모던',
-    description: '불필요한 요소를 덜어낸 절제된 아름다움. 깔끔한 산세리프 타이포그래피와 여백의 미학이 돋보이는 세련된 청첩장입니다.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Modern%20minimalist%20wedding%20invitation%20with%20clean%20sans%20serif%20typography%20simple%20geometric%20layout%20and%20subtle%20blind%20embossing%20on%20thick%20textured%20white%20card%20stock%20with%20botanical%20line%20art%20illustration%20editorial%20stationery%20design%20with%20generous%20white%20space&width=800&height=1200&seq=invite-modern-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Modern%20minimalist%20wedding%20invitation%20suite%20with%20clean%20geometric%20typography%20blind%20debossed%20details%20and%20delicate%20line%20art%20botanical%20illustrations%20on%20textured%20cream%20paper%20flat%20lay%20with%20dried%20pampas%20grass%20and%20ceramic%20vase%20editorial%20stationery%20photography%20soft%20natural%20light&width=1200&height=800&seq=invite-modern-detail-01&orientation=landscape',
-    colors: ['#FAFAFA', '#E8E4E1', '#2C2C2C', '#8E8E8E'],
-    features: ['블라인드 엠보싱', '텍스처 카드지', '라인아트 일러스트', '반투명 봉투'],
+    name: "아리스 화이트",
+    rating: "4.8",
+    type: "SPECIAL DAY",
+    bg: "linear-gradient(145deg, #f8f7f3 0%, #e6e1d8 50%, #faf8f4 100%)",
+    accent: "#8c8174",
   },
   {
-    id: 'floral-romance',
-    name: '플로럴 로맨스',
-    style: 'floral',
-    styleLabel: '로맨틱',
-    description: '수채화로 그린 듯한 섬세한 플라워 일러스트가 사랑스러운 분위기를 자아냅니다. 봄, 여름 웨딩에 특히 잘 어울리는 디자인이에요.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Romantic%20wedding%20invitation%20with%20watercolor%20floral%20wreath%20illustration%20in%20soft%20blush%20pink%20peach%20and%20sage%20green%20tones%20elegant%20script%20calligraphy%20on%20textured%20ivory%20paper%20delicate%20botanical%20design%20with%20scattered%20petals%20editorial%20stationery%20photography&width=800&height=1200&seq=invite-floral-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Romantic%20watercolor%20floral%20wedding%20invitation%20suite%20with%20blush%20pink%20roses%20and%20sage%20green%20foliage%20wreath%20design%20elegant%20calligraphy%20on%20handmade%20paper%20flat%20lay%20with%20fresh%20garden%20roses%20loose%20petals%20and%20silk%20ribbon%20editorial%20photography%20soft%20dreamy%20lighting%20pastel%20tones&width=1200&height=800&seq=invite-floral-detail-01&orientation=landscape',
-    colors: ['#FDF2F4', '#E8C4C8', '#C49799', '#8B9D83'],
-    features: ['수채화 일러스트', '핸드메이드 페이퍼', '드라이플라워 동봉', '컬러 봉투 포함'],
+    name: "플로럴 핑크",
+    rating: "4.9",
+    type: "FLOWER",
+    bg: "linear-gradient(145deg, #f4d7d5 0%, #fff5f1 48%, #e9c0bd 100%)",
+    accent: "#d9828b",
   },
   {
-    id: 'vintage-heritage',
-    name: '빈티지 헤리티지',
-    style: 'vintage',
-    styleLabel: '빈티지',
-    description: '오래된 편지지에서 영감을 받은 디자인. 세피아 톤의 레이스 패턴과 앤티크한 타이포그래피로 특별한 추억을 담아보세요.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Vintage%20wedding%20invitation%20design%20with%20antique%20lace%20border%20patterns%20sepia%20toned%20background%20old%20style%20serif%20typography%20and%20ornate%20filigree%20details%20reminiscent%20of%20old%20love%20letters%20on%20aged%20parchment%20paper%20texture%20editorial%20stationery%20photography&width=800&height=1200&seq=invite-vintage-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Vintage%20style%20wedding%20invitation%20suite%20with%20antique%20lace%20patterns%20sepia%20tones%20old%20fashioned%20letterpress%20details%20wax%20seal%20and%20dried%20lavender%20stems%20on%20aged%20wooden%20surface%20flat%20lay%20editorial%20photography%20with%20warm%20nostalgic%20lighting%20and%20soft%20shadows&width=1200&height=800&seq=invite-vintage-detail-01&orientation=landscape',
-    colors: ['#F5EDE0', '#D4C5B2', '#A0846C', '#5C4A3A'],
-    features: ['레터프레스 인쇄', '에이징 페이퍼', '레이스 패턴', '왁스씰 포함'],
+    name: "빈티지 레이스",
+    rating: "4.7",
+    type: "WEDDING",
+    bg: "linear-gradient(145deg, #d8c39c 0%, #f3ead8 48%, #cbb386 100%)",
+    accent: "#a38454",
   },
-  {
-    id: 'botanical-garden',
-    name: '보태니컬 가든',
-    style: 'floral',
-    styleLabel: '로맨틱',
-    description: '자연에서 영감을 받은 허브와 와일드플라워 모티브. 가든 웨딩이나 야외 예식을 계획 중인 커플에게 완벽한 선택입니다.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Botanical%20garden%20wedding%20invitation%20with%20delicate%20herb%20and%20wildflower%20illustrations%20in%20muted%20sage%20and%20dusty%20lavender%20tones%20elegant%20script%20typography%20on%20natural%20kraft%20textured%20paper%20organic%20garden%20inspired%20design%20editorial%20stationery%20photography&width=800&height=1200&seq=invite-botanical-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Botanical%20garden%20style%20wedding%20invitation%20suite%20with%20pressed%20wildflowers%20and%20herbs%20sage%20green%20and%20lavender%20color%20palette%20natural%20kraft%20paper%20texture%20linen%20ribbon%20tied%20details%20flat%20lay%20on%20rustic%20wooden%20board%20with%20fresh%20herbs%20editorial%20photography%20soft%20diffused%20morning%20light&width=1200&height=800&seq=invite-botanical-detail-01&orientation=landscape',
-    colors: ['#F7F4EF', '#D5DCC8', '#9CAD8E', '#6B7F6A'],
-    features: ['보태니컬 일러스트', '크라프트 페이퍼', '린넨 리본', '프레스드 플라워'],
-  },
-  {
-    id: 'midnight-elegance',
-    name: '미드나잇 엘레강스',
-    style: 'modern',
-    styleLabel: '모던',
-    description: '딥 네이비와 골드의 조화로운 대비. 이브닝 웨딩이나 겨울 시즌에 어울리는 고급스러운 디자인으로 특별함을 더합니다.',
-    previewImage: 'https://readdy.ai/api/search-image?query=Elegant%20dark%20navy%20and%20gold%20wedding%20invitation%20with%20metallic%20gold%20foil%20text%20modern%20calligraphy%20on%20deep%20navy%20card%20stock%20dramatic%20contrast%20with%20subtle%20constellation%20or%20star%20pattern%20luxurious%20evening%20wedding%20stationery%20design%20editorial%20photography&width=800&height=1200&seq=invite-midnight-01&orientation=portrait',
-    detailImage: 'https://readdy.ai/api/search-image?query=Luxurious%20navy%20blue%20and%20gold%20wedding%20invitation%20suite%20with%20gold%20foil%20details%20metallic%20accents%20dark%20card%20stock%20and%20modern%20calligraphy%20flat%20lay%20with%20gold%20geometric%20accessories%20brass%20candle%20holder%20and%20navy%20velvet%20ribbon%20editorial%20photography%20dramatic%20elegant%20lighting&width=1200&height=800&seq=invite-midnight-detail-01&orientation=landscape',
-    colors: ['#1C2431', '#2D3A4A', '#C9A96E', '#E8D5B7'],
-    features: ['골드 포일 프레스', '네이비 카드지', '메탈릭 디테일', '벨벳 리본'],
-  },
-];
-
-const styleFilters = [
-  { id: 'all', label: '전체' },
-  { id: 'classic', label: '클래식' },
-  { id: 'modern', label: '모던' },
-  { id: 'floral', label: '로맨틱' },
-  { id: 'vintage', label: '빈티지' },
 ];
 
 const features = [
-  { icon: 'ri-smartphone-line', title: '모바일 최적화', desc: '스마트폰에서 가장 아름답게 보이도록 디자인되어, 어디서든 편하게 공유할 수 있어요.' },
-  { icon: 'ri-palette-line', title: '커스텀 컬러', desc: '원하는 컬러 팔레트로 변경 가능. 웨딩 테마에 딱 맞는 색감으로 완성해 드려요.' },
-  { icon: 'ri-image-line', title: '포토 갤러리', desc: '웨딩 촬영본, 우정샷까지 여러 장의 사진을 갤러리 형태로 담을 수 있어요.' },
-  { icon: 'ri-map-pin-line', title: '오시는 길', desc: '예식장 위치를 지도로 안내하고, 네비게이션 바로 연결까지 한 번에.' },
-  { icon: 'ri-chat-heart-line', title: '방명록', desc: '하객들이 남기는 따뜻한 축하 메시지. 소중한 마음을 모아 간직할 수 있어요.' },
-  { icon: 'ri-share-line', title: '간편 공유', desc: '카카오톡, 문자, 이메일로 간편하게 공유. 링크 하나면 충분해요.' },
+  {
+    icon: WandSparkles,
+    title: "쉽고 빠른 제작",
+    description: "복잡한 과정 없이\n나만의 청첩장을 간편하게 완성",
+  },
+  {
+    icon: Clock3,
+    title: "실시간 공유",
+    description: "모바일 환경에 최적화된\n멋진 웹 청첩장 디자인",
+  },
+  {
+    icon: MessageCircleHeart,
+    title: "참여 기능",
+    description: "방명록과 축하 메시지 등\n소중한 사람들의 마음을 기록",
+  },
+  {
+    icon: Users,
+    title: "함께하는 기능",
+    description: "부부가 함께 편집하고\n소중한 순간을 준비",
+  },
+  {
+    icon: Palette,
+    title: "다양한 테마",
+    description: "로맨틱부터 모던까지\n다양한 스타일을 자유롭게 선택",
+  },
+  {
+    icon: ShieldCheck,
+    title: "안전한 보안",
+    description: "개인정보 보호를 위한\n안전한 서비스 환경",
+  },
 ];
 
-export default function InvitationPage() {
-  const [activeStyle, setActiveStyle] = useState('all');
-  const [selectedTemplate, setSelectedTemplate] = useState<InvitationTemplate | null>(null);
+function ShineButton({
+  children,
+  onClick,
+  variant = "primary",
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  variant?: "primary" | "light";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        group relative overflow-hidden rounded-full
+        px-7 py-3.5 text-sm font-bold
+        transition-all duration-300
+        hover:-translate-y-0.5 hover:shadow-lg
+        ${
+          variant === "primary"
+            ? "bg-[#f28b8c] text-white shadow-[0_8px_24px_rgba(242,139,140,0.25)]"
+            : "bg-white/90 text-[#b76e79] shadow-[0_8px_24px_rgba(255,255,255,0.25)]"
+        }
+      `}
+    >
+      {/* 계속 지나가는 반짝임 */}
+      <span
+        className="
+          pointer-events-none absolute inset-y-0 -left-1/2 w-1/3
+          -skew-x-12 bg-gradient-to-r from-transparent via-white/70 to-transparent
+          animate-[invitationShine_2.3s_ease-in-out_infinite]
+        "
+      />
 
-  const filteredTemplates = activeStyle === 'all'
-    ? invitationTemplates
-    : invitationTemplates.filter((t) => t.style === activeStyle);
+      <span className="relative z-10 flex items-center justify-center gap-2">
+        {children}
+      </span>
+    </button>
+  );
+}
+
+export default function InvitationPage() {
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://readdy.ai/api/search-image?query=Editorial%20wedding%20stationery%20boutique%20atmosphere%20luxurious%20warm%20cream%20and%20champagne%20tones%20soft%20silk%20fabric%20and%20delicate%20dried%20flowers%20scattered%20on%20marble%20surface%20elegant%20calligraphy%20tools%20gold%20accents%20refined%20minimal%20composition%20with%20dreamy%20diffused%20backlight%20high%20end%20magazine%20aesthetic&width=1800&height=1200&seq=invitation-hero-v3&orientation=landscape"
-            alt=""
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/40"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/25"></div>
+    <div className="min-h-screen bg-[#fcfaf9] text-[#292525]">
+      {/* 반짝임 애니메이션 */}
+      <style>
+        {`
+          @keyframes invitationShine {
+            0% {
+              transform: translateX(-180%) skewX(-12deg);
+              opacity: 0;
+            }
+            15% {
+              opacity: 1;
+            }
+            45% {
+              opacity: 1;
+            }
+            65% {
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(520%) skewX(-12deg);
+              opacity: 0;
+            }
+          }
+
+          @keyframes invitationFloat {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+
+          @keyframes invitationGlow {
+            0%, 100% {
+              opacity: .35;
+              transform: scale(.95);
+            }
+            50% {
+              opacity: .75;
+              transform: scale(1.05);
+            }
+          }
+
+          .invitation-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+
+      {/* =========================
+          HEADER
+      ========================= */}
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/40 bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-5 md:px-8">
+          {/* 로고 */}
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="text-xl font-black tracking-[-0.04em] text-[#f08386]"
+          >
+            WEDU
+          </button>
+
+          {/* 메뉴 */}
+          <nav className="hidden items-center gap-7 text-[12px] font-medium text-gray-600 md:flex">
+            <button
+              onClick={() => navigate("/invitation")}
+              className="font-bold text-[#b76e79]"
+            >
+              청첩장
+            </button>
+
+            <button
+              onClick={() => navigate("/invitation/create")}
+              className="transition-colors hover:text-[#b76e79]"
+            >
+              청첩장 만들기
+            </button>
+
+            <button className="transition-colors hover:text-[#b76e79]">
+              샘플 보기
+            </button>
+
+            <button className="transition-colors hover:text-[#b76e79]">
+              이용 안내
+            </button>
+
+            <button className="transition-colors hover:text-[#b76e79]">
+              고객센터
+            </button>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <button className="hidden text-xs font-medium text-gray-600 sm:block">
+              로그인
+            </button>
+
+            <ShineButton
+              onClick={() => navigate("/invitation/create")}
+            >
+              회원가입
+            </ShineButton>
+          </div>
+        </div>
+      </header>
+
+      {/* =========================
+          HERO
+      ========================= */}
+      <section className="relative min-h-[720px] overflow-hidden pt-[68px]">
+        {/* 배경 */}
+        <div
+          className="
+            absolute inset-0
+            bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.95),transparent_35%),linear-gradient(135deg,#d9cec0_0%,#eee7dd_42%,#d4c4b1_100%)]
+          "
+        />
+
+        {/* 패브릭 느낌 */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute -left-20 top-20 h-[450px] w-[700px] rotate-[-12deg] rounded-[45%] bg-white/60 blur-3xl" />
+          <div className="absolute -right-32 bottom-0 h-[400px] w-[600px] rotate-[15deg] rounded-[50%] bg-[#c3ad93]/50 blur-3xl" />
         </div>
 
-        <div className="absolute relative z-10 w-full px-6 md:px-10 lg:px-16 py-24 md:py-32">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-px bg-white/40"></div>
-                <span className="text-white/60 text-xs md:text-sm tracking-[0.35em] uppercase font-bold">Mobile Invitation</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl text-white font-bold tracking-tight leading-[1.08] mb-6">
+        {/* 꽃 장식 */}
+        <div className="absolute left-[8%] top-[13%] text-white/80">
+          <Sparkles className="h-8 w-8" />
+        </div>
+
+        <div className="absolute right-[13%] top-[20%] text-white/70">
+          <Sparkles className="h-6 w-6" />
+        </div>
+
+        <div className="relative mx-auto flex min-h-[650px] max-w-[1280px] items-center px-6 py-20 md:px-12">
+          <div className="grid w-full items-center gap-12 lg:grid-cols-2">
+            {/* 왼쪽 */}
+            <div className="max-w-xl text-white drop-shadow-[0_2px_10px_rgba(0,0,0,.18)]">
+              <p className="mb-5 text-xs font-semibold tracking-[0.35em] text-white/80">
+                INVITATION
+              </p>
+
+              <h1 className="text-[42px] font-bold leading-[1.18] tracking-[-0.05em] md:text-[58px]">
                 당신의 이야기를
                 <br />
                 가장 아름답게
                 <br />
-                <span className="italic font-normal">전하는 편지</span>
+                전하는 편지
               </h1>
-              <p className="text-white/80 text-sm md:text-base max-w-lg leading-relaxed mb-10 font-light">
-                클래식부터 모던까지, 손끝에서 펼쳐지는 우아한 초대의 순간.
-                당신만의 모바일 청첩장으로 소중한 사람들을 초대하세요.
+
+              <p className="mt-6 text-sm leading-7 text-white/85 md:text-base">
+                소중한 순간을 담은 모바일 청첩장을
+                <br />
+                WEDU에서 나만의 스타일로 만들어보세요.
               </p>
-              <div className="flex items-center gap-4">
-                <a
-                  href="#templates"
-                  className="px-8 py-4 bg-[#B76E79] hover:bg-[#B8985D] text-white rounded-full text-sm font-bold shadow-lg shadow-[#C9A96E]/30 transition-all whitespace-nowrap hover:-translate-y-0.5"
+
+              <div className="mt-9 flex items-center gap-4">
+                <ShineButton
+                  onClick={() => navigate("/invitation/create")}
                 >
-                  템플릿 둘러보기
-                </a>
-                <Link
-                  to="/invitation/create"
-                  className="px-8 py-4 rounded-full border border-white/40 text-white text-sm font-bold hover:bg-white/10 transition-all whitespace-nowrap"
+                  청첩장 만들기
+                  <ArrowRight className="h-4 w-4" />
+                </ShineButton>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    document
+                      .getElementById("templates")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="text-xs font-semibold text-white/80 underline-offset-4 hover:text-white hover:underline"
                 >
-                  시작하기
-                </Link>
+                  샘플 보기
+                </button>
               </div>
             </div>
 
-            <div className="flex-1 items-center justify-center relative h-[420px] md:h-[500px] hidden lg:flex">
-              <div className="absolute animate-float-card-main w-[260px]">
-                <div className="relative rounded-2xl bg-white/95 backdrop-blur-sm shadow-2xl shadow-black/25 overflow-hidden border border-white/50 p-5">
-                  <div className="h-0.5 bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent mb-4"></div>
-                  <div className="text-center space-y-3">
-                    <p className="text-[10px] text-gray-500 tracking-[0.25em] uppercase font-bold">Save the Date</p>
-                    <p className="text-xl italic text-gray-800 font-bold">2026. 10. 24</p>
-                    <p className="text-xs text-gray-500">토요일 오후 2시</p>
-                    <div className="py-1.5">
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="w-8 h-px bg-gray-300"></div>
-                        <i className="ri-heart-fill text-[#C9A96E] text-base animate-heartbeat"></i>
-                        <div className="w-8 h-px bg-gray-300"></div>
-                      </div>
-                    </div>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight">수지</p>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight -mt-1">인준</p>
-                    <div className="pt-2">
-                      <p className="text-[11px] text-gray-500 leading-relaxed italic">
-                        &ldquo;서로를 향한 마음이 하나 되는 날,<br />소중한 분들과 함께하고 싶습니다.&rdquo;
-                      </p>
-                    </div>
-                  </div>
-                  <div className="h-0.5 bg-gradient-to-r from-transparent via-[#C9A96E]/30 to-transparent mt-4"></div>
+            {/* 오른쪽 청첩장 미리보기 */}
+            <div className="relative flex min-h-[440px] items-center justify-center">
+              {/* 뒤 카드 */}
+              <div
+                className="
+                  absolute h-[300px] w-[220px]
+                  rotate-[-10deg]
+                  rounded-xl border border-white/60
+                  bg-[#eee6d9]/80
+                  shadow-[0_30px_60px_rgba(70,50,30,.18)]
+                "
+              />
+
+              {/* 메인 카드 */}
+              <div
+                className="
+                  relative z-10 h-[340px] w-[250px]
+                  rounded-xl border border-white/80
+                  bg-[#f8f4ed]
+                  p-5
+                  shadow-[0_30px_70px_rgba(60,45,30,.25)]
+                  animate-[invitationFloat_4s_ease-in-out_infinite]
+                "
+              >
+                <div className="flex h-full flex-col items-center justify-center border border-[#c9b49c]/50">
+                  <p className="text-[9px] tracking-[0.35em] text-[#b76e79]">
+                    MY INVITATION
+                  </p>
+
+                  <div className="my-6 h-px w-16 bg-[#c9b49c]" />
+
+                  <p className="font-serif text-lg text-[#7d6b5b]">
+                    Hello together.
+                  </p>
+
+                  <Heart
+                    className="my-5 h-5 w-5 fill-[#ed9a9b] text-[#ed9a9b]"
+                  />
+
+                  <p className="text-2xl font-semibold text-[#393333]">
+                    수지
+                  </p>
+
+                  <p className="mt-1 text-2xl font-semibold text-[#393333]">
+                    인준
+                  </p>
+
+                  <p className="mt-5 text-[10px] tracking-[0.12em] text-gray-500">
+                    2026. 05. 24
+                  </p>
+
+                  <p className="mt-2 text-[9px] text-gray-400">
+                    더채플앳청담 그랜드홀
+                  </p>
                 </div>
+              </div>
+
+              {/* 플로팅 카드 */}
+              <div
+                className="
+                  absolute right-[3%] top-[20%] z-20
+                  rounded-2xl border border-white/70
+                  bg-white/90 px-5 py-4
+                  text-center shadow-xl backdrop-blur-md
+                  animate-[invitationFloat_4s_ease-in-out_1s_infinite]
+                "
+              >
+                <Heart className="mx-auto mb-2 h-5 w-5 text-[#f08c8d]" />
+                <p className="text-[10px] font-semibold text-gray-700">
+                  참여해요
+                </p>
+                <p className="mt-1 text-[9px] text-gray-400">
+                  마음 전하기
+                </p>
+              </div>
+
+              <div
+                className="
+                  absolute bottom-[12%] left-[4%] z-20
+                  rounded-xl border border-white/70
+                  bg-white/90 px-4 py-3
+                  shadow-xl backdrop-blur-md
+                "
+              >
+                <p className="text-[8px] uppercase tracking-[0.15em] text-[#e28a8d]">
+                  Wedding Day
+                </p>
+                <p className="mt-1 text-xs font-bold text-gray-700">
+                  2026.05.24
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="templates" className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm transition-all">
-        <div className="w-full px-6 md:px-10 lg:px-16">
-          <div className="flex items-center justify-between py-3 md:py-4">
-            <p className="text-xs text-[#C9A96E] font-bold tracking-wider whitespace-nowrap hidden sm:block">FILTER BY STYLE</p>
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-nowrap ml-auto sm:ml-0 pb-2 pt-1 px-1 -mx-1">
-              {styleFilters.map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveStyle(filter.id)}
-                  className={`flex-shrink-0 px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                    activeStyle === filter.id
-                      ? 'bg-[#C9A96E] text-white shadow-md shadow-[#C9A96E]/20'
-                      : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  {filter.label}
-                </button>
+      {/* =========================
+          TEMPLATE
+      ========================= */}
+      <section
+        id="templates"
+        className="bg-white px-6 py-24 md:px-12"
+      >
+        <div className="mx-auto max-w-[1120px]">
+          <div className="mb-12 flex items-end justify-between">
+            <div>
+              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-[#e18a8d]">
+                TEMPLATE
+              </p>
+
+              <h2 className="text-3xl font-bold tracking-[-0.04em] md:text-4xl">
+                청첩장 템플릿
+              </h2>
+            </div>
+
+            <button className="hidden items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-[#b76e79] sm:flex">
+              전체 보기
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              className="
+                absolute -left-5 top-1/2 z-10
+                hidden h-10 w-10 -translate-y-1/2
+                items-center justify-center
+                rounded-full bg-white shadow-lg
+                md:flex
+              "
+            >
+              <ChevronLeft className="h-5 w-5 text-gray-500" />
+            </button>
+
+            <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-7">
+              {templates.map((template) => (
+                <div key={template.name} className="group">
+                  <div
+                    className="
+                      relative aspect-[0.66]
+                      overflow-hidden rounded-[22px]
+                      border border-gray-100
+                      p-3 shadow-[0_10px_35px_rgba(0,0,0,.07)]
+                      transition-all duration-500
+                      group-hover:-translate-y-2
+                      group-hover:shadow-[0_20px_45px_rgba(0,0,0,.12)]
+                    "
+                    style={{ background: template.bg }}
+                  >
+                    <div className="flex h-full flex-col items-center justify-center rounded-[15px] border border-white/70 bg-white/30 px-4 text-center backdrop-blur-[1px]">
+                      <span
+                        className="text-[7px] font-bold tracking-[0.25em]"
+                        style={{ color: template.accent }}
+                      >
+                        {template.type}
+                      </span>
+
+                      <div className="my-5 h-px w-10 bg-black/15" />
+
+                      <p className="font-serif text-[17px] text-[#5e554d]">
+                        수지 & 인준
+                      </p>
+
+                      <Heart
+                        className="my-4 h-3.5 w-3.5"
+                        style={{ color: template.accent }}
+                      />
+
+                      <p className="text-[8px] tracking-widest text-gray-500">
+                        2026.05.24
+                      </p>
+
+                      <div className="mt-5 h-14 w-14 rounded-full bg-white/40 blur-[1px]" />
+                    </div>
+
+                    <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[7px] font-bold text-gray-500 shadow-sm">
+                      NEW
+                    </span>
+                  </div>
+
+                  <div className="mt-4 text-center">
+                    <p className="text-sm font-bold text-gray-800">
+                      {template.name}
+                    </p>
+
+                    <p className="mt-2 text-xs text-gray-400">
+                      <span className="text-[#e3a34e]">★</span>{" "}
+                      {template.rating}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
+
+            <button
+              type="button"
+              className="
+                absolute -right-5 top-1/2 z-10
+                hidden h-10 w-10 -translate-y-1/2
+                items-center justify-center
+                rounded-full bg-white shadow-lg
+                md:flex
+              "
+            >
+              <ChevronRight className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="mt-10 flex justify-center gap-2">
+            <span className="h-1.5 w-5 rounded-full bg-[#ef8d90]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
+            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
+            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
+            <span className="h-1.5 w-1.5 rounded-full bg-gray-200" />
           </div>
         </div>
       </section>
 
-      <section className="w-full px-6 md:px-10 lg:px-16 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-10 md:mb-14">
+      {/* =========================
+          FEATURES + DDAY
+      ========================= */}
+      <section className="bg-[#f8f6f5] px-6 py-24 md:px-12">
+        <div className="mx-auto max-w-[1120px]">
+          <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
+            {/* 왼쪽 */}
             <div>
-              <p className="text-xs text-[#C9A96E] tracking-[0.2em] uppercase font-bold mb-3">Curated Collection</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">청첩장 템플릿</h2>
-            </div>
-            <p className="text-sm font-bold text-gray-500 bg-gray-100 px-4 py-1.5 rounded-full hidden sm:block">{filteredTemplates.length}개의 디자인</p>
-          </div>
+              <p className="mb-3 text-[10px] font-bold tracking-[0.25em] text-[#e18a8d]">
+                FEATURE
+              </p>
 
-          <div className="flex gap-6 md:gap-10 overflow-x-auto py-6 px-4 -mx-4 scrollbar-hide snap-x snap-mandatory">
-            {filteredTemplates.map((template, idx) => (
-              <button
-                key={template.id}
-                onClick={() => setSelectedTemplate(template)}
-                className="group flex-shrink-0 snap-start cursor-pointer animate-float-up"
-                style={{ animationDelay: `${idx * 120}ms` }}
-              >
-                <div className="relative w-[260px] md:w-[320px]">
-                  <div className="relative rounded-[2.5rem] md:rounded-[3rem] border-[3px] border-gray-100 bg-white p-2.5 md:p-3 transition-all duration-500 group-hover:border-[#C9A96E]/50 group-hover:shadow-[0_20px_40px_-15px_rgba(201,169,110,0.3)] group-hover:-translate-y-2">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 md:w-24 h-6 md:h-7 bg-gray-100 rounded-b-2xl z-10 transition-colors group-hover:bg-[#f8f5f0]"></div>
-                    <div className="relative rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-gray-100 aspect-[9/16]">
-                      <img
-                        src={template.previewImage}
-                        alt={template.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
-                      <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-[11px] md:text-xs font-bold text-gray-800 shadow-sm">
-                        {template.styleLabel}
+              <h2 className="mb-10 text-3xl font-bold tracking-[-0.04em]">
+                WEDU를 선택하는 이유
+              </h2>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {features.map((feature) => {
+                  const Icon = feature.icon;
+
+                  return (
+                    <div
+                      key={feature.title}
+                      className="
+                        flex min-h-[115px] items-start gap-4
+                        rounded-2xl border border-white
+                        bg-white p-5
+                        shadow-[0_5px_20px_rgba(0,0,0,.03)]
+                        transition-all duration-300
+                        hover:-translate-y-1 hover:shadow-md
+                      "
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fff0ef]">
+                        <Icon className="h-4.5 w-4.5 text-[#ec898d]" />
                       </div>
-                      {idx === 0 && (
-                        <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-[#C9A96E] text-[11px] font-bold text-white shadow-md">
-                          인기
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-6 text-center">
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-[#C9A96E] transition-colors">
-                      {template.name}
-                    </h3>
-                    <div className="flex items-center justify-center gap-2 mt-3">
-                      {template.colors.slice(0, 3).map((color, i) => (
-                        <div
-                          key={i}
-                          className="w-3.5 h-3.5 rounded-full border border-gray-200 transition-transform group-hover:scale-110 shadow-sm"
-                          style={{ backgroundColor: color }}
-                        ></div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <section className="w-full px-6 md:px-10 lg:px-16 py-16 md:py-24 bg-white border-t border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
-            <div>
-              <p className="text-xs text-[#C9A96E] tracking-[0.2em] uppercase font-bold mb-3">Details</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-10">특별함을 더하는 디테일</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
-                {features.map((feat, idx) => (
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-800">
+                          {feature.title}
+                        </h3>
+
+                        <p className="mt-2 whitespace-pre-line text-[11px] leading-5 text-gray-400">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* D-DAY */}
+            <div
+              className="
+                rounded-[30px] border border-white
+                bg-white p-8
+                shadow-[0_15px_45px_rgba(0,0,0,.06)]
+              "
+            >
+              <p className="text-center text-[10px] font-bold tracking-[0.3em] text-[#e68a8e]">
+                D-DAY
+              </p>
+
+              <p className="mt-3 text-center text-xs text-gray-400">
+                우리의 특별한 날까지
+              </p>
+
+              <h3 className="mt-3 text-center text-3xl font-bold">
+                수지 <span className="text-[#ef9294]">&</span> 인준
+              </h3>
+
+              <p className="mt-2 text-center text-xs text-gray-500">
+                2026.05.24 SAT 2:00PM
+              </p>
+
+              <div className="mt-8 grid grid-cols-4 gap-2">
+                {[
+                  ["72", "Days"],
+                  ["16", "Hours"],
+                  ["34", "Minutes"],
+                  ["52", "Seconds"],
+                ].map(([number, label]) => (
                   <div
-                    key={idx}
-                    className="flex gap-4 p-5 rounded-2xl bg-gray-50 border border-transparent hover:bg-white hover:border-[#C9A96E]/30 hover:shadow-lg hover:shadow-[#C9A96E]/5 transition-all duration-300 group"
+                    key={label}
+                    className="rounded-xl bg-[#faf9f8] px-2 py-4 text-center"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 group-hover:border-[#C9A96E]/30 transition-colors shadow-sm">
-                      <i className={`${feat.icon} text-xl text-[#C9A96E]`}></i>
-                    </div>
-                    <div>
-                      <h3 className="text-[15px] font-bold text-gray-900 mb-1.5">{feat.title}</h3>
-                      <p className="text-[13px] text-gray-500 leading-relaxed">{feat.desc}</p>
-                    </div>
+                    <p className="text-xl font-bold text-gray-800">
+                      {number}
+                    </p>
+                    <p className="mt-1 text-[8px] text-gray-400">
+                      {label}
+                    </p>
                   </div>
                 ))}
               </div>
+
+              <div className="mt-7 text-center">
+                <p className="text-xs font-medium text-gray-600">
+                  더채플앳청담 그랜드홀
+                </p>
+
+                <p className="mt-1 text-[10px] text-gray-400">
+                  서울특별시 강남구 도산대로 327
+                </p>
+              </div>
+
+              <div className="mt-7 flex justify-center">
+                <ShineButton
+                  onClick={() => navigate("/invitation/create")}
+                >
+                  청첩장 미리보기
+                  <ArrowRight className="h-4 w-4" />
+                </ShineButton>
+              </div>
             </div>
-            <DdayPreviewCard />
           </div>
         </div>
       </section>
 
-      {selectedTemplate && (
+      {/* =========================
+          CTA
+      ========================= */}
+      <section className="px-6 py-20 md:px-12">
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
-          onClick={() => setSelectedTemplate(null)}
+          className="
+            relative mx-auto max-w-[1120px]
+            overflow-hidden rounded-[30px]
+            border border-[#f3d6d2]
+            bg-gradient-to-br from-[#fff2f0] via-[#fffafa] to-[#fce9e8]
+            px-6 py-16 text-center
+          "
         >
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
-          <div
-            className="relative z-10 bg-white rounded-3xl md:rounded-[2.5rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedTemplate(null)}
-              className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors z-20 cursor-pointer text-gray-600 hover:text-gray-900"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+          {/* 장식 */}
+          <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full border border-[#f1c5c4]/60" />
+          <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full border border-[#f1c5c4]/60" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="relative aspect-[3/4] md:aspect-auto overflow-hidden bg-gray-100">
-                <img src={selectedTemplate.detailImage} alt={selectedTemplate.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-8 md:p-12 flex flex-col justify-center">
-                <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full mb-4 w-fit">
-                  {selectedTemplate.styleLabel}
-                </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{selectedTemplate.name}</h2>
-                <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-8">{selectedTemplate.description}</p>
-                
-                <div className="space-y-6 mb-8">
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Color Palette</h4>
-                    <div className="flex gap-2">
-                      {selectedTemplate.colors.map((color, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full border border-gray-200 shadow-sm" style={{ backgroundColor: color }}></div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+          <div className="relative">
+            <Heart className="mx-auto mb-5 h-6 w-6 text-[#ed999b]" />
 
-                <Link
-                  to="/invitation/create"
-                  onClick={() => setSelectedTemplate(null)}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-bold bg-[#C9A96E] hover:bg-[#B8985D] text-white shadow-lg shadow-[#C9A96E]/30 whitespace-nowrap self-start transition-all hover:-translate-y-0.5"
-                >
-                  이 템플릿으로 시작하기
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </Link>
-              </div>
+            <h2 className="text-2xl font-bold tracking-[-0.04em] md:text-3xl">
+              지금 바로 나만의 청첩장을
+              <br className="sm:hidden" /> 만들어보세요
+            </h2>
+
+            <p className="mt-4 text-xs leading-6 text-gray-500 md:text-sm">
+              수많은 커플들이 선택한 WEDU와 함께
+              <br />
+              특별한 순간을 더 특별하게 만들어보세요.
+            </p>
+
+            <div className="mt-7 flex justify-center">
+              <ShineButton
+                onClick={() => navigate("/invitation/create")}
+              >
+                무료로 시작하기
+                <ArrowRight className="h-4 w-4" />
+              </ShineButton>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </section>
 
-function DdayPreviewCard() {
-  const [timeLeft, setTimeLeft] = useState({ days: '80', hours: '14', mins: '32' });
-
-  useEffect(() => {
-    const target = new Date('2026-10-24T14:00:00').getTime();
-    const timer = setInterval(() => {
-      const now = Date.now();
-      const diff = target - now;
-      if (diff <= 0) {
-        setTimeLeft({ days: '0', hours: '0', mins: '0' });
-        clearInterval(timer);
-        return;
-      }
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeLeft({
-        days: String(d).padStart(2, '0'),
-        hours: String(h).padStart(2, '0'),
-        mins: String(m).padStart(2, '0'),
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="flex h-full">
-      <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden bg-gray-50 border border-gray-100 p-8 md:p-12 flex flex-col items-center justify-center text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-        <p className="text-xs text-[#C9A96E] tracking-[0.2em] uppercase mb-4 font-bold">Save the Date</p>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">
-          수지 <span className="text-[#C9A96E] font-normal italic">&amp;</span> 인준
-        </h2>
-        <p className="text-[15px] font-medium text-gray-500 mb-8">2026년 10월 24일 토요일 오후 2시</p>
-        
-        <div className="inline-flex items-center gap-4 md:gap-6 px-8 py-5 md:px-10 md:py-6 bg-white rounded-2xl border border-gray-100 mb-10 shadow-sm">
-          {[
-            { value: timeLeft.days, unit: 'DAYS' },
-            { value: timeLeft.hours, unit: 'HOURS' },
-            { value: timeLeft.mins, unit: 'MINS' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4 md:gap-6">
-              {i > 0 && <div className="w-px h-8 bg-gray-200"></div>}
-              <div className="text-center min-w-[48px]">
-                <p className="text-2xl md:text-3xl font-bold text-[#C9A96E] tabular-nums tracking-tight">{item.value}</p>
-                <p className="text-[10px] md:text-xs text-gray-400 tracking-widest font-bold mt-1">{item.unit}</p>
+      {/* =========================
+          FOOTER
+      ========================= */}
+      <footer className="border-t border-gray-100 bg-[#f7f5f4] px-6 py-12 md:px-12">
+        <div className="mx-auto max-w-[1120px]">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <div>
+              <p className="text-xs font-bold text-gray-700">서비스</p>
+              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
+                <p>청첩장</p>
+                <p>청첩장 만들기</p>
+                <p>템플릿</p>
               </div>
             </div>
-          ))}
+
+            <div>
+              <p className="text-xs font-bold text-gray-700">이용 안내</p>
+              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
+                <p>서비스 이용방법</p>
+                <p>자주 묻는 질문</p>
+                <p>고객센터</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-bold text-gray-700">WEDU</p>
+              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
+                <p>서비스 소개</p>
+                <p>이용약관</p>
+                <p>개인정보처리방침</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-bold text-gray-700">고객센터</p>
+              <div className="mt-4 space-y-2 text-[10px] text-gray-400">
+                <p>평일 09:00 - 18:00</p>
+                <p>주말 및 공휴일 휴무</p>
+                <p>support@wedu.com</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 border-t border-gray-200 pt-7">
+            <p className="text-xl font-black tracking-[-0.04em] text-[#ed8589]">
+              WEDU
+            </p>
+
+            <p className="mt-2 text-[9px] text-gray-400">
+              당신의 특별한 순간을 위한 웨딩 플랫폼
+            </p>
+          </div>
         </div>
-        
-        <Link
-          to="/invitation/create"
-          className="px-8 py-4 rounded-full text-[15px] font-bold bg-[#C9A96E] hover:bg-[#B8985D] text-white shadow-lg shadow-[#C9A96E]/30 transition-all whitespace-nowrap hover:-translate-y-0.5"
-        >
-          나만의 청첩장 만들기
-        </Link>
-      </div>
+      </footer>
     </div>
   );
 }
