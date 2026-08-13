@@ -8,14 +8,13 @@ import ProgressBar from '../../components/ui/ProgressBar';
 import TextField from '../../components/ui/TextField';
 import Button from '../../components/ui/Button';
 import { useChecklist, RECOMMENDED_TODOS, type CategoryType } from './hooks/useChecklist';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
+import EmptyState from '../../components/ui/EmptyState';
 
 const CATEGORIES: CategoryType[] = ['기본', '예식', '촬영', '예물', '주거', '여행'];
 
 export default function ChecklistPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { todos:rawTodos, addTodo, toggleTodo, deleteTodo, updateTodo } = useChecklist();
@@ -159,16 +158,11 @@ export default function ChecklistPage() {
 
       {/* 비회원일 때 보여줄 빈 화면 멘트 */}
       {!user && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
-            <Check className="h-8 w-8 text-primary" />
-          </div>
-          <h3 className="mb-2 text-lg font-bold text-text">할 일을 등록하고 진행률을 확인하세요</h3>
-          <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별로 할 일을 관리할 수 있습니다.</p>
-          <Button onClick={() => navigate('/login')} className="px-6">
-            로그인하러 가기
-          </Button>
-        </div>
+        <EmptyState
+            icon={Check}
+            title="할 일을 등록하고 진행률을 확인하세요"
+            description="로그인 후 카테고리별로 할 일을 관리할 수 있습니다."
+          />
       )}
 
       {user && (
