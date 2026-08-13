@@ -88,7 +88,7 @@ export default function QuizPage() {
 
   return (
     <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
-    <div className="flex flex-col h-[calc(100svh-80px)] md:h-[calc(100svh-96px)] overflow-hidden px-5 md:px-8">
+    <div className="flex flex-col min-h-[calc(100dvh-80px)] md:min-h-[calc(100dvh-96px)] px-5 md:px-8">
       {/* 고정 타이틀 영역 */}
       <div className="shrink-0 text-center pt-2 pb-1 px-4">
         <button
@@ -107,7 +107,7 @@ export default function QuizPage() {
       <div className="flex-1 flex flex-col px-4 py-2">
         <div className="w-full max-w-2xl mx-auto flex flex-col gap-2 flex-1">
           <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
-        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-3 flex flex-col gap-1 flex-1">
+        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-3 flex flex-col gap-1 flex-1 overflow-y-auto">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">
             문항 {current + 1} / {QUIZ_QUESTIONS.length}
