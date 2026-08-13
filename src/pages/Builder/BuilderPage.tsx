@@ -149,13 +149,6 @@ export default function BuilderPage() {
           : null;
 
   return (
-
-    <div className="min-h-screen bg-[#FDFBF9] pb-32 pt-20">
-      <div className="mx-auto max-w-[900px] px-4">
-
-        {/* 진행 단계 */}
-        <div className="mb-12 flex items-center justify-center">
-
     <div className="min-h-screen bg-surface pt-20 pb-32">
       <div className="max-w-[900px] mx-auto px-4">
         {/* 상단 프로그레스 바 */}

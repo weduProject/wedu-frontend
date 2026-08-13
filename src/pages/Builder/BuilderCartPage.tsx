@@ -133,24 +133,8 @@ export default function BuilderCartPage() {
   };
 
   return (
-
-    <div className="min-h-screen bg-[#FDFBF9] pb-24">
-      <div className="mx-auto max-w-5xl px-4 pt-10">
-
     <div className="min-h-screen bg-surface pt-20 pb-32">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="flex justify-between items-end mb-10 px-2">
-          <div>
-            <h1 className="text-3xl font-bold mb-3 text-gray-900">프로포즈 장바구니</h1>
-            <p className="text-gray-500 text-[15px]">선택한 상품들을 확인하고 관리하세요</p>
-          </div>
-          <button
-            onClick={clearCart}
-            className="text-[13px] font-medium text-gray-400 hover:text-gray-900 transition-colors"
-          >
-            전체 비우기
-          </button>
-        </div>
 
         {/* 뒤로가기 */}
         <button
