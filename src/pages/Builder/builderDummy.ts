@@ -13,7 +13,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "야외/자연",
     description: "숲, 해변, 공원 등 자연이 어우러진 프로포즈",
     tags: ["야외", "감성", "힐링"],
-    icon: "🌿",
+    icon: "tree",
     image: "/images/outdoor.jpg",
   },
   {
@@ -21,7 +21,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "호텔/레스토랑",
     description: "프라이빗한 공간에서 분위기 있는 프로포즈",
     tags: ["럭셔리", "로맨틱", "야경"],
-    icon: "🍽️",
+    icon: "restaurant",
     image: "/images/hotel.jpg",
   },
   {
@@ -29,7 +29,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "놀이공원",
     description: "즐거운 추억과 함께하는 특별한 이벤트",
     tags: ["활동적", "이벤트", "사진"],
-    icon: "🎡",
+    icon: "themepark",
     image: "/images/themepark.jpg",
   },
   {
@@ -37,7 +37,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "한강 피크닉",
     description: "도심 속 감성 피크닉 프로포즈",
     tags: ["피크닉", "감성", "야경"],
-    icon: "🧺",
+    icon: "picnic",
     image: "/images/hangang.jpg",
   },
   {
@@ -45,7 +45,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "루프탑",
     description: "야경이 아름다운 루프탑에서 로맨틱하게",
     tags: ["야경", "분위기", "감성"],
-    icon: "🌃",
+    icon: "rooftop",
     image: "/images/rooftop.jpg",
   },
   {
@@ -53,7 +53,7 @@ export const weddingHallList: BuilderItem[] = [
     name: "펜션/풀빌라",
     description: "둘만의 공간에서 프라이빗한 프로포즈",
     tags: ["숙박", "프라이빗", "감성"],
-    icon: "🏡",
+    icon: "house",
     image: "/images/poolvilla.jpg",
   },
 ];
@@ -64,7 +64,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "로맨틱",
     description: "장미와 촛불이 가득한 분위기",
     tags: ["꽃", "캔들"],
-    icon: "🌹",
+    icon: "rose",
     image: "/images/romantic.jpg",
   },
   {
@@ -72,7 +72,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "우아한",
     description: "고급스럽고 클래식한 분위기",
     tags: ["클래식", "호텔"],
-    icon: "✨",
+    icon: "elegant",
     image: "/images/elegant.jpg",
   },
   {
@@ -80,7 +80,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "아늑한",
     description: "따뜻하고 편안한 공간",
     tags: ["감성", "조명"],
-    icon: "🕯️",
+    icon: "cozy",
     image: "/images/cozy.jpg",
   },
   {
@@ -88,7 +88,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "활발한",
     description: "즐겁고 유쾌한 분위기",
     tags: ["파티", "이벤트"],
-    icon: "🎉",
+    icon: "party",
     image: "/images/festival.jpg",
   },
   {
@@ -96,7 +96,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "감성적",
     description: "영화 같은 순간을 연출",
     tags: ["감성", "사진"],
-    icon: "💖",
+    icon: "emotional",
     image: "/images/emotional.jpg",
   },
   {
@@ -104,7 +104,7 @@ export const seudeumeList: BuilderItem[] = [
     name: "럭셔리",
     description: "호텔급 프리미엄 데코레이션",
     tags: ["프리미엄", "럭셔리"],
-    icon: "💎",
+    icon: "luxury",
     image: "/images/luxury.jpg",
   },
 ];
@@ -115,7 +115,7 @@ export const honeymoonList: BuilderItem[] = [
     name: "파인 다이닝",
     description: "코스요리와 와인이 함께하는 식사",
     tags: ["양식", "와인"],
-    icon: "🍷",
+    icon: "wine",
     image: "/images/finedining.jpg",
   },
   {
@@ -123,7 +123,7 @@ export const honeymoonList: BuilderItem[] = [
     name: "한식 정찬",
     description: "품격 있는 한식 코스",
     tags: ["한식", "정갈"],
-    icon: "🍚",
+    icon: "korean",
     image: "/images/koreanfood.jpg",
   },
   {
@@ -131,7 +131,7 @@ export const honeymoonList: BuilderItem[] = [
     name: "뷔페",
     description: "다양한 메뉴를 즐기는 식사",
     tags: ["뷔페", "가족"],
-    icon: "🍽️",
+    icon: "buffet",
     image: "/images/buffet.jpg",
   },
   {
@@ -139,7 +139,7 @@ export const honeymoonList: BuilderItem[] = [
     name: "디저트 카페",
     description: "케이크와 커피로 달콤한 마무리",
     tags: ["카페", "디저트"],
-    icon: "🍰",
+    icon: "cafe",
     image: "/images/cafe.jpg",
   },
   {
@@ -147,7 +147,7 @@ export const honeymoonList: BuilderItem[] = [
     name: "피크닉 도시락",
     description: "야외에서 즐기는 감성 도시락",
     tags: ["피크닉", "야외"],
-    icon: "🧺",
+    icon: "picnic",
     image: "/images/picnic.jpg",
   },
   {
@@ -155,17 +155,18 @@ export const honeymoonList: BuilderItem[] = [
     name: "오마카세",
     description: "프라이빗한 셰프 코스 요리",
     tags: ["일식", "프리미엄"],
-    icon: "🍣",
+    icon: "omakase",
     image: "/images/omakase.jpg",
   },
 ];
+
 export const budgetList: BuilderItem[] = [
   {
     id: 1,
     name: "100만원 이하",
     description: "0~100만원",
     tags: [],
-    icon: "💰",
+    icon: "money",
     image: "",
   },
   {
@@ -173,7 +174,7 @@ export const budgetList: BuilderItem[] = [
     name: "100~200만원",
     description: "100~200만원",
     tags: [],
-    icon: "💎",
+    icon: "gem",
     image: "",
   },
   {
@@ -181,7 +182,7 @@ export const budgetList: BuilderItem[] = [
     name: "200~300만원",
     description: "200~300만원",
     tags: [],
-    icon: "👑",
+    icon: "crown",
     image: "",
   },
   {
@@ -189,15 +190,15 @@ export const budgetList: BuilderItem[] = [
     name: "300~500만원",
     description: "300~500만원",
     tags: [],
-    icon: "⭐",
+    icon: "star",
     image: "",
   },
   {
     id: 5,
     name: "500만원 이상",
-    description: "",
+    description: "500만원 이상",
     tags: [],
-    icon: "✨",
+    icon: "sparkles",
     image: "",
   },
 ];

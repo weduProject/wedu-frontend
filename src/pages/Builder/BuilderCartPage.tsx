@@ -1,131 +1,288 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../components"; 
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Heart,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
+
+import { Button } from "../../components";
 import { useBuilder } from "./BuilderContext";
-import { getRecommendedProducts, type RecommendedItem } from "./builderUtils"; 
+import { BuilderIcon } from "./builderIcons";
+import {
+  buildRecommendationParams,
+  fetchRecommendations,
+  fetchWishlistProductIds,
+  addToWishlist,
+  removeFromWishlist,
+  type RecommendedProduct,
+} from "./builderApi";
 
 export default function BuilderCartPage() {
   const navigate = useNavigate();
-  const { builder, reset } = useBuilder();
+  const { builder } = useBuilder();
 
-  const [cartItems, setCartItems] = useState<RecommendedItem[]>(() => {
-    return getRecommendedProducts(builder);
-  });
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const removeItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  // 상품별 찜 상태 + 처리중 여부
+  const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
+  const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+
+  /**
+   * 빌더에서 선택한 장르 + 예산 기준으로 실제 추천 상품과, 이미 찜해둔 상품 목록을 함께 불러온다.
+   */
+  const loadData = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const { genres, minPrice, maxPrice } = buildRecommendationParams(builder);
+
+      const [products, wishlistIds] = await Promise.all([
+        fetchRecommendations({ genres, minPrice, maxPrice }),
+        fetchWishlistProductIds().catch(() => new Set<number>()),
+      ]);
+
+      setRecommendedProducts(products);
+      setWishlistedIds(wishlistIds);
+    } catch (error) {
+      console.error("추천 상품 조회 실패:", error);
+      setLoadError("추천 상품을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const totalPrice = recommendedProducts.reduce((sum, p) => sum + p.price, 0);
+
+  /**
+   * 찜하기 / 찜 취소 토글.
+   * 실제 스펙에는 프로포즈 전용 "장바구니" API가 없어, 담아두는 동작은
+   * 문서화된 Wishlist API(POST/DELETE /api/wishlists/items/{productId})로 처리한다.
+   */
+  const toggleWishlist = async (product: RecommendedProduct) => {
+    if (pendingIds.has(product.id)) return;
+
+    const isWishlisted = wishlistedIds.has(product.id);
+    setPendingIds((prev) => new Set(prev).add(product.id));
+
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(product.id);
+        setWishlistedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(product.id);
+          return next;
+        });
+      } else {
+        await addToWishlist(product.id);
+        setWishlistedIds((prev) => new Set(prev).add(product.id));
+      }
+    } catch (error) {
+      console.error("찜하기 처리 실패:", error);
+      alert("찜하기 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }
   };
 
-  const handleRestart = () => {
-    reset();
-    navigate("/builder-start");
-  };
+  const handleAddAllToWishlist = async () => {
+    const targets = recommendedProducts.filter((p) => !wishlistedIds.has(p.id));
+    if (targets.length === 0) {
+      alert("이미 모든 추천 상품을 찜하셨어요.");
+      return;
+    }
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const maxPrice = Math.floor(totalPrice * 1.3);
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      targets.forEach((p) => next.add(p.id));
+      return next;
+    });
+
+    try {
+      await Promise.all(targets.map((p) => addToWishlist(p.id)));
+      setWishlistedIds((prev) => {
+        const next = new Set(prev);
+        targets.forEach((p) => next.add(p.id));
+        return next;
+      });
+      alert("추천 상품을 찜 목록에 담았습니다.");
+    } catch (error) {
+      console.error("추천 상품 찜하기 실패:", error);
+      alert("찜하기에 실패했습니다.");
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        targets.forEach((p) => next.delete(p.id));
+        return next;
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-32">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex justify-between items-end mb-10 px-2">
-          <div>
-            <h1 className="text-3xl font-bold mb-3 text-gray-900">프로포즈 장바구니</h1>
-            <p className="text-gray-500 text-[15px]">선택한 상품들을 확인하고 관리하세요</p>
+    <div className="min-h-screen bg-[#FDFBF9] pb-24">
+      <div className="mx-auto max-w-5xl px-4 pt-10">
+
+        {/* 뒤로가기 */}
+        <button
+          type="button"
+          onClick={() => navigate("/builder")}
+          className="mb-8 flex items-center gap-2 rounded-full border border-gray-100 bg-white px-5 py-2.5 text-[13px] font-bold text-gray-500 shadow-sm transition hover:text-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          빌더로 돌아가기
+        </button>
+
+        {/* 제목 */}
+        <div className="mb-10">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF0E8] text-[#F2705C]">
+              <ShoppingCart className="h-6 w-6" />
+            </div>
+
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                맞춤 추천 결과
+              </h1>
+
+              <p className="mt-1 text-sm text-gray-500">
+                선택하신 스타일과 예산에 맞춰 추천된 상품이에요. 마음에 드는 상품을 찜해보세요.
+              </p>
+            </div>
           </div>
-          <button
-            onClick={clearCart}
-            className="text-[13px] font-medium text-gray-400 hover:text-gray-900 transition-colors"
-          >
-            전체 비우기
-          </button>
         </div>
 
-        <div className="space-y-4 mb-12">
-          {cartItems.length > 0 ? (
-            cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between p-6 bg-white border border-gray-100 rounded-[1.5rem] shadow-[0_2px_12px_rgba(0,0,0,0.02)]"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 flex items-center justify-center rounded-2xl text-2xl bg-gray-50">
-                    {item.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] text-gray-900">{item.title}</h3>
-                    <p className="text-[12px] font-medium text-gray-400 mt-1">{item.category}</p>
-                  </div>
-                </div>
+        {/* 추천 상품 */}
+        <div className="rounded-[2rem] border border-[#FFE0DC] bg-[#FFF8F6] p-6 md:p-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">
+                빌더 추천 상품
+              </h2>
 
-                <div className="flex items-center gap-6">
-                  <span className="font-bold text-[16px] text-gray-900">
-                    {item.displayPrice}
-                  </span>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors text-lg"
-                    aria-label="삭제"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="py-20 text-center bg-white border border-gray-100 rounded-[1.5rem] shadow-sm">
-              <div className="text-4xl mb-4 opacity-30">🛒</div>
-              <p className="text-gray-500 font-medium">장바구니가 비어있습니다.</p>
+              <p className="mt-1 text-sm text-gray-500">
+                선택하신 조건에 맞춰 추천된 상품입니다.
+              </p>
             </div>
+
+            {!isLoading && recommendedProducts.length > 0 && (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#F2705C]">
+                {recommendedProducts.length}개
+              </span>
+            )}
+          </div>
+
+          {isLoading ? (
+            <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-gray-400">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              추천 상품을 불러오는 중...
+            </div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center">
+              <p className="text-sm text-gray-400">{loadError}</p>
+              <Button variant="secondary" size="sm" onClick={loadData}>
+                다시 시도
+              </Button>
+            </div>
+          ) : recommendedProducts.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-gray-400">
+              <Sparkles className="h-8 w-8 text-gray-300" />
+              <p className="text-sm">선택한 조건에 맞는 추천 상품이 없습니다.</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6 space-y-3">
+                {recommendedProducts.map((product) => {
+                  const isWishlisted = wishlistedIds.has(product.id);
+                  const isPending = pendingIds.has(product.id);
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-white bg-white p-4 shadow-sm"
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#FFF5F4] text-[#F48171]">
+                          <BuilderIcon icon={product.iconKey} className="h-5 w-5" />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold text-gray-900">
+                            {product.title}
+                          </p>
+
+                          <p className="mt-1 text-xs text-gray-400">
+                            {product.category}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="text-sm font-bold text-gray-900">
+                          {product.price.toLocaleString()}원
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleWishlist(product)}
+                          disabled={isPending}
+                          aria-pressed={isWishlisted}
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${
+                            isWishlisted
+                              ? "border-[#F48171] bg-[#FFF0EE] text-[#F48171]"
+                              : "border-gray-200 text-gray-300 hover:text-[#F48171]"
+                          } ${isPending ? "opacity-50" : ""}`}
+                        >
+                          {isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Heart className="h-4 w-4" fill={isWishlisted ? "currentColor" : "none"} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <Button
+                type="button"
+                onClick={handleAddAllToWishlist}
+                className="w-full rounded-full border-none bg-gradient-to-r from-[#F89685] to-[#F2705C] py-3.5 font-bold text-white shadow-md"
+              >
+                추천 상품 모두 찜하기
+                <Heart className="ml-2 inline h-4 w-4" />
+              </Button>
+
+              <div className="mt-6 flex items-center justify-between border-t border-white pt-6">
+                <span className="font-bold text-gray-700">
+                  추천 상품 합계
+                </span>
+
+                <span className="text-2xl font-bold text-[#F2705C]">
+                  {totalPrice.toLocaleString()}원
+                </span>
+              </div>
+            </>
           )}
         </div>
 
-        {/* 예상 금액 카드 */}
-        <div className="bg-[#FFF6F5] border border-[#FFE0DC] rounded-[2rem] p-8 md:p-10 mb-10 shadow-sm">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="bg-[#F89685]/20 p-2 rounded-xl text-[#F48171]">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-            </div>
-            <h3 className="font-bold text-xl text-gray-900">예상 금액</h3>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="flex justify-between items-center pb-6 border-b border-[#FFE0DC]/60">
-              <span className="text-gray-600 text-[15px] font-medium">선택한 항목</span>
-              <span className="font-bold text-gray-900">{cartItems.length}개</span>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 pt-2">
-              <div>
-                <span className="text-gray-600 text-[15px] font-medium">예상 총 비용</span>
-                <p className="text-[12px] text-gray-400 mt-1">실제 비용은 상세 옵션에 따라 변동될 수 있어요</p>
-              </div>
-              <span className="text-2xl md:text-[28px] font-bold text-gray-900 tracking-tight">
-                {totalPrice === 0 
-                  ? "0원" 
-                  : `${(totalPrice).toLocaleString()}원 ~ ${(maxPrice).toLocaleString()}원`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* 하단 버튼 영역 */}
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-8">
-          <Button 
-            variant="secondary"
-            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-[15px] bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors border-0" 
-            onClick={handleRestart}
-          >
-            계속 둘러보기
-          </Button>
-          <Button 
-            className="w-full sm:w-auto px-10 py-4 rounded-full font-bold text-[15px] text-white bg-gradient-to-r from-[#F89685] to-[#F2705C] shadow-lg shadow-[#F2705C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all border-0" 
-            onClick={() => navigate("/shop")}
-          >
-            나만의 프로포즈 다시 만들기
+        <div className="mt-6 flex justify-center">
+          <Button variant="secondary" onClick={() => navigate("/shop/wishlist")}>
+            찜 목록 전체 보기
           </Button>
         </div>
       </div>

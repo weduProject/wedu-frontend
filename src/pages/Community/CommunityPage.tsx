@@ -145,18 +145,23 @@ export default function CommunityPage() {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {pagedPosts.length > 0 ? (
             pagedPosts.map((post) => (
-              <CommunityCard key={post.id} post={post} />
+              <CommunityCard
+                key={post.id}
+                post={post}
+              />
             ))
           ) : (
             <div className="col-span-1 mt-4 flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-gray-200 bg-white py-32 text-center shadow-sm md:col-span-2">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-300">
                 <span className="text-4xl">💬</span>
               </div>
-              <p className="mb-6 text-gray-500 font-medium">아직 해당하는 게시글이 없어요</p>
+
+              <p className="mb-6 text-gray-500 font-medium">
+                아직 해당하는 게시글이 없어요
+              </p>
             </div>
           )}
         </div>
-
         {/* 페이지네이션 */}
         {totalPages > 1 && (
           <div className="mt-12 flex justify-center gap-2">

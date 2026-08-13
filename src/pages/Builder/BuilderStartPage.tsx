@@ -1,28 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components";
+import { MapPin, Drama, UtensilsCrossed, Gift, Lock, Target, ShoppingCart } from "lucide-react";
 
 const steps = [
   {
     number: "1",
-    icon: "📍",
+    icon: MapPin,
     title: "장소 선택",
     description: "어디서 프로포즈할까요?",
   },
   {
     number: "2",
-    icon: "🎭",
+    icon: Drama,
     title: "분위기 선택",
     description: "어떤 분위기를 원하세요?",
   },
   {
     number: "3",
-    icon: "🍽️",
+    icon: UtensilsCrossed,
     title: "음식 선택",
     description: "어떤 음식이 어울릴까요?",
   },
   {
     number: "4",
-    icon: "💝",
+    icon: Gift,
     title: "예산 확인",
     description: "최종 예산과 플랜 확인",
   },
@@ -30,19 +31,19 @@ const steps = [
 
 const features = [
   {
-    icon: "🔒",
+    icon: Lock,
     title: "저장되고 공유돼요",
     description: "완성된 플랜은 마이페이지에 저장되고 파트너와 공유할 수 있어요",
   },
   {
-    icon: "🎯",
+    icon: Target,
     title: "심리테스트 기반 추천",
     description: "테스트 결과에 따라 최적의 장소와 분위기를 먼저 추천해드려요",
   },
   {
-    icon: "🛒",
-    title: "한 번에 장바구니에",
-    description: "선택한 옵션들은 장바구니에 담아 한눈에 확인하고 관리할 수 있어요",
+    icon: ShoppingCart,
+    title: "한 번에 찜 목록에",
+    description: "선택한 옵션들은 찜 목록에 담아 한눈에 확인하고 관리할 수 있어요",
   },
 ];
 
@@ -77,7 +78,7 @@ export default function BuilderStartPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-bold flex items-center gap-2 text-gray-900">
-                    <span>{step.icon}</span> {step.title}
+                    <step.icon className="h-5 w-5 text-primary" strokeWidth={2} /> {step.title}
                   </h2>
                   <p className="text-gray-500 text-sm mt-1">
                     {step.description}
@@ -107,7 +108,9 @@ export default function BuilderStartPage() {
               key={idx}
               className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm text-center flex flex-col items-center hover:shadow-md transition-shadow"
             >
-              <div className="text-3xl mb-4 p-4 bg-gray-50 rounded-2xl">{feature.icon}</div>
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 text-primary">
+                <feature.icon className="h-7 w-7" strokeWidth={2} />
+              </div>
               <h3 className="font-bold text-base text-gray-900 mb-2">{feature.title}</h3>
               <p className="text-[13px] text-gray-500 leading-relaxed word-break break-keep">
                 {feature.description}

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { redirectToOAuthLogin } from '../../lib/oauth';
+import weduLogo from '../../assets/wedu-logo.png';
 
 function KakaoIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect width="20" height="20" rx="4" fill="#FEE500" />
       <path
         d="M10 4C6.686 4 4 6.134 4 8.762c0 1.696.978 3.183 2.453 4.063l-.625 2.302a.14.14 0 0 0 .213.155l2.786-1.848A7.37 7.37 0 0 0 10 13.524c3.314 0 6-2.133 6-4.762C16 6.134 13.314 4 10 4Z"
         fill="#3C1E1E"
@@ -25,11 +25,6 @@ function GoogleIcon() {
   );
 }
 
-const SOCIAL_BUTTONS = [
-  { id: 'kakao', icon: <KakaoIcon />, label: '카카오로 계속하기' },
-  { id: 'google', icon: <GoogleIcon />, label: '구글로 계속하기' },
-] as const;
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,51 +38,63 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4">
-      <div className="flex w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm bg-white rounded-3xl shadow-lg border border-gray-100 px-8 py-12 flex flex-col items-center">
 
-        <div className="flex flex-col justify-center px-10 py-14 w-full md:w-1/2">
-          <h1 className="text-4xl font-bold text-primary mb-3">WEDU</h1>
-          <p className="text-text text-sm leading-relaxed mb-10">
-            당신의 특별한 순간을<br />
-            WEDU와 함께 준비하세요.
-          </p>
-
-          {error && (
-            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-error">{error}</p>
-          )}
-
-          <div className="flex flex-col gap-3">
-            {SOCIAL_BUTTONS.map(({ id, icon, label }) => (
-              <button
-                key={id}
-                type="button"
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border text-sm text-text hover:bg-gray-50 transition-colors cursor-pointer bg-white"
-                onClick={() => handleSocialLogin(id)}
-              >
-                {icon}
-                {label}
-              </button>
-            ))}
+        {/* 로고 */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-0 mb-10">
+          <img src={weduLogo} alt="WEDU 로고" className="w-36 h-36 object-contain" />
+          <div style={{ filter: 'drop-shadow(0 4px 20px rgba(183, 110, 121, 0.45))', opacity: 1 }} className="-mt-3">
+            <span
+              className="text-3xl font-extrabold tracking-wide"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-rosegold-1) 0%, var(--color-rosegold-2) 25%, var(--color-rosegold-3) 50%, var(--color-rosegold-4) 75%, var(--color-rosegold-1) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              WEDU
+            </span>
           </div>
+          <p className="text-xs text-gray-400 text-center">특별한 순간을 함께 준비해요</p>
+        </div>
+
+        {/* 에러 */}
+        {error && (
+          <div className="w-full mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-500 text-center">
+            {error}
+          </div>
+        )}
+
+        {/* 버튼 영역 */}
+        <div className="flex flex-col gap-3 w-full">
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('kakao')}
+            className="flex items-center justify-center gap-3 w-full py-3 rounded-full bg-[#FEE500] text-sm font-bold text-[#3C1E1E] hover:brightness-95 transition cursor-pointer shadow-[0_4px_14px_rgba(254,229,0,0.45)]"
+          >
+            <KakaoIcon />
+            카카오로 계속하기
+          </button>
 
           <button
             type="button"
-            className="mt-8 text-sm text-text-muted hover:text-text transition-colors flex items-center gap-0.5 cursor-pointer bg-transparent border-0 p-0 w-fit"
-            onClick={() => navigate('/home')}
+            onClick={() => handleSocialLogin('google')}
+            className="flex items-center justify-center gap-3 w-full py-3 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.08)]"
           >
-            비회원으로 둘러보기 &gt;
+            <GoogleIcon />
+            구글로 계속하기
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate('/home')}
+            className="w-full py-3 rounded-full bg-gray-100 text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+          >
+            비회원으로 둘러보기
           </button>
         </div>
-
-        <div
-          className="hidden md:block w-1/2 bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200"
-          style={{
-            backgroundImage: `url('/hero.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
       </div>
     </div>
   );

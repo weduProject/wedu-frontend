@@ -61,6 +61,8 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/oauth2/authorization/google" element={<AuthCallbackPage />} />
+            <Route path="/oauth2/authorization/kakao" element={<AuthCallbackPage />} />
             
             <Route element={<OnboardingRoutes />}>
               <Route path="/onboarding" element={<OnboardingStartPage />} />
@@ -91,21 +93,16 @@ export default function App() {
               <Route path="/shop/cart" element={<CartPage />} />
               <Route path="/builder-start" element={<BuilderStartPage />} />
               <Route
-                path="/builder"
                 element={
                   <BuilderProvider>
-                    <BuilderPage />
+                    <Outlet />
                   </BuilderProvider>
                 }
-              />
-              <Route
-                path="/builder/cart"
-                element={
-                  <BuilderProvider>
-                    <BuilderCartPage />
-                  </BuilderProvider>
-                }
-              />
+              >
+                <Route path="/builder" element={<BuilderPage />} />
+                <Route path="/builder/cart" element={<BuilderCartPage />} />
+              </Route>
+              
               <Route path="/checklist" element={<ChecklistPage />} />
               <Route path="/shared/checklist/:token" element={<SharedChecklistPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
