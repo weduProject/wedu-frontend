@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  Image,
   MessageCircleHeart,
   Palette,
   ShieldCheck,
