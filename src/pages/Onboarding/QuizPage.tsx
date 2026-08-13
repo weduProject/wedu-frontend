@@ -103,23 +103,23 @@ export default function QuizPage() {
       </div>
 
       {/* 퀴즈 카드 */}
-      <div className="flex-1 flex flex-col px-4 py-6">
-        <div className="w-full max-w-xl mx-auto flex flex-col gap-2 my-auto">
+      <div className="flex-1 flex flex-col px-4 py-4">
+        <div className="w-full max-w-2xl mx-auto flex flex-col gap-2 flex-1">
           <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
-        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-5 flex flex-col gap-2 overflow-y-auto max-h-[65vh]">
+        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-3 flex flex-col gap-1 flex-1">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">
             문항 {current + 1} / {QUIZ_QUESTIONS.length}
           </p>
 
           {/* 질문 */}
-          <div className="text-center py-1">
-            <p className="text-2xl font-bold text-text leading-snug mb-0.5" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
-            {question.hint && <p className="text-sm text-text-muted">{question.hint}</p>}
+          <div className="text-center">
+            <p className="text-xl font-bold text-text leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
+            {question.hint && <p className="text-xs text-text-muted mt-0.5">{question.hint}</p>}
           </div>
 
           {/* 선택지 */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {question.answers.map((answer) => {
               const isSelected =
                 question.type === 'single'
@@ -144,7 +144,7 @@ export default function QuizPage() {
                     else handleOrdered(answer.value);
                   }}
                   className={clsx(
-                    'flex items-center gap-3 w-full px-4 py-3 rounded-2xl border text-left transition-all cursor-pointer',
+                    'flex items-center gap-2 w-full px-3 py-1.5 rounded-xl border text-left transition-all cursor-pointer',
                     isSelected
                       ? 'border-primary bg-primary/10 text-primary font-semibold'
                       : 'border-gray-200 bg-white text-text hover:border-primary/40 hover:bg-primary/5',
@@ -153,12 +153,12 @@ export default function QuizPage() {
                 >
                   {/* 라디오/체크 인디케이터 */}
                   <span className={clsx(
-                    'flex-none w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all',
+                    'flex-none w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
                     isSelected ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
                   )}>
-                    {isSelected && <span className="w-2.5 h-2.5 rounded-full bg-white" />}
+                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </span>
-                  <span className="text-sm">{answer.label}</span>
+                  <span className="text-xs">{answer.label}</span>
                   {question.type === 'ordered' && orderIndex !== -1 && (
                     <span className="ml-auto w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0 font-bold">
                       {orderIndex + 1}
@@ -193,13 +193,14 @@ export default function QuizPage() {
             </div>
           )}
 
+
           {/* 이전 / 도트 / 다음 */}
-          <div className="flex items-center justify-between gap-3 mt-0">
+          <div className="flex items-center justify-center gap-4 mt-auto pt-2">
             <Button variant="secondary" className="flex-none" disabled={current === 0} onClick={goPrev}>
               ← 이전
             </Button>
 
-            <div className="flex items-center gap-1 flex-1 justify-center flex-wrap">
+            <div className="flex items-center gap-1 justify-center flex-wrap">
               {QUIZ_QUESTIONS.map((_, i) => (
                 <span
                   key={i}
