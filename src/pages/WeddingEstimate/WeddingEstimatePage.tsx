@@ -120,7 +120,7 @@ export default function WeddingEstimatePage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl pb-20">
+    <div className="mx-auto max-w-5xl p-5 pt-20 md:p-8 md:pt-24">
       
       {/* 1. 페이지 헤더 */}
       <div className="mb-10 text-center">

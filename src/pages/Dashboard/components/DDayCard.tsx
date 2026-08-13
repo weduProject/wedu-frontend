@@ -60,7 +60,7 @@ export default function DDayCard({targetDate, showEditButton, onEditClick }: DDa
         <img alt="배경 이미지" className="h-full w-full object-cover" src={ddayBgImage}></img>
       </div>
         <Calendar className="mx-auto mb-3 h-10 w-10" />
-        <h3 className="mb-4 text-6xl font-bold font-serif">D-Day</h3>
+        <h3 className="mb-4 text-6xl font-bold">D-Day</h3>
         <p className="mb-4 text-sm text-center font-medium">
           결혼 날짜를 등록하고<br />남은 날을 확인해보세요
         </p>
@@ -100,7 +100,7 @@ return (
           WEDDING D-DAY
         </span>
         
-        <h2 className="mb-2 text-6xl font-extrabold font-serif tracking-tighter md:text-8xl">
+        <h2 className="mb-2 text-6xl font-extrabold tracking-tighter md:text-8xl">
           D-{timeLeft.days}
         </h2>
         

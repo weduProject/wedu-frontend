@@ -52,7 +52,7 @@ export default function DDayPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1024px] pb-20">
+    <div className="mx-auto max-w-5xl">
       <DDayCard
         targetDate={dday?.weddingDate ?? ''}
         showEditButton={true}
