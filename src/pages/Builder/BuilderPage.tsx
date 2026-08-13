@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 
+import { Button } from "../../components";
 import { useBuilder } from "./BuilderContext";
 import BuilderOptionCard from "./BuilderOptionCard";
 import { BuilderIcon } from "./builderIcons";
@@ -149,8 +150,8 @@ export default function BuilderPage() {
           : null;
 
   return (
-    <div className="min-h-screen bg-surface pt-20 pb-32">
-      <div className="max-w-[900px] mx-auto px-4">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+      <div className="max-w-[900px] mx-auto px-5 py-16 md:px-8">
         {/* 상단 프로그레스 바 */}
         <div className="flex items-center justify-center mb-10">
 
@@ -170,8 +171,8 @@ export default function BuilderPage() {
                     text-sm font-bold transition-all
                     ${
                       completed || active
-                        ? "bg-[#F48171] text-white shadow-sm"
-                        : "border border-gray-200 bg-white text-gray-400"
+                        ? "bg-primary text-white shadow-sm"
+                        : "border border-border bg-white text-text-muted"
                     }
                   `}
                 >
@@ -191,8 +192,8 @@ export default function BuilderPage() {
                       h-[2px] w-10 md:w-16
                       ${
                         currentStep > stepNumber
-                          ? "bg-[#F48171]"
-                          : "bg-gray-200"
+                          ? "bg-primary"
+                          : "bg-border"
                       }
                     `}
                   />
@@ -204,15 +205,15 @@ export default function BuilderPage() {
 
         {/* 제목 */}
         <div className="mb-12 text-center">
-          <span className="mb-4 inline-flex rounded-full bg-[#FFF5F4] px-4 py-1.5 text-[13px] font-bold text-[#F48171]">
+          <span className="mb-4 inline-flex rounded-full bg-primary-light px-4 py-1.5 text-[13px] font-bold text-primary">
             {currentInfo.step}
           </span>
 
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[32px]">
+          <h2 className="text-2xl font-bold tracking-tight text-text md:text-[32px]">
             {currentInfo.title}
           </h2>
 
-          <p className="mt-3 text-[15px] text-gray-500">
+          <p className="mt-3 text-[15px] text-text-muted">
             {currentInfo.subtitle}
           </p>
         </div>
@@ -279,22 +280,22 @@ export default function BuilderPage() {
 
             {/* 선택 결과 */}
             {currentSelectedItem && (
-              <div className="mt-8 rounded-3xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+              <div className="mt-8 rounded-3xl border border-border bg-white p-5 shadow-sm md:p-6">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FFF5F4] text-[#F48171]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-light text-primary">
                     <BuilderIcon icon={currentSelectedItem.icon} className="h-6 w-6" />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="mb-1 text-xs font-medium text-gray-400">
+                    <p className="mb-1 text-xs font-medium text-text-muted">
                       현재 선택
                     </p>
 
-                    <h3 className="truncate text-[16px] font-bold text-gray-900">
+                    <h3 className="truncate text-[16px] font-bold text-text">
                       {currentSelectedItem.name}
                     </h3>
 
-                    <p className="mt-1 truncate text-sm text-gray-500">
+                    <p className="mt-1 truncate text-sm text-text-muted">
                       {currentSelectedItem.description}
                     </p>
                   </div>
@@ -304,7 +305,7 @@ export default function BuilderPage() {
                       (tag) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-[#FFF5F4] px-3 py-1 text-[11px] font-bold text-[#F48171]"
+                          className="rounded-full bg-primary-light px-3 py-1 text-[11px] font-bold text-primary"
                         >
                           {tag}
                         </span>
@@ -322,13 +323,13 @@ export default function BuilderPage() {
           <div className="animate-fade-in space-y-8">
 
             {/* 선택 요약 */}
-            <div className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+            <div className="rounded-[2rem] border border-border bg-white p-6 shadow-sm md:p-8">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-text">
                   지금까지의 선택
                 </h3>
 
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-text-muted">
                   선택한 스타일을 한눈에 확인해보세요.
                 </p>
               </div>
@@ -350,18 +351,18 @@ export default function BuilderPage() {
                 ].map((data) => (
                   <div
                     key={data.label}
-                    className="rounded-2xl bg-[#FAFAFA] p-4"
+                    className="rounded-2xl bg-surface p-4"
                   >
-                    <p className="mb-2 text-xs font-medium text-gray-400">
+                    <p className="mb-2 text-xs font-medium text-text-muted">
                       {data.label}
                     </p>
 
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#F48171] shadow-sm">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm">
                         <BuilderIcon icon={data.item?.icon} className="h-5 w-5" />
                       </div>
 
-                      <p className="truncate text-sm font-bold text-gray-900">
+                      <p className="truncate text-sm font-bold text-text">
                         {data.item?.name ?? "-"}
                       </p>
                     </div>
@@ -373,11 +374,11 @@ export default function BuilderPage() {
             {/* 예산 */}
             <div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-text">
                   예산을 선택해주세요
                 </h3>
 
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-text-muted">
                   프로포즈에 사용할 예산을 선택해주세요.
                 </p>
               </div>
@@ -404,25 +405,25 @@ export default function BuilderPage() {
 
             {/* 추천 상품 */}
             {builder.budget && (
-              <div className="rounded-[2rem] border border-[#FFE0DC] bg-[#FFF8F6] p-6 md:p-8">
+              <div className="rounded-[2rem] border border-primary-light bg-surface p-6 md:p-8">
 
                 <div className="mb-6 flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#F48171] shadow-sm">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm">
                     <Target className="h-5 w-5" />
                   </div>
 
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-bold text-gray-900">
+                      <h3 className="text-lg font-bold text-text">
                         추천 상품
                       </h3>
 
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#F48171]">
+                      <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-primary">
                         맞춤 추천
                       </span>
                     </div>
 
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-text-muted">
                       선택하신 스타일과 예산을 기준으로 추천해드려요.
                     </p>
                   </div>
@@ -430,12 +431,12 @@ export default function BuilderPage() {
 
                 <div className="space-y-3">
                   {isLoadingRecommendations ? (
-                    <div className="flex items-center justify-center gap-2 rounded-2xl bg-white p-8 text-sm text-gray-400">
+                    <div className="flex items-center justify-center gap-2 rounded-2xl bg-white p-8 text-sm text-text-muted">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       맞춤 상품을 찾고 있어요...
                     </div>
                   ) : recommendationError ? (
-                    <div className="rounded-2xl bg-white p-6 text-center text-sm text-gray-400">
+                    <div className="rounded-2xl bg-white p-6 text-center text-sm text-text-muted">
                       {recommendationError}
                     </div>
                   ) : recommendedProducts.length > 0 ? (
@@ -445,35 +446,35 @@ export default function BuilderPage() {
                         className="flex items-center justify-between gap-4 rounded-2xl border border-white bg-white p-4 shadow-sm"
                       >
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#FFF5F4] text-[#F48171]">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary">
                             <BuilderIcon icon={product.iconKey} className="h-5 w-5" />
                           </div>
 
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-bold text-gray-900">
+                            <p className="truncate text-sm font-bold text-text">
                               {product.title}
                             </p>
 
-                            <p className="mt-1 text-xs text-gray-400">
+                            <p className="mt-1 text-xs text-text-muted">
                               {product.category}
                             </p>
                           </div>
                         </div>
 
-                        <span className="shrink-0 text-sm font-bold text-gray-900">
+                        <span className="shrink-0 text-sm font-bold text-text">
                           {product.price.toLocaleString()}원
                         </span>
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-2xl bg-white p-6 text-center text-sm text-gray-400">
+                    <div className="rounded-2xl bg-white p-6 text-center text-sm text-text-muted">
                       선택한 조건에 맞는 추천 상품이 없습니다.
                     </div>
                   )}
                 </div>
 
-                <div className="mt-5 flex items-center gap-2 rounded-xl bg-white/70 px-4 py-3 text-xs text-gray-500">
-                  <ShoppingCart className="h-4 w-4 text-[#F48171]" />
+                <div className="mt-5 flex items-center gap-2 rounded-xl bg-white/70 px-4 py-3 text-xs text-text-muted">
+                  <ShoppingCart className="h-4 w-4 text-primary" />
                   다음 단계에서 추천 상품을 찜 목록에 담을 수 있습니다.
                 </div>
               </div>
@@ -482,30 +483,21 @@ export default function BuilderPage() {
         )}
 
         {/* 하단 버튼 */}
-        <div className="mt-12 flex items-center justify-between border-t border-gray-100 pt-6">
+        <div className="mt-12 flex items-center justify-between border-t border-border pt-6">
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={handlePrev}
-            className="flex items-center gap-1 rounded-full px-4 py-3 text-sm font-medium text-gray-500 transition hover:bg-white hover:text-gray-900"
+            className="flex items-center gap-1 border-0 shadow-none"
           >
             <ChevronLeft className="h-4 w-4" />
             이전
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
             onClick={handleNext}
             disabled={!canNext}
-            className={`
-              flex items-center gap-1.5 rounded-full px-7 py-3.5
-              text-sm font-bold transition-all
-              ${
-                canNext
-                  ? "bg-gradient-to-r from-[#F89685] to-[#F2705C] text-white shadow-md hover:-translate-y-0.5 hover:shadow-lg"
-                  : "cursor-not-allowed bg-gray-200 text-gray-400"
-              }
-            `}
+            className="flex items-center gap-1.5"
           >
             {currentStep === 1 && "다음: 분위기 선택"}
             {currentStep === 2 && "다음: 음식 선택"}
@@ -521,7 +513,7 @@ export default function BuilderPage() {
             {currentStep !== 4 && (
               <ChevronRight className="h-4 w-4" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

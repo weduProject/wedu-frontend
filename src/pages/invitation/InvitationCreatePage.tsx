@@ -8,17 +8,19 @@ import {
   Image as ImageIcon,
   MessageCircleHeart,
   Palette,
-  Plus,
   Trash2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
+import { Button, SelectableCard } from "../../components";
 
 import {
   InvitationTextField,
   InvitationTextArea,
   InvitationSectionTitle,
   InvitationAccountRow,
+  InvitationAddButton,
 } from "./components/InvitationFormControls";
 
 type SectionKey =
@@ -190,26 +192,26 @@ export default function InvitationCreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f6]">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       {/* 상단 헤더 */}
-      <section className="border-b border-[#eadfd8] bg-white">
+      <section className="border-b border-border bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 md:px-8 md:py-14">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-[#B76E79]">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
             INVITATION
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-[#302a28] md:text-4xl">
+          <h1 className="text-2xl font-bold tracking-tight text-text md:text-4xl">
             모바일 청첩장 만들기
           </h1>
 
-          <p className="mt-3 text-sm leading-6 text-[#8b817d] md:text-base">
+          <p className="mt-3 text-sm leading-6 text-text-muted md:text-base">
             소중한 순간을 담은 나만의 모바일 청첩장을 만들어보세요.
           </p>
         </div>
       </section>
 
       {/* 단계 네비게이션 */}
-      <div className="sticky top-0 z-30 border-b border-[#eadfd8] bg-white/95 backdrop-blur">
+      <div className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-6xl overflow-x-auto px-4 py-3">
           <div className="flex min-w-max justify-center gap-2">
             {sections.map((section, index) => {
@@ -222,9 +224,7 @@ export default function InvitationCreatePage() {
                   type="button"
                   onClick={() => setActiveSection(section.key)}
                   className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition md:text-sm ${
-                    active
-                      ? "bg-[#B76E79] text-white shadow-sm"
-                      : "bg-[#faf8f6] text-[#8b817d] hover:bg-[#f2ebe7]"
+                    active ? "category-tab-active" : "category-tab-inactive"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -245,7 +245,7 @@ export default function InvitationCreatePage() {
       <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
           {/* 입력 영역 */}
-          <section className="rounded-[28px] border border-[#eadfd8] bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10">
+          <section className="rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10">
             {/* 기본 정보 */}
             {activeSection === "basic" && (
               <div className="space-y-10">
@@ -301,7 +301,7 @@ export default function InvitationCreatePage() {
                 </div>
 
                 <div>
-                  <h3 className="mb-5 text-sm font-bold text-[#4d4541]">
+                  <h3 className="mb-5 text-sm font-bold text-text">
                     혼주 정보
                   </h3>
 
@@ -445,14 +445,14 @@ export default function InvitationCreatePage() {
                   placeholder="예: 2호선 강남역 3번 출구 도보 5분"
                 />
 
-                <div className="rounded-2xl border border-dashed border-[#d8c5bc] bg-[#faf8f6] p-8 text-center">
-                  <MapPin className="mx-auto mb-3 h-8 w-8 text-[#B76E79]" />
+                <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
+                  <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
 
-                  <p className="text-sm font-semibold text-[#514944]">
+                  <p className="text-sm font-semibold text-text">
                     지도 영역
                   </p>
 
-                  <p className="mt-1 text-xs text-[#9a908b]">
+                  <p className="mt-1 text-xs text-text-muted">
                     실제 지도 API 연결은 추후 진행합니다.
                   </p>
                 </div>
@@ -480,22 +480,18 @@ export default function InvitationCreatePage() {
                 ).map(({ key, label }) => (
                   <div key={key}>
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-[#4d4541]">
+                      <h3 className="text-sm font-bold text-text">
                         {label}
                       </h3>
 
-                      <button
-                        type="button"
+                      <InvitationAddButton
+                        label="계좌 추가"
                         onClick={() => addAccount(key)}
-                        className="flex items-center gap-1.5 rounded-full border border-[#d9b1b7] px-4 py-2 text-xs font-bold text-[#B76E79] transition hover:bg-[#faf0f1]"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        계좌 추가
-                      </button>
+                      />
                     </div>
 
                     {form[key].length === 0 ? (
-                      <div className="rounded-2xl bg-[#faf8f6] py-10 text-center text-sm text-[#a59b96]">
+                      <div className="rounded-2xl bg-surface py-10 text-center text-sm text-text-muted">
                         등록된 계좌가 없습니다.
                       </div>
                     ) : (
@@ -537,38 +533,33 @@ export default function InvitationCreatePage() {
                   갤러리
                 </InvitationSectionTitle>
 
-                <div className="rounded-2xl bg-[#faf8f6] p-5">
+                <div className="rounded-2xl bg-surface p-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-bold text-[#4d4541]">
+                      <p className="text-sm font-bold text-text">
                         사진 추가
                       </p>
 
-                      <p className="mt-1 text-xs text-[#9a908b]">
+                      <p className="mt-1 text-xs text-text-muted">
                         청첩장에 보여줄 사진을 추가해주세요.
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={addGallery}
-                      className="flex items-center gap-1.5 rounded-full bg-[#B76E79] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#a95f6b]"
-                    >
-                      <Plus className="h-4 w-4" />
-                      사진 추가
-                    </button>
+                    <Button variant="main" size="sm" onClick={addGallery}>
+                      + 사진 추가
+                    </Button>
                   </div>
                 </div>
 
                 {form.gallery.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[#d8c5bc] py-16 text-center">
-                    <ImageIcon className="mx-auto mb-3 h-9 w-9 text-[#c9b8b0]" />
+                  <div className="rounded-2xl border border-dashed border-border py-16 text-center">
+                    <ImageIcon className="mx-auto mb-3 h-9 w-9 text-text-muted" />
 
-                    <p className="text-sm font-semibold text-[#766c67]">
+                    <p className="text-sm font-semibold text-text">
                       아직 추가된 사진이 없어요.
                     </p>
 
-                    <p className="mt-1 text-xs text-[#aaa09b]">
+                    <p className="mt-1 text-xs text-text-muted">
                       사진 추가 버튼을 눌러주세요.
                     </p>
                   </div>
@@ -577,10 +568,10 @@ export default function InvitationCreatePage() {
                     {form.gallery.map((image, index) => (
                       <div
                         key={index}
-                        className="relative rounded-2xl border border-[#eadfd8] bg-white p-3"
+                        className="relative rounded-2xl border border-border bg-white p-3"
                       >
                         {image ? (
-                          <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-[#f3eeeb]">
+                          <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-surface">
                             <img
                               src={image}
                               alt=""
@@ -588,8 +579,8 @@ export default function InvitationCreatePage() {
                             />
                           </div>
                         ) : (
-                          <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-[#f3eeeb]">
-                            <ImageIcon className="h-8 w-8 text-[#c7bab3]" />
+                          <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-surface">
+                            <ImageIcon className="h-8 w-8 text-text-muted" />
                           </div>
                         )}
 
@@ -602,7 +593,7 @@ export default function InvitationCreatePage() {
                             )
                           }
                           placeholder="이미지 URL"
-                          className="w-full rounded-xl border border-[#e3d8d2] bg-[#faf8f6] px-4 py-3 text-sm outline-none transition focus:border-[#B76E79]"
+                          className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition focus:border-primary"
                         />
 
                         <button
@@ -610,7 +601,7 @@ export default function InvitationCreatePage() {
                           onClick={() =>
                             removeGallery(index)
                           }
-                          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#8d817c] shadow-sm transition hover:text-red-500"
+                          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-text-muted shadow-sm transition hover:text-red-500"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -656,7 +647,7 @@ export default function InvitationCreatePage() {
                 </InvitationSectionTitle>
 
                 <div>
-                  <p className="mb-4 text-sm font-bold text-[#4d4541]">
+                  <p className="mb-4 text-sm font-bold text-text">
                     메인 색상
                   </p>
 
@@ -666,20 +657,16 @@ export default function InvitationCreatePage() {
                         form.mainColor === color.value;
 
                       return (
-                        <button
+                        <SelectableCard
                           key={color.value}
-                          type="button"
+                          isSelected={selected}
                           onClick={() =>
                             updateField(
                               "mainColor",
                               color.value
                             )
                           }
-                          className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                            selected
-                              ? "border-[#B76E79] bg-[#faf0f1] shadow-sm"
-                              : "border-[#eadfd8] hover:bg-[#faf8f6]"
-                          }`}
+                          className="flex items-center gap-3"
                         >
                           <span
                             className="h-8 w-8 shrink-0 rounded-full border border-white shadow-sm"
@@ -692,21 +679,21 @@ export default function InvitationCreatePage() {
                           <span
                             className={`text-xs font-semibold ${
                               selected
-                                ? "text-[#B76E79]"
-                                : "text-[#716762]"
+                                ? "text-primary"
+                                : "text-text-muted"
                             }`}
                           >
                             {color.name}
                           </span>
-                        </button>
+                        </SelectableCard>
                       );
                     })}
                   </div>
                 </div>
 
                 {/* 미리보기 */}
-                <div className="rounded-[28px] bg-[#faf8f6] p-6">
-                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[#9a908b]">
+                <div className="rounded-[28px] bg-surface p-6">
+                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-text-muted">
                     Preview
                   </p>
 
@@ -730,15 +717,15 @@ export default function InvitationCreatePage() {
                     </div>
 
                     <div className="px-6 py-10 text-center">
-                      <p className="text-lg font-semibold text-[#403936]">
+                      <p className="text-lg font-semibold text-text">
                         {form.groomName || "신랑"}{" "}
-                        <span className="mx-2 text-[#B76E79]">
+                        <span className="mx-2 text-primary">
                           &
                         </span>{" "}
                         {form.brideName || "신부"}
                       </p>
 
-                      <p className="mt-3 text-sm text-[#8d817c]">
+                      <p className="mt-3 text-sm text-text-muted">
                         {form.weddingDate ||
                           "2026. 00. 00."}
                       </p>
@@ -749,50 +736,49 @@ export default function InvitationCreatePage() {
             )}
 
             {/* 하단 네비게이션 */}
-            <div className="mt-12 flex items-center justify-between border-t border-[#eee6e1] pt-7">
-              <button
-                type="button"
+            <div className="mt-12 flex items-center justify-between border-t border-border pt-7">
+              <Button
+                variant="secondary"
                 onClick={goPrev}
                 disabled={currentIndex === 0}
-                className="flex items-center gap-1 rounded-full px-5 py-3 text-sm font-semibold text-[#817670] transition hover:bg-[#faf8f6] disabled:cursor-not-allowed disabled:opacity-30"
+                className="flex items-center gap-1"
               >
                 <ChevronLeft className="h-4 w-4" />
                 이전
-              </button>
+              </Button>
 
-              <span className="rounded-full bg-[#faf8f6] px-4 py-2 text-xs font-bold text-[#9a908b]">
+              <span className="rounded-full bg-surface px-4 py-2 text-xs font-bold text-text-muted">
                 {currentIndex + 1} / {sections.length}
               </span>
 
               {currentIndex < sections.length - 1 ? (
-                <button
-                  type="button"
+                <Button
+                  variant="main"
                   onClick={goNext}
-                  className="flex items-center gap-1 rounded-full bg-[#B76E79] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#a95f6b]"
+                  className="flex items-center gap-1"
                 >
                   다음
                   <ChevronRight className="h-4 w-4" />
-                </button>
+                </Button>
               ) : (
-                <button
-                  type="button"
+                <Button
+                  variant="main"
                   onClick={() => navigate("/invitation")}
-                  className="rounded-full bg-[#B76E79] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#a95f6b]"
                 >
                   미리보기
-                </button>
+                </Button>
               )}
             </div>
           </section>
 
           {/* 오른쪽 미니 미리보기 */}
           <aside className="hidden lg:block">
-            <div className="sticky top-24 rounded-[28px] border border-[#eadfd8] bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)]">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#9a908b]">
+            <div className="sticky top-24 rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)]">
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-text-muted">
                 Preview
               </p>
 
-              <div className="overflow-hidden rounded-[24px] border border-[#eee5e0]">
+              <div className="overflow-hidden rounded-[24px] border border-border">
                 <div
                   className="px-5 py-14 text-center text-white"
                   style={{
@@ -810,34 +796,34 @@ export default function InvitationCreatePage() {
                 </div>
 
                 <div className="px-5 py-8 text-center">
-                  <p className="text-sm font-semibold text-[#413a37]">
+                  <p className="text-sm font-semibold text-text">
                     {form.groomName || "신랑"}{" "}
-                    <span className="mx-1 text-[#B76E79]">
+                    <span className="mx-1 text-primary">
                       &
                     </span>{" "}
                     {form.brideName || "신부"}
                   </p>
 
-                  <div className="mx-auto my-5 h-px w-10 bg-[#d8c5bc]" />
+                  <div className="mx-auto my-5 h-px w-10 bg-border" />
 
-                  <p className="text-xs leading-5 text-[#8d817c]">
+                  <p className="text-xs leading-5 text-text-muted">
                     {form.weddingDate ||
                       "2026. 00. 00."}
                   </p>
 
-                  <p className="mt-1 text-xs text-[#8d817c]">
+                  <p className="mt-1 text-xs text-text-muted">
                     {form.venueName ||
                       "예식장"}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-5 rounded-2xl bg-[#faf8f6] p-4">
-                <p className="text-xs font-semibold text-[#716762]">
+              <div className="mt-5 rounded-2xl bg-surface p-4">
+                <p className="text-xs font-semibold text-text-muted">
                   현재 단계
                 </p>
 
-                <p className="mt-1 text-sm font-bold text-[#B76E79]">
+                <p className="mt-1 text-sm font-bold text-primary">
                   {sections[currentIndex].label}
                 </p>
               </div>

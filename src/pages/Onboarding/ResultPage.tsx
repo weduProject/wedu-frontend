@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useOnboarding } from './OnboardingContext';
+import { Button } from '../../components';
 
 // ─── 스타일 데이터 ─────────────────────────────────────────────
 const STYLE_DATA: Record<string, {
@@ -132,7 +133,7 @@ export default function ResultPage() {
           <span className="mb-4 inline-block rounded-full border border-primary px-4 py-1 text-xs font-semibold text-primary">
             테스트 완료!
           </span>
-          <h1 className="mb-2 text-3xl font-bold text-text" style={{ fontFamily: 'var(--font-serif)' }}>
+          <h1 className="mb-2 text-3xl font-bold text-text font-serif">
             두 분의 프로포즈 스타일은
           </h1>
           <p className="text-sm text-text-muted">나의 성향과 파트너의 MBTI를 분석한 결과예요</p>
@@ -179,7 +180,7 @@ export default function ResultPage() {
                 </span>
                 <div>
                   <p className="mb-1 text-xs text-text-muted">추천 프로포즈 스타일</p>
-                  <p className="flex items-center gap-2 text-2xl font-bold text-text" style={{ fontFamily: 'var(--font-serif)' }}>
+                  <p className="flex items-center gap-2 text-2xl font-bold text-text font-serif">
                     <StyleIcon className="h-6 w-6 text-primary" strokeWidth={1.8} />
                     {style.name}
                   </p>
@@ -194,7 +195,7 @@ export default function ResultPage() {
                 <p className="mb-2 text-xs text-text-muted">추천 장소</p>
                 <div className="flex flex-wrap gap-1.5">
                   {style.places.map((p) => (
-                    <span key={p} className="rounded-full border border-border bg-[#FAF8F4] px-3 py-1 text-xs text-text-muted">
+                    <span key={p} className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-muted">
                       {p}
                     </span>
                   ))}
@@ -204,7 +205,7 @@ export default function ResultPage() {
                 <p className="mb-2 text-xs text-text-muted">분위기 키워드</p>
                 <div className="flex flex-wrap gap-1.5">
                   {style.keywords.map((k) => (
-                    <span key={k} className="rounded-full border border-border bg-[#FAF8F4] px-3 py-1 text-xs text-text-muted">
+                    <span key={k} className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-muted">
                       {k}
                     </span>
                   ))}
@@ -233,29 +234,16 @@ export default function ResultPage() {
 
         {/* 하단 버튼 */}
         <div className="mt-6 flex gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/shop')}
-            className="flex-1 rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
+          <Button className="flex-1" onClick={() => navigate('/shop')}>
             프로포즈 상품 보러가기
-          </button>
-          <button
-            type="button"
-            onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}
-            className="rounded-full border border-border bg-white px-5 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50 whitespace-nowrap"
-          >
+          </Button>
+          <Button variant="secondary" className="whitespace-nowrap" onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}>
             다시 테스트하기
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('/mypage/dashboard')}
-            className="rounded-full border border-border bg-white px-5 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50 whitespace-nowrap"
-          >
+          </Button>
+          <Button variant="secondary" className="whitespace-nowrap" onClick={() => navigate('/mypage/dashboard')}>
             대시보드로 가기
-          </button>
+          </Button>
         </div>
-
       </div>
     </div>
   );

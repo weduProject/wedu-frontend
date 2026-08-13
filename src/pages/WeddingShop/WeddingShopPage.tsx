@@ -24,7 +24,11 @@ export default function WeddingShopPage() {
               Wedding Lookbook
             </span>
             <h1 className="max-w-3xl text-[60px] font-semibold leading-15 tracking-[-1.5px] text-white">당신의 웨딩을 완성할 룩북</h1>
-            <p className="mt-6 max-w-xl text-lg leading-7 text-white/70">베뉴부터 드레스, 허니문까지 — 실제 웨딩 업체들의 포트폴리오를 룩북처럼 만나보세요.</p>
+            <p className="mt-6 max-w-xl text-lg leading-7 text-white/70">
+            웨딩홀부터 드레스, 허니문까지 
+            <br />
+            실제 웨딩 업체들의 포트폴리오를 룩북처럼 만나보세요.
+            </p>
           </div>
         </div>
       </section>
