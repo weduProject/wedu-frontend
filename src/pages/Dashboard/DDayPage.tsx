@@ -6,6 +6,7 @@ import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown,
 import { useChecklist } from "../Checklist/hooks/useChecklist";
 import { useDDay } from "../../contexts/DDayContext";
 import { useAuth } from "../../contexts/AuthContext";
+import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 
 const ANNIVERSARIES = [
   { id: 1, title: '처음 만난 날', desc: '운명적인 첫 만남, 모든 것이 시작된 순간.', icon: <Heart className="h-4 w-4" /> },
@@ -15,12 +16,13 @@ const ANNIVERSARIES = [
 ];
 
 export default function DDayPage() {
-  const { dday, createDDay, updateDDay } = useDDay();
+  const { dday, createDDay, hasDDay, updateDDay, deleteDDay } = useDDay();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { todos, toggleTodo } = useChecklist();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [tempDate, setTempDate] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export default function DDayPage() {
     setIsSaving(true);
     setSaveError(null);
     try {
-      if (dday) {
+      if (hasDDay) {
         await updateDDay(tempDate);
       } else {
         await createDDay(tempDate);
@@ -50,6 +52,16 @@ export default function DDayPage() {
       setIsSaving(false);
     }
   }
+
+  const executeDelete = async () => {
+    const success = await deleteDDay();
+    if (success) {
+      setIsDeleteModalOpen(false);
+      setIsModalOpen(false);
+    } else {
+      alert("디데이 삭제에 실패했습니다.");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -169,6 +181,17 @@ export default function DDayPage() {
               />
             </div>
             {saveError && <p className="mb-4 text-xs text-error">{saveError}</p>}
+
+            <div className="flex justify-end mt-5 mr-5">
+              {hasDDay && (
+                <button 
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="text-xs text-text-muted underline underline-offset-2 transition-colors hover:text-gray-600"
+                >
+                  내 D-day 삭제하기
+                </button>
+              )}
+            </div>
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -187,6 +210,12 @@ export default function DDayPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDeleteModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={executeDelete}
+      />
     </div>
   );
 }
