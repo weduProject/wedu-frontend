@@ -9,6 +9,8 @@ import { Button } from '../../components/index.ts';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
+import EmptyState from '../../components/ui/EmptyState.tsx';
+
 
 export type CategoryType = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';
 
@@ -77,7 +79,7 @@ export default function CalendarPage() {
         />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3 pb-6">
         <div className="lg:col-span-2">
           <CalendarGrid
             schedules={filteredSchedules}
@@ -98,16 +100,11 @@ export default function CalendarPage() {
 
       {/* 비회원일 때 보여줄 빈 화면 멘트 */}
         {!user && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border mt-10 py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
-              <Calendar className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-bold text-text">나의 일정을 관리하세요</h3>
-            <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별 일정을 관리하고 다가오는 일정을 확인할 수 있습니다.</p>
-            <Button onClick={() => navigate('/login')} className="px-6">
-              로그인하러 가기
-            </Button>
-          </div>
+          <EmptyState
+            icon={Calendar}
+            title="나의 일정을 관리하세요"
+            description="로그인 후 카테고리별 일정을 관리하고 다가오는 일정을 확인할 수 있습니다."
+          />
         )}
 
       {/* 1. 새 일정 추가 모달 (isAddModalOpen이 true일 때 뜸) */}
