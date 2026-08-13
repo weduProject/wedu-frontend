@@ -17,6 +17,8 @@ interface DDayContextValue {
   isLoading: boolean;
   createDDay: (weddingDate: string) => Promise<void>;
   updateDDay: (weddingDate: string) => Promise<void>;
+  hasDDay: boolean; 
+  deleteDDay: () => Promise<boolean>;
 }
 
 const DDayContext = createContext<DDayContextValue | null>(null);
@@ -25,6 +27,7 @@ export function DDayProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [dday, setDday] = useState<DDayResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasDDay = dday !== null;
 
   useEffect(() => {
     if (!user) {
@@ -73,8 +76,24 @@ export function DDayProvider({ children }: { children: ReactNode }) {
     setDday(body.data);
   }
 
+  async function deleteDDay(): Promise<boolean> {
+    try {
+      const res = await apiFetch('/api/ddays/me', {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setDday(null); // 삭제 성공 시 상태 초기화
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("D-Day 삭제 실패:", error);
+      return false;
+    }
+  }
+
   return (
-    <DDayContext.Provider value={{ dday, isLoading, createDDay, updateDDay }}>
+    <DDayContext.Provider value={{ dday, isLoading, createDDay, updateDDay, hasDDay, deleteDDay }}>
       {children}
     </DDayContext.Provider>
   );

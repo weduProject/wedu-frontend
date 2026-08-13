@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, HeartPlus, Star, ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from './OnboardingContext';
 
 const STEPS = [
   {
@@ -34,12 +35,13 @@ const STATS = [
 export default function OnboardingStartPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { resetQuiz } = useOnboarding();
   const isCompleted = user?.onboardingCompleted ?? false;
 
   return (
-    <div className="-mx-5 -mt-5 md:-mx-8 md:-mt-8">
+    <div className="-mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       {/* 히어로 섹션 */}
-      <section className="flex flex-col items-center justify-center bg-gradient-to-b from-rose-50 via-pink-50/40 to-white px-4 py-20 text-center">
+      <section className="flex flex-col items-center justify-center bg-surface px-4 py-20 text-center">
         <span className="mb-6 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white">
           심리테스트
         </span>
@@ -65,7 +67,7 @@ export default function OnboardingStartPage() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/onboarding/intro')}
+                onClick={() => { resetQuiz(); navigate('/onboarding/intro'); }}
                 className="rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition-colors hover:bg-gray-50"
               >
                 다시 하기
@@ -112,7 +114,7 @@ export default function OnboardingStartPage() {
       </section>
 
       {/* 통계 섹션 */}
-      <section className="bg-[#F5F2EF] px-4 py-16 text-center">
+      <section className="bg-surface px-4 py-16 text-center">
         <h2 className="mb-10 text-xl font-bold text-text">이미 많은 커플이 WEDU와 함께했어요</h2>
         <div className="mx-auto flex max-w-2xl justify-around">
           {STATS.map(({ value, label }) => (
@@ -124,16 +126,6 @@ export default function OnboardingStartPage() {
         </div>
       </section>
 
-      {/* 나중에 하기 */}
-      <div className="bg-white py-6 text-center">
-        <button
-          type="button"
-          onClick={() => navigate('/home')}
-          className="cursor-pointer border-0 bg-transparent text-sm text-text-muted transition-colors hover:text-text"
-        >
-          나중에 하기
-        </button>
-      </div>
     </div>
   );
 }

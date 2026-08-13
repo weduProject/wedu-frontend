@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
 import { Button, ProgressBar } from '../../components';
+import SelectableCard from '../../components/ui/SelectableCard';
 import { useOnboarding, QUIZ_QUESTIONS, TRAVEL_REGIONS } from './OnboardingContext';
 import type { QuizAnswers } from './OnboardingContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -86,9 +87,10 @@ export default function QuizPage() {
   const orderedSelected = (Array.isArray(currentAnswer) ? currentAnswer : []) as string[];
 
   return (
-    <div className="flex flex-col h-[calc(100svh-80px)] md:h-[calc(100svh-96px)] overflow-hidden">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+    <div className="flex flex-col min-h-[calc(100dvh-80px)] md:min-h-[calc(100dvh-96px)] px-5 md:px-8">
       {/* 고정 타이틀 영역 */}
-      <div className="shrink-0 text-center pt-4 pb-3 px-4">
+      <div className="shrink-0 text-center pt-2 pb-1 px-4">
         <button
           type="button"
           onClick={() => navigate('/onboarding/intro')}
@@ -97,29 +99,28 @@ export default function QuizPage() {
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.8} />
           테스트 안내로 돌아가기
         </button>
-        <h1 className="text-2xl font-bold text-text mb-1">나의 성향 테스트</h1>
-        <p className="text-xs text-text-muted mb-4">솔직하게 답변할수록 더 정확한 결과를 얻을 수 있어요</p>
-        <div className="max-w-md mx-auto">
-          <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
-        </div>
+        <h1 className="text-3xl font-black text-text mb-1" style={{ fontFamily: 'var(--font-serif)' }}>나의 성향 테스트</h1>
+        <p className="text-xs text-text-muted">솔직하게 답변할수록 더 정확한 결과를 얻을 수 있어요</p>
       </div>
 
       {/* 퀴즈 카드 */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-4 pb-6 overflow-y-auto">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-border/60 p-5 flex flex-col gap-3">
+      <div className="flex-1 flex flex-col px-4 py-2">
+        <div className="w-full max-w-2xl mx-auto flex flex-col gap-2 flex-1">
+          <ProgressBar value={current + 1} max={QUIZ_QUESTIONS.length} />
+        <div className="w-full bg-surface rounded-2xl shadow-sm border border-border/60 p-3 flex flex-col gap-1 flex-1 overflow-y-auto">
           {/* 문항 번호 */}
           <p className="text-xs font-semibold text-primary">
             문항 {current + 1} / {QUIZ_QUESTIONS.length}
           </p>
 
           {/* 질문 */}
-          <div>
-            <p className="text-base font-bold text-text leading-snug mb-0.5">{question.text}</p>
-            <p className="text-xs text-text-muted">{question.hint}</p>
+          <div className="text-center">
+            <p className="text-lg font-bold text-text leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>{question.text}</p>
+            {question.hint && <p className="text-xs text-text-muted">{question.hint}</p>}
           </div>
 
           {/* 선택지 */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {question.answers.map((answer) => {
               const isSelected =
                 question.type === 'single'
@@ -134,47 +135,47 @@ export default function QuizPage() {
                 !['NO_SERVICE', 'NONE', 'UNKNOWN'].includes(answer.value);
 
               return (
-                <button
+                <SelectableCard
                   key={answer.value}
-                  type="button"
+                  isSelected={isSelected}
                   disabled={isDisabled}
                   onClick={() => {
                     if (question.type === 'single') handleSingle(answer.value);
                     else if (question.type === 'multi') handleMulti(answer.value);
                     else handleOrdered(answer.value);
                   }}
-                  className={clsx(
-                    'flex items-center justify-between w-full px-4 py-2.5 rounded-xl border text-sm text-left transition-colors cursor-pointer bg-white',
-                    isSelected ? 'border-primary bg-primary/[.06] text-primary font-medium' : 'border-border text-text hover:bg-gray-50',
-                    isDisabled && 'opacity-40 cursor-not-allowed'
-                  )}
+                  className="flex items-center gap-2 !px-3 !py-1.5"
                 >
-                  <span>{answer.label}</span>
+                  {/* 라디오/체크 인디케이터 */}
+                  <span className={clsx(
+                    'flex-none w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
+                    isSelected ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
+                  )}>
+                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                  <span className={clsx('text-xs', isSelected ? 'text-primary font-semibold' : 'text-text')}>{answer.label}</span>
                   {question.type === 'ordered' && orderIndex !== -1 && (
-                    <span className="w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0">
+                    <span className="ml-auto w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center shrink-0 font-bold">
                       {orderIndex + 1}
                     </span>
                   )}
-                  {question.type === 'multi' && isSelected && (
-                    <span className="text-primary text-base leading-none shrink-0">✓</span>
-                  )}
-                </button>
+                </SelectableCard>
               );
             })}
           </div>
 
           {/* Q2 여행지 선택 */}
           {isQ2Travel && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className="text-xs font-medium text-text-muted">지역을 선택해주세요.</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1">
                 {TRAVEL_REGIONS.map((region) => (
                   <button
                     key={region.value}
                     type="button"
                     onClick={() => handleRegion(region.value)}
                     className={clsx(
-                      'px-3 py-2 rounded-lg border text-xs text-center transition-colors cursor-pointer bg-white',
+                      'px-2 py-1 rounded-lg border text-xs text-center transition-colors cursor-pointer bg-white',
                       answers.q2_region === region.value
                         ? 'border-primary bg-primary/[.06] text-primary font-medium'
                         : 'border-border text-text hover:bg-gray-50'
@@ -187,13 +188,14 @@ export default function QuizPage() {
             </div>
           )}
 
+
           {/* 이전 / 도트 / 다음 */}
-          <div className="flex items-center justify-between gap-3 mt-1">
+          <div className="flex items-center justify-center gap-4 mt-auto pt-1">
             <Button variant="secondary" className="flex-none" disabled={current === 0} onClick={goPrev}>
               ← 이전
             </Button>
 
-            <div className="flex items-center gap-1 flex-1 justify-center flex-wrap">
+            <div className="flex items-center gap-1 justify-center flex-wrap">
               {QUIZ_QUESTIONS.map((_, i) => (
                 <span
                   key={i}
@@ -215,7 +217,9 @@ export default function QuizPage() {
             </button>
           </div>
         </div>
+        </div>
       </div>
+    </div>
     </div>
   );
 }

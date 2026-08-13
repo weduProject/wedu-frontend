@@ -38,8 +38,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-lg border border-gray-100 px-8 py-12 flex flex-col items-center">
+    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8 min-h-[calc(100dvh-80px)] md:min-h-[calc(100dvh-96px)] flex flex-col px-4 py-12">
+      <div className="w-full max-w-sm bg-surface rounded-3xl shadow-lg border border-gray-100 px-8 py-12 flex flex-col items-center mx-auto my-auto">
 
         {/* 로고 */}
         <div className="flex-1 flex flex-col items-center justify-center gap-0 mb-10">

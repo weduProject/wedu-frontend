@@ -33,12 +33,12 @@ export default function DashboardSection() {
   const paidCount = budgetItems.filter((item) => item.isPaid).length;
   const totalCount = budgetItems.length;
 
-  const { todos } = useChecklist();
+  const { todos, toggleTodo } = useChecklist();
   const completedCount = todos.filter((t) => t.isCompleted).length;
   const todoTotal = todos.length;
 
   return (
-    <main className="flex flex-col gap-6">
+    <main className="mx-auto max-w-5xl flex flex-col gap-6">
       {/* 헤더 */}
       <section className="flex items-start justify-between gap-4">
         <div>
@@ -132,7 +132,11 @@ export default function DashboardSection() {
               </div>
               <div className="flex flex-col gap-1.5">
                 {todos.slice(0, 5).map((todo) => (
-                  <div key={todo.id} className="flex items-center gap-2">
+                  <div
+                    key={todo.id}
+                    onClick={() => toggleTodo(todo.id)}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-primary-light/20"
+                  >
                     <span
                       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded ${
                         todo.isCompleted ? 'bg-amber-500' : 'border border-border bg-white'
@@ -226,7 +230,7 @@ export default function DashboardSection() {
               <h3 className="text-sm font-bold text-text">프로포즈 스타일</h3>
             </div>
             {user?.onboardingCompleted && (
-              <Link to="/onboarding/quiz" className="text-xs font-medium text-primary no-underline hover:underline">
+              <Link to="/onboarding/result" className="text-xs font-medium text-primary no-underline hover:underline">
                 결과보기
               </Link>
             )}
@@ -236,7 +240,7 @@ export default function DashboardSection() {
               <>
                 <p className="mb-3 text-sm text-text-muted">심리테스트가 완료되었어요</p>
                 <Link
-                  to="/onboarding/quiz"
+                  to="/onboarding/result"
                   className="text-sm font-semibold text-primary no-underline hover:underline"
                 >
                   결과 다시 보기

@@ -45,7 +45,7 @@ export default function CommunityDetailPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFBF9] text-gray-500">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface text-gray-500">
         게시글을 찾을 수 없습니다.
 
         <br />
@@ -89,7 +89,7 @@ export default function CommunityDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pt-20 pb-24">
+    <div className="min-h-screen bg-surface pt-20 pb-24">
       <div className="mx-auto max-w-4xl px-4">
 
         {/* 목록으로 */}

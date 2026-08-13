@@ -1,5 +1,9 @@
+
 import { Routes, Route, Outlet } from 'react-router-dom';
 import { PageLayout } from './components';
+
+
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import LandingPage from './pages/Landing/LandingPage';
 import LoginPage from './pages/Login/LoginPage';
@@ -33,11 +37,28 @@ import OnboardingStartPage from './pages/Onboarding/OnboardingStartPage';
 import OnboardingIntroPage from './pages/Onboarding/OnboardingIntroPage';
 import QuizPage from './pages/Onboarding/QuizPage';
 import PartnerMbtiPage from './pages/Onboarding/PartnerMbtiPage';
+
 import { OnboardingProvider } from './pages/Onboarding/OnboardingContext';
 
 import WeddingShopPage from './pages/WeddingShop/WeddingShopPage';
 import WeddingShopDetailPage from './pages/WeddingShop/WeddingShopDetailPage';
 import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
+import ResultPage from './pages/Onboarding/ResultPage';
+import CommunityDetailPage from './pages/Community/CommunityDetailPage';
+import CommunityWritePage from './pages/Community/CommunityWritePage';
+import DDayPage from './pages/Dashboard/DDayPage';
+import { ScheduleProvider } from './pages/Calendar/hooks/useSchedules';
+import { ChecklistProvider } from './pages/Checklist/hooks/useChecklist';
+import { BudgetProvider } from './pages/Budget/hooks/useBudget';
+import { DDayProvider } from './contexts/DDayContext';
+import { BuilderProvider } from './pages/Builder/BuilderContext';
+import { CommunityProvider } from './pages/Community/CommunityContext';
+import { WishlistProvider } from './pages/Shop/WishlistContext';
+import { CartProvider } from './pages/Shop/CartContext';
+import BuilderStartPage from './pages/Builder/BuilderStartPage';
+import BuilderCartPage from './pages/Builder/BuilderCartPage';
+import ScrollToTop from './components/ScrollToTop';
+import AuthCallbackPage from './pages/Login/AuthCallbackPage';
 
 import InvitationPage from './pages/invitation/InvitationPage';
 import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
@@ -61,7 +82,7 @@ import ScrollToTop from './components/ScrollToTop';
 function OnboardingRoutes() {
   return (
     <OnboardingProvider>
-      <Outlet />
+      <PageLayout />
     </OnboardingProvider>
   );
 }
@@ -99,6 +120,10 @@ export default function App() {
                         path="/onboarding/partner"
                         element={<PartnerMbtiPage />}
                       />
+
+                      <Route path="/onboarding/partner" element={<PartnerMbtiPage />} />
+                      <Route path="/onboarding/result" element={<ResultPage />} />
+
                     </Route>
 
                     <Route element={<PageLayout />}>
