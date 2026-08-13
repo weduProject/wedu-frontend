@@ -7,6 +7,7 @@ import { formatPrice } from './utils/formatPrice';
 import { IMAGE_PLACEHOLDER_BG, CARD_BORDER } from './styles';
 import weddingShopHeroBg from '../../assets/wedding-shop/hero.jpg';
 import weddingShopCtaBg from '../../assets/wedding-shop/cta.jpg';
+import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../styles/categoryTab';
 
 export default function WeddingShopPage() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -31,11 +32,26 @@ export default function WeddingShopPage() {
       <section className="sticky top-16 z-30 border-b border-[#E7E4E3]/60 bg-[#FAF8F8]/80 backdrop-blur-[12px] md:top-20">
         <div className="mx-auto max-w-5xl px-5 md:px-8">
           <div className="flex items-center gap-3 overflow-x-auto py-4 scrollbar-hide">
-            <button type="button" onClick={() => setActiveCategory(null)} className={clsx('shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors', activeCategory === null ? 'bg-text text-white' : 'bg-[#F0EEED] text-text-muted hover:bg-[#E7E4E3]')}>
+            <button
+              type="button"
+              onClick={() => setActiveCategory(null)}
+              className={clsx(
+                'shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors',
+                activeCategory === null ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+              )}
+            >
               전체
             </button>
             {CATEGORIES.map((cat) => (
-              <button key={cat.id} type="button" onClick={() => setActiveCategory(cat.id)} className={clsx('shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors', activeCategory === cat.id ? 'bg-text text-white' : 'bg-[#F0EEED] text-text-muted hover:bg-[#E7E4E3]')}>
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                className={clsx(
+                  'shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors',
+                  activeCategory === cat.id ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+                )}
+              >
                 {cat.name}
               </button>
             ))}
