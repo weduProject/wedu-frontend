@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import type { LucideIcon } from 'lucide-react';
-import { CATEGORY_TAB_ACTIVE, CATEGORY_TAB_INACTIVE } from '../../../styles/categoryTab';
 
 interface CategoryOption {
   id: string;
@@ -33,7 +32,7 @@ export default function CategoryFilter({
                 aria-pressed={active}
                 className={clsx(
                   'flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-all',
-                  active ? CATEGORY_TAB_ACTIVE : CATEGORY_TAB_INACTIVE,
+                  active ? 'category-tab-active' : 'category-tab-inactive',
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />

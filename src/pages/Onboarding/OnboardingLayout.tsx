@@ -10,12 +10,12 @@ export default function OnboardingLayout({ children, showSkip = false }: Onboard
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-light/60 px-4 py-10">
-      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-8">
+    <div className="flex items-center justify-center py-10">
+      <div className="relative w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         {showSkip && (
           <button
             type="button"
-            className="absolute top-4 right-5 text-sm text-text-muted hover:text-text transition-colors cursor-pointer bg-transparent border-0 p-0"
+            className="absolute right-5 top-4 cursor-pointer border-0 bg-transparent text-sm text-text-muted transition-colors hover:text-text"
             onClick={() => navigate('/home')}
           >
             건너뛰기

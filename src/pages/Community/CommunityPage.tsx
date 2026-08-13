@@ -70,8 +70,8 @@ export default function CommunityPage() {
             </p>
           </div>
 
-          <button 
-            onClick={() => navigate("/community/write")} 
+          <button
+            onClick={() => navigate("/community/write")}
             className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-[#F89685] to-[#F2705C] text-white font-bold text-[15px] shadow-[0_8px_16px_rgba(242,112,92,0.25)] hover:shadow-[0_12px_20px_rgba(242,112,92,0.35)] hover:-translate-y-0.5 transition-all"
           >
             <PenLine className="w-4 h-4" />

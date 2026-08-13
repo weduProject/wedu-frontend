@@ -8,6 +8,7 @@ import {
 import BaseCard from '../../components/ui/BaseCard';
 import ProgressBar from '../../components/ui/ProgressBar';
 import Button from '../../components/ui/Button';
+import EmptyState from '../../components/ui/EmptyState';
 
 import { useBudget } from './hooks/useBudget';
 import type { BudgetCategory, BudgetItem } from './hooks/useBudget';
@@ -76,7 +77,7 @@ export default function BudgetPage() {
         };
 
   return (
-    <div className="mx-auto max-w-[1024px] pb-20">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold font-serif text-text md:text-3xl">예산 관리</h2>
@@ -88,7 +89,7 @@ export default function BudgetPage() {
       </div>
 
       {/* 1. 상단 요약 카드 3개 */}
-      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         
         {/* 1. 전체 예산 카드 */}
         <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
@@ -140,7 +141,7 @@ export default function BudgetPage() {
       </div>
 
       {/* 2. 전체 집행률 프로그레스 바 */}
-      <BaseCard className="mb-10 p-6 shadow-sm">
+      <BaseCard className="mb-6 p-6 shadow-sm">
         <div className="mb-3 flex items-end justify-between">
           <span className="text-sm font-bold text-text">전체 집행률</span>
           <span className="text-lg font-bold text-primary">{overallProgress}%</span>
@@ -158,16 +159,11 @@ export default function BudgetPage() {
       <div className="flex flex-col gap-6">
         {/* 비회원일 때 보여줄 빈 화면 멘트 */}
         {!user && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/50">
-              <Wallet className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-bold text-text">나만의 예산을 계획해보세요</h3>
-            <p className="mb-6 text-sm text-text-muted">로그인 후 카테고리별 예산을 관리하고 결제 내역을 기록할 수 있습니다.</p>
-            <Button onClick={() => navigate('/login')} className="px-6">
-              로그인하러 가기
-            </Button>
-          </div>
+          <EmptyState
+            icon={Wallet}
+            title="나만의 예산을 계획해보세요"
+            description="로그인 후 카테고리별 예산을 관리하고 결제 내역을 기록할 수 있습니다."
+          />
         )}
 
         {CATEGORIES.map(category => {
