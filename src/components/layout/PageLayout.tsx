@@ -2,7 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 
-const NO_FOOTER_PATHS = ['/onboarding/quiz'];
+const NO_FOOTER_PATHS = ['/onboarding/quiz', '/invitation/preview'];
 
 export default function PageLayout() {
   const { pathname } = useLocation();

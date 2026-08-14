@@ -103,3 +103,46 @@ export function InvitationAddButton({ label, onClick }: { label: string; onClick
     </button>
   );
 }
+
+// ─────────────────────────────────────────────────────────
+// 청첩장 작성 폼 데이터 형태 — CreatePage(작성)와 DetailPage(미리보기)가 공유
+// ─────────────────────────────────────────────────────────
+export interface InvitationDraftForm {
+  title: string;
+  groomName: string;
+  groomPhone: string;
+  brideName: string;
+  bridePhone: string;
+  groomFatherName: string;
+  groomMotherName: string;
+  brideFatherName: string;
+  brideMotherName: string;
+  weddingDate: string;
+  weddingTime: string;
+  venueName: string;
+  venueHall: string;
+  address: string;
+  addressDetail: string;
+  groomAccounts: InvitationAccount[];
+  brideAccounts: InvitationAccount[];
+  gallery: string[];
+  greetingMessage: string;
+  mainColor: string;
+}
+
+const DRAFT_STORAGE_KEY = "wedu_invitation_draft";
+
+// API 연동 전까지는 브라우저 세션에만 임시 저장해서 미리보기 화면에 전달한다.
+export function saveInvitationDraft(draft: InvitationDraftForm) {
+  sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+}
+
+export function loadInvitationDraft(): InvitationDraftForm | null {
+  const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as InvitationDraftForm;
+  } catch {
+    return null;
+  }
+}

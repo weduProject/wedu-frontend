@@ -21,6 +21,7 @@ import {
   InvitationSectionTitle,
   InvitationAccountRow,
   InvitationAddButton,
+  saveInvitationDraft,
 } from "./components/InvitationFormControls";
 
 type SectionKey =
@@ -180,15 +181,20 @@ export default function InvitationCreatePage() {
   const goNext = () => {
     if (currentIndex < sections.length - 1) {
       setActiveSection(sections[currentIndex + 1].key);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   const goPrev = () => {
     if (currentIndex > 0) {
       setActiveSection(sections[currentIndex - 1].key);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handlePreview = () => {
+    saveInvitationDraft(form);
+    navigate("/invitation/preview");
   };
 
   return (
@@ -211,7 +217,7 @@ export default function InvitationCreatePage() {
       </section>
 
       {/* 단계 네비게이션 */}
-      <div className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
+      <div className="sticky top-16 md:top-20 z-30 border-b border-border bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-6xl overflow-x-auto px-4 py-3">
           <div className="flex min-w-max justify-center gap-2">
             {sections.map((section, index) => {
@@ -222,7 +228,10 @@ export default function InvitationCreatePage() {
                 <button
                   key={section.key}
                   type="button"
-                  onClick={() => setActiveSection(section.key)}
+                  onClick={() => {
+                    setActiveSection(section.key);
+                    document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
                   className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition md:text-sm ${
                     active ? "category-tab-active" : "category-tab-inactive"
                   }`}
@@ -245,7 +254,10 @@ export default function InvitationCreatePage() {
       <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
           {/* 입력 영역 */}
-          <section className="rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10">
+          <section
+            id="invitation-form-section"
+            className="scroll-mt-[130px] rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10 md:scroll-mt-[150px]"
+          >
             {/* 기본 정보 */}
             {activeSection === "basic" && (
               <div className="space-y-10">
@@ -763,7 +775,7 @@ export default function InvitationCreatePage() {
               ) : (
                 <Button
                   variant="main"
-                  onClick={() => navigate("/invitation")}
+                  onClick={handlePreview}
                 >
                   미리보기
                 </Button>

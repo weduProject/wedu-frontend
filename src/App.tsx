@@ -177,6 +177,10 @@ export default function App() {
                         element={<InvitationCreatePage />}
                       />
                       <Route
+                        path="/invitation/preview"
+                        element={<InvitationDetailPage />}
+                      />
+                      <Route
                         path="/invitation/:id"
                         element={<InvitationDetailPage />}
                       />
