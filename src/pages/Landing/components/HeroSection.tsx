@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Header from '../../../components/layout/Header';
 import Button from '../../../components/ui/Button';
 import heroBg from '../../../assets/landing/hero-bg.jpg';
 
@@ -9,8 +8,6 @@ export default function HeroSection() {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      <Header />
-
       <div className="absolute inset-0 bg-[#463730]">
         <img
           src={heroBg}
@@ -31,13 +28,15 @@ export default function HeroSection() {
           </h1>
           <div className="mt-8 flex flex-col gap-6 md:flex-row md:gap-12">
             <p className="max-w-sm text-base leading-relaxed text-white/90 drop-shadow-md md:text-lg">
-              심리테스트로 찾는 나만의 프로포즈 스타일.
+              심리테스트로 알아가는
               <br />
-              WEDU와 함께라면 결혼 준비도 설레는 여정이 됩니다.
+              나만의 특별한 프로포즈 스타일,
+              <br />
+              WEDU와 함께 설레는 여정을 시작하세요.
             </p>
             <div className="flex flex-col gap-3 md:pt-2">
               <Button
-                variant="main"
+                variant="hero"
                 size="md"
                 onClick={() => navigate('/onboarding')}
                 className="inline-flex w-fit items-center gap-2 px-6 py-3"

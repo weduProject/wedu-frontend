@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
-type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill';
+type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill' | 'hero';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,12 +11,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const PRIMARY_GRADIENT = 'gradient-primary-bg shadow-gradient-primary';
+const PRIMARY_GRADIENT_ANIMATED = 'gradient-primary-bg-animated shadow-gradient-primary';
 
 const variantClasses: Record<ButtonVariant, string> = {
   main:      `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
   secondary: 'bg-white text-text border border-border hover:enabled:bg-primary-light/40',
   wishlist:  `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
   pill:      `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
+  // 랜딩 페이지 CTA처럼 강조가 필요한 버튼 전용 — 반짝이는 애니메이션 그라디언트
+  hero:      `${PRIMARY_GRADIENT_ANIMATED} text-white border-0 hover:enabled:opacity-90`,
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

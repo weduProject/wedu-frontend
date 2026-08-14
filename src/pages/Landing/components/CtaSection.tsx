@@ -34,10 +34,12 @@ export default function CtaSection() {
               당신만의 프로포즈
             </h2>
             <p className="mb-8 text-base leading-relaxed text-text-muted">
-              심리테스트로 성향을 분석하고, 4단계 맞춤 플래닝으로 완벽한 프로포즈를 준비하세요.
+              심리테스트로 성향을 분석하고, 4단계 맞춤 플래닝으로 
+              <br />
+              완벽한 프로포즈를 준비하세요.
             </p>
             <Button
-              variant="main"
+              variant="hero"
               size="lg"
               onClick={() => navigate('/onboarding')}
               className="inline-flex items-center gap-2"

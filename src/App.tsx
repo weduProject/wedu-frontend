@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { PageLayout } from './components';
 
 import LandingPage from './pages/Landing/LandingPage';
@@ -79,7 +79,7 @@ export default function App() {
                   <ScrollToTop />
 
                   <Routes>
-                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/auth/callback" element={<AuthCallbackPage />} />
                     <Route

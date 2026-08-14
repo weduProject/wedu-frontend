@@ -12,7 +12,7 @@ const FEATURES = [
 export default function FeatureSection() {
   return (
     <section className="bg-white py-20 md:py-28">
-      <div className="w-full px-6 md:px-16">
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
         <div className="mb-16 text-center">
           <div className="mb-8 mx-auto flex h-40 w-40 items-center justify-center md:h-52 md:w-52">
             <img
