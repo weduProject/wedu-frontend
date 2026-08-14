@@ -12,6 +12,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useOnboarding } from './OnboardingContext';
 import { Button } from '../../components';
+import CategoryBadge from '../../components/ui/CategoryBadge';
 
 // ─── 스타일 데이터 ─────────────────────────────────────────────
 const STYLE_DATA: Record<string, {
@@ -38,7 +39,7 @@ const STYLE_DATA: Record<string, {
   LUXURY_EVENT: {
     Icon: Sparkles,
     name: '럭셔리',
-    description: '특별하고 화려한 순간을 원하는 당신. 최고급 호텔과 완벽한 연출로 평생 기억에 남을 프로포즈를 계획합니다.',
+    description: '특별하고 화려한 순간을 원하는 당신.\n최고급 호텔과 완벽한 연출로 평생 기억에 남을 프로포즈를 계획합니다.',
     places: ['5성급 호텔', '프라이빗 다이닝', '크루즈', '야외 특설 무대'],
     keywords: ['화려한', '특별한', '고급스러운', '완벽한'],
     ideas: [
@@ -102,6 +103,43 @@ const STYLE_DATA: Record<string, {
   },
 };
 
+function GradientNumberBadge({ number }: { number: number }) {
+  return (
+    <span
+      className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+      style={{
+        background: 'linear-gradient(111.47deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)',
+      }}
+    >
+      {/* 안쪽 원 — 카드 배경(흰색)으로 덮어서 링만 남김 */}
+      <span className="absolute inset-[2px] rounded-full bg-white" />
+      {/* 숫자 텍스트 — 같은 그라디언트를 텍스트에 직접 클리핑 */}
+      <span
+        className="relative text-[11px] font-bold"
+        style={{
+          background: 'linear-gradient(111.47deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}
+      >
+        {number}
+      </span>
+    </span>
+  );
+}
+
+// 그라디언트 테두리 뱃지 — 바깥 래퍼가 그라디언트 배경, 안쪽 span이 흰 배경으로 1px 얇게 감싸는 방식
+function GradientBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex rounded-full p-[2px] gradient-primary-bg">
+      <span className="flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium leading-none tracking-[0.3px] text-primary">
+        {label}
+      </span>
+    </span>
+  );
+}
+
 // ─── 궁합 % 계산 ──────────────────────────────────────────────
 function computeCompatibility(moodType: string, partnerMbti: string) {
   const seed = (moodType + partnerMbti)
@@ -109,7 +147,7 @@ function computeCompatibility(moodType: string, partnerMbti: string) {
     .reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const score = 45 + (seed % 50);
 
-  if (score >= 80) return { score, message: '완벽한 궁합이에요! 두 분은 서로를 너무나도 잘 이해해요.' };
+  if (score >= 80) return { score, message: '완벽한 궁합이에요!\n두 분은 서로를 너무나도 잘 이해해요.' };
   if (score >= 65) return { score, message: '좋은 궁합이에요. 서로의 장점을 살려 완벽한 프로포즈를 만들어보세요.' };
   return { score, message: '서로 다른 매력이 만났네요. 조화롭게 맞춰가면 더 특별해질 거예요.' };
 }
@@ -141,77 +179,70 @@ export default function ResultPage() {
 
         {/* 결과 카드 */}
         <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-
-          {/* 궁합 섹션 */}
-          <div className="flex justify-center px-6 pt-6">
-            <div className="flex w-full flex-col items-center gap-2 rounded-2xl bg-primary-light px-6 py-8 text-center">
-              <HeartHandshake className="h-10 w-10 text-primary" strokeWidth={1.5} />
-              <p className="text-4xl font-extrabold text-primary">{compat.score}%</p>
-              <p className="text-sm text-text-muted max-w-xs leading-relaxed">{compat.message}</p>
-            </div>
+        
+        {/* 궁합 섹션 */}
+        <div className="flex justify-center px-6 pt-6">
+          <div className="flex w-full flex-col items-center gap-2 rounded-2xl gradient-primary-bg px-6 py-8 text-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
+              <HeartHandshake className="h-8 w-8 text-white" strokeWidth={1.5} />
+            </span>
+            <p className="text-4xl font-extrabold text-white">{compat.score}%</p>
+            <p className="text-sm text-white/85 max-w-xs whitespace-pre-line leading-relaxed">{compat.message}</p>
           </div>
+        </div>
 
           <div className="px-6 py-6 flex flex-col gap-6">
             {/* 나의 성향 ↔ 파트너 MBTI */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-center gap-10 sm:gap-16">
+              <div className="text-center">
                 <p className="mb-1 text-xs text-text-muted">나의 성향</p>
-                <p className="flex items-center gap-1.5 text-base font-bold text-text">
+                <p className="flex items-center justify-center gap-1.5 text-base font-bold text-text">
                   <StyleIcon className="h-4 w-4 text-primary" strokeWidth={1.8} />
                   {style.name}
                 </p>
               </div>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-light">
-                <Heart className="h-4 w-4 text-primary/60" strokeWidth={1.5} />
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-primary-bg">
+                <Heart className="h-4 w-4 text-white" strokeWidth={1.8} fill="currentColor" />
               </span>
-              <div className="text-right">
+              <div className="text-center">
                 <p className="mb-1 text-xs text-text-muted">파트너 MBTI</p>
                 <p className="text-base font-bold text-text">{partnerMbti || '미입력'}</p>
               </div>
             </div>
 
-            <hr className="border-border/60" />
+          <hr className="border-border/60" />
 
-            {/* 추천 스타일 */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-light">
-                  <Heart className="h-4 w-4 text-primary" strokeWidth={1.5} />
-                </span>
-                <div>
-                  <p className="mb-1 text-xs text-text-muted">추천 프로포즈 스타일</p>
-                  <p className="flex items-center gap-2 text-2xl font-bold text-text font-serif">
-                    <StyleIcon className="h-6 w-6 text-primary" strokeWidth={1.8} />
-                    {style.name}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm leading-relaxed text-text-muted">{style.description}</p>
+          {/* 추천 스타일 */}
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="mb-2 text-xs text-text-muted">추천 프로포즈 스타일</p>
+              <p className="flex items-center gap-2 text-2xl font-bold text-text font-serif">
+                <StyleIcon className="h-6 w-6 text-primary" strokeWidth={1.8} />
+                {style.name}
+              </p>
             </div>
-
+            <p className="text-sm leading-relaxed whitespace-pre-line text-text-muted">{style.description}</p>
+          </div>
+          
             {/* 태그 */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="mb-2 text-xs text-text-muted">추천 장소</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {style.places.map((p) => (
-                    <span key={p} className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-muted">
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="mb-2 text-xs text-text-muted">분위기 키워드</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {style.keywords.map((k) => (
-                    <span key={k} className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-muted">
-                      {k}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+<div className="grid grid-cols-2 gap-4">
+  <div>
+    <p className="mb-2 text-xs text-text-muted">추천 장소</p>
+    <div className="flex flex-wrap gap-1.5">
+      {style.places.map((p) => (
+        <GradientBadge key={p} label={p} />
+      ))}
+    </div>
+  </div>
+  <div>
+    <p className="mb-2 text-xs text-text-muted">분위기 키워드</p>
+    <div className="flex flex-wrap gap-1.5">
+      {style.keywords.map((k) => (
+        <GradientBadge key={k} label={k} />
+      ))}
+    </div>
+  </div>
+</div>
 
             <hr className="border-border/60" />
 
@@ -221,9 +252,7 @@ export default function ResultPage() {
               <div className="flex flex-col gap-3">
                 {style.ideas.map((idea, idx) => (
                   <div key={idx} className="flex items-start gap-3">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-light text-[10px] font-bold text-primary mt-0.5">
-                      {idx + 1}
-                    </span>
+                    <GradientNumberBadge number={idx + 1} />
                     <p className="text-sm text-text-muted leading-relaxed">{idea}</p>
                   </div>
                 ))}
