@@ -12,7 +12,6 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useOnboarding } from './OnboardingContext';
 import { Button } from '../../components';
-import CategoryBadge from '../../components/ui/CategoryBadge';
 
 // ─── 스타일 데이터 ─────────────────────────────────────────────
 const STYLE_DATA: Record<string, {
