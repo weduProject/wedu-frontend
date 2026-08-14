@@ -8,7 +8,7 @@ import CtaSection from './components/CtaSection';
 
 export default function LandingPage() {
   return (
-    <div className="-m-5 min-h-screen bg-white md:-m-8">
+    <div className="-m-5 min-h-screen bg-background-50 md:-m-8">
       <HeroSection />
       <FeatureSection />
       <FeedSection />

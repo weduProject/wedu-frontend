@@ -20,6 +20,20 @@
   --color-rosegold-3: #9e5060;
   --color-rosegold-4: #cc9488;
 
+  /* 랜딩 페이지 배경 레이어 */
+  --color-background-50: #FAF8F7;
+  --color-background-100: #F0EEED;
+  --color-background-200: #E7E4E3;
+  --color-secondary-100: #F7E1EE;
+
+  /* 텍스트 레이어 (foreground) */
+  --color-foreground-600: #514C4A;
+  --color-foreground-950: #0C0B0A;
+
+  /* 포인트 컬러 단계 */
+  --color-primary-300: #FEABA0;
+  --color-primary-500: #E8796C;
+
   /* 폰트 토큰 */
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Noto Sans KR', sans-serif;
@@ -28,6 +42,7 @@
 body {
   font-family: var(--font-sans);
   color: #333;
+  background-color: var(--color-background-50);
   word-break: keep-all;
 }
 
@@ -88,6 +103,14 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes gradient-move {
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
+}
+
+/* 유리 질감 카드 — 배경색 위에서 살짝 배경과 섞이는 반투명 카드 */
+.glass-card {
+  background-color: color-mix(in oklch, var(--color-background-50) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .scrollbar-hide {

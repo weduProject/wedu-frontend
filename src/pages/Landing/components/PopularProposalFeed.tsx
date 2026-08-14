@@ -126,7 +126,7 @@ export default function FeedSection() {
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {item.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="rounded-full bg-[#F3E2C7] px-2 py-0.5 text-xs text-[#876934]">
+                      <span key={tag} className="rounded-full bg-secondary-100 px-2 py-0.5 text-xs text-[#876934]">
                         {tag}
                       </span>
                     ))}
