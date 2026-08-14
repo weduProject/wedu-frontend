@@ -70,33 +70,36 @@ export default function WeddingShopPage() {
             <p className="text-sm text-text-muted">해당 카테고리에 상품이 없습니다.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredProducts.map((product) => {
-              const hasDiscount = product.discountPrice !== null && product.discountPrice < product.price;
-              const displayPrice = hasDiscount ? product.discountPrice! : product.price;
-              return (
-                <Link key={product.id} to={'/wedding-shop/' + product.id} className={clsx('group block overflow-hidden rounded-2xl border bg-white no-underline transition-colors hover:border-[#D9C9C6]', CARD_BORDER)}>
-                  <div className={clsx('relative h-[231px] w-full overflow-hidden', IMAGE_PLACEHOLDER_BG)}>
-                    <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
-                    {hasDiscount ? (
-                      <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-white">
-                        {Math.round(((product.price - product.discountPrice!) / product.price) * 100)}% OFF
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="p-5">
-                    <span className="text-xs font-medium tracking-[0.3px] text-text-muted">{CATEGORIES.find((c) => c.id === product.categoryId)?.name}</span>
-                    <h3 className="mt-1.5 line-clamp-1 text-base font-semibold leading-6 text-[#181515]">{product.name}</h3>
-                    <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-text-muted">{product.description}</p>
-                    <div className="mt-3 flex items-baseline gap-2">
-                      <span className="text-lg font-bold text-[#0C0B0A]">₩{formatPrice(displayPrice)}</span>
-                      {hasDiscount ? <span className="text-xs text-text-muted line-through">₩{formatPrice(product.price)}</span> : null}
+          <>
+            <p className="mb-3 text-sm text-[#968178]">총 {filteredProducts.length}개</p>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredProducts.map((product) => {
+                const hasDiscount = product.discountPrice !== null && product.discountPrice < product.price;
+                const displayPrice = hasDiscount ? product.discountPrice! : product.price;
+                return (
+                  <Link key={product.id} to={'/wedding-shop/' + product.id} className={clsx('group block overflow-hidden rounded-2xl border bg-white no-underline transition-colors hover:border-[#D9C9C6]', CARD_BORDER)}>
+                    <div className={clsx('relative h-[231px] w-full overflow-hidden', IMAGE_PLACEHOLDER_BG)}>
+                      <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
+                      {hasDiscount ? (
+                        <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-white">
+                          {Math.round(((product.price - product.discountPrice!) / product.price) * 100)}% OFF
+                        </span>
+                      ) : null}
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                    <div className="p-5">
+                      <span className="text-xs font-medium tracking-[0.3px] text-text-muted">{CATEGORIES.find((c) => c.id === product.categoryId)?.name}</span>
+                      <h3 className="mt-1.5 line-clamp-1 text-base font-semibold leading-6 text-[#181515]">{product.name}</h3>
+                      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-text-muted">{product.description}</p>
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="text-lg font-bold text-[#0C0B0A]">₩{formatPrice(displayPrice)}</span>
+                        {hasDiscount ? <span className="text-xs text-text-muted line-through">₩{formatPrice(product.price)}</span> : null}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </>
         )}
       </section>
 
