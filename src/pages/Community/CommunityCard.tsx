@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, MessageCircle, User } from "lucide-react";
-import type { CommunityPost } from "./communityDummy";
+import type { CommunityPost } from "./CommunityContext";
 
 interface Props {
   post: CommunityPost;
