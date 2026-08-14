@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Music, Heart, MapPin, Landmark, ArrowLeft, Share2, Mail } from "lucide-react";
 import { Button } from "../../components";
-import { loadInvitationDraft } from "./components/InvitationFormControls";
 import type { InvitationDraftForm } from "./components/InvitationFormControls";
 
+// state 없이(새로고침 등) 이 페이지에 접근했을 때 보여줄 기본값
 const FALLBACK_DRAFT: InvitationDraftForm = {
   title: "",
   groomName: "신랑",
@@ -26,6 +26,8 @@ const FALLBACK_DRAFT: InvitationDraftForm = {
   gallery: [],
   greetingMessage: "",
   mainColor: "#B76E79",
+  accentColor: "#B76E79",
+  backgroundGradient: undefined,
 };
 
 function formatWeddingDate(dateStr: string, timeStr: string): string {
@@ -49,11 +51,14 @@ function getContrastTextColor(hex: string): string {
 
 export default function InvitationDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [bgmPlaying, setBgmPlaying] = useState(false);
 
-  const savedDraft = useMemo(() => loadInvitationDraft(), []);
-  const draft = savedDraft ?? FALLBACK_DRAFT;
-  const isPreview = savedDraft !== null;
+  // 작성 페이지가 "미리보기" 클릭 시 navigate state로 넘긴 폼 데이터를 그대로 사용.
+  // 새로고침하거나 state 없이 이 URL에 바로 접근하면 자동으로 초기화되어 FALLBACK_DRAFT가 쓰인다.
+  const passedForm = (location.state as { form?: InvitationDraftForm } | null)?.form;
+  const draft = passedForm ?? FALLBACK_DRAFT;
+  const isPreview = passedForm !== undefined;
 
   const toggleBgm = useCallback(() => {
     setBgmPlaying((prev) => !prev);
@@ -80,7 +85,7 @@ export default function InvitationDetailPage() {
         <div className="fixed left-6 top-24 z-40 md:top-28">
           <button
             type="button"
-            onClick={() => navigate("/invitation/create")}
+            onClick={() => navigate("/invitation/create", { state: { restoredForm: draft } })}
             className="flex items-center gap-1.5 rounded-full border border-border bg-white/90 px-4 py-2 text-xs font-medium text-text-muted shadow-md backdrop-blur transition-colors hover:text-primary"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -103,7 +108,11 @@ export default function InvitationDetailPage() {
           <section className="flex flex-col items-center">
             <div
               className="flex w-full flex-col items-center justify-center px-6 py-16 text-center md:py-20"
-              style={{ backgroundColor: draft.mainColor }}
+              style={{
+                background:
+                  draft.backgroundGradient ??
+                  `linear-gradient(135deg, ${draft.mainColor} 0%, ${draft.accentColor ?? draft.mainColor} 100%)`,
+              }}
             >
               <p
                 className="mb-4 text-xs font-medium uppercase tracking-[0.3em] opacity-80"
@@ -120,9 +129,9 @@ export default function InvitationDetailPage() {
             </div>
 
             <div className="flex w-full flex-col items-center px-6 py-14 text-center md:py-16">
-              <p className="text-lg font-semibold text-text md:text-xl">
+              <p className="font-serif text-lg font-semibold text-text md:text-xl">
                 {draft.groomName || "신랑"}
-                <span className="mx-2" style={{ color: draft.mainColor }}>&</span>
+                <span className="mx-2" style={{ color: draft.accentColor ?? draft.mainColor }}>&</span>
                 {draft.brideName || "신부"}
               </p>
 

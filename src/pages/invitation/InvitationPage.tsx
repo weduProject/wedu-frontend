@@ -255,8 +255,13 @@ export default function InvitationPage() {
                     Hello together.
                   </p>
                   <Heart className="my-5 h-5 w-5 fill-primary text-primary" />
-                  <p className="text-2xl font-semibold text-[#393333]">수지</p>
-                  <p className="mt-1 text-2xl font-semibold text-[#393333]">인준</p>
+                  <p className="font-serif text-2xl font-semibold text-[#393333]">
+                    수지
+                  </p>
+
+                  <p className="mt-1 font-serif text-2xl font-semibold text-[#393333]">
+                    인준
+                  </p>
                   <p className="mt-5 text-[10px] tracking-[0.12em] text-text-muted">
                     2026. 05. 24
                   </p>
@@ -605,7 +610,15 @@ export default function InvitationPage() {
                   className="w-fit"
                   onClick={() => {
                     setSelectedTemplate(null);
-                    navigate("/invitation/create");
+                    navigate("/invitation/create", {
+                      state: {
+                        // colors[0]: 배경(가장 옅은 톤), accent: 구분선·강조 텍스트용 포인트색
+                        mainColor: selectedTemplate.colors[0],
+                        accentColor: selectedTemplate.accent,
+                        // 템플릿 카드에 쓰던 원본 3단 그라디언트를 그대로 커버 배경에 적용
+                        backgroundGradient: selectedTemplate.bg,
+                      },
+                    });
                   }}
                 >
                   <span className="inline-flex items-center gap-1.5">

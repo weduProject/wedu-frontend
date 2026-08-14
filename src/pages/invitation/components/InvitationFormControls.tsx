@@ -104,9 +104,7 @@ export function InvitationAddButton({ label, onClick }: { label: string; onClick
   );
 }
 
-// ─────────────────────────────────────────────────────────
 // 청첩장 작성 폼 데이터 형태 — CreatePage(작성)와 DetailPage(미리보기)가 공유
-// ─────────────────────────────────────────────────────────
 export interface InvitationDraftForm {
   title: string;
   groomName: string;
@@ -128,21 +126,17 @@ export interface InvitationDraftForm {
   gallery: string[];
   greetingMessage: string;
   mainColor: string;
+  // 배경(mainColor)과 별개로 구분선·강조 텍스트에 쓰는 포인트 색. 없으면 mainColor를 그대로 씀
+  accentColor?: string;
+  // 템플릿에서 넘어온 원본 3단 그라디언트 CSS 값. 있으면 mainColor/accentColor 조합 대신 이걸 그대로 씀
+  backgroundGradient?: string;
 }
 
-const DRAFT_STORAGE_KEY = "wedu_invitation_draft";
+// 숫자만 추출해서 010-0000-0000 형태로 자동 하이픈을 넣어줌.
+export function formatPhoneNumber(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
 
-// API 연동 전까지는 브라우저 세션에만 임시 저장해서 미리보기 화면에 전달한다.
-export function saveInvitationDraft(draft: InvitationDraftForm) {
-  sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-}
-
-export function loadInvitationDraft(): InvitationDraftForm | null {
-  const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as InvitationDraftForm;
-  } catch {
-    return null;
-  }
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
