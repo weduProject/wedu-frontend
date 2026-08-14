@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
-type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill' | 'hero';
+type ButtonVariant = 'main' | 'secondary' | 'wishlist' | 'pill' | 'hero' | 'outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,8 +18,9 @@ const variantClasses: Record<ButtonVariant, string> = {
   secondary: 'bg-white text-text border border-border hover:enabled:bg-primary-light/40',
   wishlist:  `${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90 transition-opacity`,
   pill:      `rounded-full ${PRIMARY_GRADIENT} text-white border-0 hover:enabled:opacity-90`,
-  // 랜딩 페이지 CTA처럼 강조가 필요한 버튼 전용 — 반짝이는 애니메이션 그라디언트
   hero:      `${PRIMARY_GRADIENT_ANIMATED} text-white border-0 hover:enabled:opacity-90`,
+  // 이미지/그라디언트 배경 위에 얹히는 반투명 테두리 버튼 — 히어로 섹션 보조 CTA 전용
+  outline:   'border border-white/60 bg-transparent text-white transition-colors hover:enabled:bg-white/10',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
