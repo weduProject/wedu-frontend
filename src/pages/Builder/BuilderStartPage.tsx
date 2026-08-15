@@ -70,10 +70,10 @@ export default function BuilderStartPage() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="group flex items-center justify-between bg-white rounded-[1.5rem] border border-border shadow-sm p-6 hover:border-primary/30 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+              className="flex items-center justify-between bg-white rounded-[1.5rem] border border-border shadow-sm p-6"
             >
               <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-bold text-xl shrink-0 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-bold text-xl shrink-0">
                   {step.number}
                 </div>
                 <div>
@@ -85,7 +85,7 @@ export default function BuilderStartPage() {
                   </p>
                 </div>
               </div>
-              <div className="text-text-muted w-8 h-8 flex items-center justify-center rounded-full bg-surface group-hover:bg-primary group-hover:text-white transition-colors">
+              <div className="text-text-muted w-8 h-8 flex items-center justify-center rounded-full bg-surface">
                 <span className="text-sm font-bold">&gt;</span>
               </div>
             </div>
