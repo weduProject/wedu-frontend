@@ -30,7 +30,7 @@ export default function VendorSection() {
 
   return (
     <section className="bg-white py-20 md:py-28">
-      <div className="w-full px-6 md:px-16">
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
         <div className="mb-10 flex flex-col justify-between gap-4 md:mb-12 md:flex-row md:items-end">
           <h2 className="text-3xl font-bold text-text md:text-4xl">인기 프로포즈 패키지</h2>
           <p className="max-w-sm text-sm text-text-muted md:text-base">

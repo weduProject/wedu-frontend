@@ -80,7 +80,7 @@ export default function ShopDetailPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="flex items-center gap-2 text-sm text-text-muted">
+      <div className="flex items-center gap-2 pt-3 text-sm text-text-muted">
         <Link to="/shop" className="no-underline hover:text-primary">프로포즈 편집실</Link>
         <span>/</span>
         <span className="truncate font-medium text-[#2B2827]">{product.title}</span>

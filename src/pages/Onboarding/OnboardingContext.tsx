@@ -176,7 +176,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q7',
-    text: '상대방이 부담스러워하거나 원하지 않을 것 같은 요소가 있나요?',
+    text: '상대방이 부담스러워하거나\n원하지 않을 것 같은 요소가 있나요?',
     hint: '복수 선택할 수 있습니다.',
     type: 'multi',
     answers: [

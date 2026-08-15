@@ -29,7 +29,7 @@ export default function WeddingShopDetailPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="flex items-center gap-2 text-sm text-text-muted">
+      <div className="flex items-center gap-2 pt-6 text-sm text-text-muted">
         <Link to="/wedding-shop" className="no-underline hover:text-primary">웨딩 룩북</Link>
         <span>/</span>
         <span>{categoryName}</span>

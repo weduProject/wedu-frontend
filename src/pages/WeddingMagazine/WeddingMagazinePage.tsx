@@ -66,7 +66,7 @@ const DUMMY_POSTS: MagazinePost[] = [
     id: 5,
     title: '스드메 패키지 똑똑하게 고르는 법 — 따로 vs 묶음 비교',
     content: '스드메(스튜디오+드레스+메이크업)는 패키지로 한 번에 해결할지, 각각 따로 구하지가 항상 고민이죠. 2026년 기준으로 패키지 평균가와 따로 구했을 때를 비교해봤어요.',
-    communityId: 3, category: '웨딩팁', imageUrl: img5, likes: 198, comments: 39, date: '2026년 7월 29일',
+    communityId: 11, category: '웨딩팁', imageUrl: img5, likes: 198, comments: 39, date: '2026년 7월 29일',
   },
   {
     id: 6,
@@ -84,13 +84,13 @@ const DUMMY_POSTS: MagazinePost[] = [
     id: 8,
     title: '강남 vs 홍대 vs 종로 — 지역별 웨딩 플래너 스타일 비교',
     content: '재미있는 사실: 서울에서도 지역에 따라 웨딩플래너 스타일이 확 갈린다는 거 아시나요? 강남권 플래너는 럭셔리 호텔 웨딩 특화로 움직여요.',
-    communityId: 6, category: '플래너', imageUrl: img8, likes: 142, comments: 28, date: '2026년 7월 26일',
+    communityId: 12, category: '플래너', imageUrl: img8, likes: 142, comments: 28, date: '2026년 7월 26일',
   },
   {
     id: 9,
     title: '2026 부산 벡스코 웨딩 박람회 — 지역 예비부부 필수 코스',
     content: '부산 울산 경남 예비부부들 주목! 10월 6일부터 8일까지 벡스코에서 대규모 웨딩박람회 열립니다. 지역 웨딩홀 50여 곳, 스드메 업체들이 한자리에 모여요.',
-    communityId: 10, category: '박람회', imageUrl: img9, likes: 73, comments: 11, date: '2026년 7월 25일',
+    communityId: 13, category: '박람회', imageUrl: img9, likes: 73, comments: 11, date: '2026년 7월 25일',
   },
   {
     id: 10,
@@ -101,10 +101,8 @@ const DUMMY_POSTS: MagazinePost[] = [
 ];
 
 function CategoryBadge({ category }: { category: CategoryKey }) {
-  const { Icon, color } = CATEGORY_META[category];
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${color}`}>
-      <Icon className="w-3 h-3" strokeWidth={2} />
+    <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-[#463730] backdrop-blur-sm">
       {category}
     </span>
   );
@@ -166,7 +164,7 @@ export default function WeddingMagazinePage() {
   return (
     <div className="-mx-5 md:-mx-8 -mt-5 md:-mt-8 -mb-5 md:-mb-8">
       {/* ── Hero (full bleed) ── */}
-      <section className="relative h-[460px] md:h-[520px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[658px] flex items-center justify-center overflow-hidden">
         <img src={heroImg} alt="매거진 히어로" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/5 to-black/30" />
         <div className="relative z-10 text-center px-6 max-w-2xl">
@@ -185,29 +183,35 @@ export default function WeddingMagazinePage() {
       </section>
 
       {/* ── Sticky category tabs (full bleed) ── */}
-      <div className="sticky top-16 md:top-20 z-30 bg-white/90 backdrop-blur-md border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 md:px-8 flex items-center gap-2 py-3 overflow-x-auto">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
-                  isActive ? 'category-tab-active' : 'category-tab-inactive'
-                }`}
-              >
-                {(() => { const { Icon } = CATEGORY_META[cat]; return <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />; })()}
-                {cat}
-              </button>
-            );
-          })}
+      <section className="sticky top-16 z-30 border-b border-[#E7E4E3]/60 bg-[#FAF8F8]/80 backdrop-blur-[12px] md:top-20">
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <div className="flex items-center gap-3 overflow-x-auto py-4 scrollbar-hide">
+            {CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat;
+              const { Icon } = CATEGORY_META[cat];
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    document.getElementById('magazine-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className={`shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                    isActive ? 'category-tab-active' : 'category-tab-inactive'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={1.8} />
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ── Content ── */}
-      <div className="max-w-5xl mx-auto px-5 md:px-8 py-8 md:py-10">
+      <div id="magazine-content" className="max-w-5xl mx-auto px-5 md:px-8 py-8 md:py-10 scroll-mt-[130px] md:scroll-mt-[150px]">
         {loading && (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -218,7 +222,11 @@ export default function WeddingMagazinePage() {
           <>
             {/* Featured post */}
             {featuredPost && (
-              <Link to={`/community/${featuredPost.communityId}`} className="group block mb-6 md:mb-8">
+              <Link
+                to={`/community/${featuredPost.communityId}`}
+                state={{ from: 'magazine' }}
+                className="group block mb-6 md:mb-8"
+              >
                 <div className="rounded-2xl border border-border bg-white overflow-hidden hover:shadow-md transition-shadow duration-300">
                   <div className="grid grid-cols-1 lg:grid-cols-5">
                     <div className="lg:col-span-3 relative h-60 lg:h-auto min-h-[260px] bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 overflow-hidden">
@@ -249,7 +257,7 @@ export default function WeddingMagazinePage() {
             {gridPosts.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
                 {gridPosts.map((post) => (
-                  <Link key={post.id} to={`/community/${post.communityId}`} className="group block">
+                  <Link key={post.id} to={`/community/${post.communityId}`} state={{ from: 'magazine' }} className="group block">
                     <div className="rounded-2xl border border-border bg-white overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
                       <div className="relative h-52 bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 flex-shrink-0 overflow-hidden">
                         <img
@@ -298,7 +306,7 @@ export default function WeddingMagazinePage() {
           </div>
           <Link
             to="/connect"
-            className="whitespace-nowrap px-6 py-3 rounded-full text-sm font-semibold bg-primary text-white hover:opacity-90 transition-opacity"
+            className="btn-primary whitespace-nowrap"
           >
             파트너 찾기
           </Link>

@@ -47,7 +47,7 @@ export default function FeedSection() {
 
   return (
     <section className="bg-white py-16 md:py-20">
-      <div className="w-full px-6 md:px-16">
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <h2 className="mb-2 text-2xl font-bold text-text md:text-3xl">인기 프로포즈 피드</h2>
@@ -126,7 +126,7 @@ export default function FeedSection() {
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {item.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="rounded-full bg-[#F3E2C7] px-2 py-0.5 text-xs text-[#876934]">
+                      <span key={tag} className="rounded-full bg-secondary-100 px-2 py-0.5 text-xs text-[#876934]">
                         {tag}
                       </span>
                     ))}

@@ -54,9 +54,8 @@ const FOOTER_COLUMNS = [
       { label: '웨딩 팁', path: '/community' },
     ],
   },
-] as const;
+];
 
-// 고객센터 항목은 피그마 상 <span>으로, 아직 연결된 페이지가 없어 링크가 아닌 텍스트로 표시
 const CUSTOMER_SERVICE_ITEMS = ['이용약관', '개인정보처리방침', '1:1 문의'];
 
 const SOCIAL_LINKS = [
@@ -64,18 +63,16 @@ const SOCIAL_LINKS = [
   { label: '카카오톡 채널', Icon: ChatIcon, href: '#' },
   { label: '유튜브', Icon: YoutubeIcon, href: '#' },
   { label: '이메일 문의', Icon: Mail, href: 'mailto:hello@wedu.com' },
-] as const;
+];
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#F0EEED]">
-      {/* 상단 은은한 코랄 라인 */}
+    <footer className="relative bg-background-100">
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px"
         style={{
-          background:
-            'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(254,171,160,0.3) 50%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(254,171,160,0.3) 50%, rgba(0,0,0,0) 100%)',
         }}
       />
 
@@ -83,14 +80,14 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           {FOOTER_COLUMNS.map((column) => (
             <div key={column.title}>
-              <h4 className="mb-2 text-base font-semibold text-[#0C0B0A]">{column.title}</h4>
-              <span className="mb-5 block h-px w-8 bg-[#FEABA0]" aria-hidden />
+              <h4 className="mb-2 text-base font-semibold text-foreground-950">{column.title}</h4>
+              <span className="mb-5 block h-px w-8 bg-primary-300" aria-hidden />
               <ul className="flex flex-col gap-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.path}
-                      className="text-sm font-normal text-[#514C4A] no-underline transition-colors hover:text-primary"
+                      className="text-sm font-normal text-foreground-600 no-underline transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -101,41 +98,42 @@ export default function Footer() {
           ))}
 
           <div>
-            <h4 className="mb-2 text-base font-semibold text-[#0C0B0A]">고객센터</h4>
-            <span className="mb-5 block h-px w-8 bg-[#FEABA0]" aria-hidden />
+            <h4 className="mb-2 text-base font-semibold text-foreground-950">고객센터</h4>
+            <span className="mb-5 block h-px w-8 bg-primary-300" aria-hidden />
             <ul className="flex flex-col gap-2">
               {CUSTOMER_SERVICE_ITEMS.map((label) => (
                 <li key={label}>
-                  <span className="text-sm font-normal text-[#514C4A]">{label}</span>
+                  <span className="text-sm font-normal text-foreground-600">{label}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-[rgba(231,228,227,0.6)] pt-[33px] sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-14 flex flex-col gap-6 border-t border-background-200/60 pt-[33px] sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="text-rosegold text-[48px] font-bold leading-[48px]">
-              WEDU
-            </span>
-            <p className="mt-2 text-sm text-[#6F6765]">당신의 특별한 순간을 함께 준비합니다.</p>
+            <span className="text-rosegold text-[48px] font-bold leading-[48px]">WEDU</span>
+            <p className="mt-2 text-sm text-foreground-600/90">당신의 특별한 순간을 함께 준비합니다.</p>
           </div>
 
           <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-3">
-            <span className="text-xs text-[#8D8482]">© 2025 WEDU. All rights reserved.</span>
+            <span className="text-xs text-text-muted">© 2025 WEDU. All rights reserved.</span>
             <div className="flex items-center gap-4">
-              {SOCIAL_LINKS.map(({ label, Icon, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#8D8482] transition-colors hover:text-primary"
-                >
-                  <Icon className="h-[18px] w-[18px]" />
-                </a>
-              ))}
+              {SOCIAL_LINKS.map((item) => {
+                const Icon = item.Icon;
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.label}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:text-primary"
+                  >
+                    <Icon className="h-[18px] w-[18px]" />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>

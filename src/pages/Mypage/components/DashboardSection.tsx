@@ -38,23 +38,34 @@ export default function DashboardSection() {
   const todoTotal = todos.length;
 
   return (
-    <main className="mx-auto max-w-5xl flex flex-col gap-6">
+    <main className="mx-auto max-w-5xl flex flex-col gap-6 pt-6">
       {/* 헤더 */}
       <section className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-text">{userName}님, 안녕하세요!</h1>
           <p className="mt-1 text-sm text-text-muted">WEDU와 함께 특별한 날을 준비해보세요</p>
         </div>
-        <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-primary-light px-4 py-3">
-          <div className="text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">D-DAY</p>
-            <p className="text-lg font-bold leading-tight text-text">
-              {dday ? `D-${dday.daysRemaining}` : '미설정'}
-            </p>
+        <div className="flex shrink-0 items-center gap-4 rounded-2xl bg-gradient-to-br from-primary-light to-white px-5 py-4">
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/70">D-DAY</p>
+            {dday ? (
+              <div className="flex items-center gap-1">
+                {String(Math.max(dday.daysRemaining, 0)).padStart(2, '0').split('').map((digit, i) => (
+                  <span
+                    key={i}
+                    className="gradient-primary-bg flex h-9 w-7 items-center justify-center rounded-md text-lg font-bold text-white shadow-gradient-primary"
+                  >
+                    {digit}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm font-bold text-text-muted">미설정</p>
+            )}
           </div>
           <Link
             to="/dday"
-            className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-text no-underline shadow-sm hover:bg-gray-50"
+            className="rounded-full border border-primary/30 bg-white/70 px-4 py-2 text-xs font-semibold text-primary no-underline transition-colors hover:bg-white"
           >
             {dday ? '상세보기' : '설정하기'}
           </Link>
@@ -139,7 +150,7 @@ export default function DashboardSection() {
                   >
                     <span
                       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded ${
-                        todo.isCompleted ? 'bg-amber-500' : 'border border-border bg-white'
+                        todo.isCompleted ? 'bg-primary' : 'border border-border bg-white'
                       }`}
                     >
                       {todo.isCompleted && (
