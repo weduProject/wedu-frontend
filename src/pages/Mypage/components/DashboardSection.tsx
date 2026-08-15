@@ -12,12 +12,30 @@ import { useChecklist } from '../../Checklist/hooks/useChecklist';
 import BaseCard from '../../../components/ui/BaseCard';
 import ProgressBar from '../../../components/ui/ProgressBar';
 import QuickMenu from '../../Dashboard/components/QuickMenu';
+import { STYLE_DATA, computeCompatibility } from '../../Onboarding/ResultPage';
+
+const ONBOARDING_STORAGE_KEY = 'wedu_onboarding';
+
+function readOnboardingResult(): { quizAnswers: Record<string, string | string[]>; partnerMbti: string } {
+  try {
+    const raw = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+    if (!raw) return { quizAnswers: {}, partnerMbti: '' };
+    return JSON.parse(raw);
+  } catch {
+    return { quizAnswers: {}, partnerMbti: '' };
+  }
+}
 
 export default function DashboardSection() {
   const { user } = useAuth();
   const { dday } = useDDay();
   const navigate = useNavigate();
   const userName = user?.name ?? 'OOO';
+
+  const { quizAnswers, partnerMbti } = readOnboardingResult();
+  const moodType = (quizAnswers.q1 as string) || 'UNDECIDED';
+  const proposalStyle = STYLE_DATA[moodType] ?? STYLE_DATA.UNDECIDED;
+  const compat = computeCompatibility(moodType, partnerMbti || 'INFP');
 
   const [viewSchedule, setViewSchedule] = useState<ScheduleItem | null>(null);
   const [editSchedule, setEditSchedule] = useState<ScheduleItem | null>(null);
@@ -201,7 +219,9 @@ export default function DashboardSection() {
           </div>
           <div className="flex flex-col gap-2">
             {upcomingSchedules.length === 0 ? (
-              <p className="py-6 text-center text-sm text-text-muted">예정된 일정이 없습니다.</p>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-sm text-text-muted">예정된 일정이 없습니다.</p>
+              </div>
             ) : (
               upcomingSchedules.map((item) => {
                 const [, month, day] = item.date.split('-');
@@ -246,29 +266,40 @@ export default function DashboardSection() {
               </Link>
             )}
           </div>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            {user?.onboardingCompleted ? (
-              <>
-                <p className="mb-3 text-sm text-text-muted">심리테스트가 완료되었어요</p>
-                <Link
-                  to="/onboarding/result"
-                  className="text-sm font-semibold text-primary no-underline hover:underline"
-                >
-                  결과 다시 보기
-                </Link>
-              </>
-            ) : (
-              <>
-                <p className="mb-3 text-sm text-text-muted">아직 심리테스트를 하지 않으셨어요</p>
-                <Link
-                  to="/onboarding"
-                  className="text-sm font-semibold text-primary no-underline hover:underline"
-                >
-                  테스트 하러 가기
-                </Link>
-              </>
-            )}
-          </div>
+          {user?.onboardingCompleted ? (
+            <div className="px-1.5">
+              <div className="flex items-stretch gap-3">
+                <span className="flex w-16 shrink-0 items-center justify-center self-stretch rounded-2xl bg-primary-light">
+                  <proposalStyle.Icon className="h-7 w-7 text-primary" strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-text-muted">추천 스타일</p>
+                  <p className="font-serif text-lg font-bold text-text">{proposalStyle.name}</p>
+                  <p className="text-xs text-primary">매칭 {compat.score}%</p>
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {proposalStyle.places.slice(0, 2).map((place) => (
+                  <span
+                    key={place}
+                    className="rounded-full bg-primary-light px-2.5 py-1 text-[11px] text-primary"
+                  >
+                    {place}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <p className="mb-3 text-sm text-text-muted">아직 심리테스트를 하지 않으셨어요</p>
+              <Link
+                to="/onboarding"
+                className="text-sm font-semibold text-primary no-underline hover:underline"
+              >
+                테스트 하러 가기
+              </Link>
+            </div>
+          )}
         </BaseCard>
       </div>
 
