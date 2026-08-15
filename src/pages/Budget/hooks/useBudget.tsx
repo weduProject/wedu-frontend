@@ -196,7 +196,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     const updatedCategory = updates.category ?? currentItem.category;
     const updatedBudgetAmount = updates.budgetAmount ?? currentItem.budgetAmount;
     const updatedPaidAmount = updates.paidAmount ?? currentItem.paidAmount;
-    const newIsPaid = updates.isPaid !== undefined ? updates.isPaid : updatedPaidAmount > 0;
+    const newIsPaid = updatedPaidAmount > 0;
 
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
 
