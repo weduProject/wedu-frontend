@@ -64,7 +64,6 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   function resetQuiz() {
     setQuizAnswersState({});
     setPartnerMbtiState('');
-    saveToStorage({}, '');
   }
 
   return (
