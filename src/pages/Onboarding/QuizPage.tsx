@@ -206,11 +206,8 @@ function renderSelectionBadge() {
               </p>
               <div className="text-center">
                 <p className="mb-1.5 whitespace-pre-line text-lg font-bold leading-snug text-text font-serif">{question.text}</p>
-                {badge ? (
-                  <div className="flex justify-center">{badge}</div>
-                ) : (
-                  question.hint && <p className="text-xs text-text-muted">{question.hint}</p>
-                )}
+                {badge && <div className="flex justify-center mb-1.5">{badge}</div>}
+                {question.hint && <p className="text-xs text-text-muted">{question.hint}</p>}
               </div>
             </div>
 

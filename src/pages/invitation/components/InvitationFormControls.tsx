@@ -18,6 +18,65 @@ export function InvitationTextField({ label, className = "", ...props }: Invitat
   );
 }
 
+interface InvitationTimeSelectProps {
+  label?: string;
+  value?: string;
+  onChange: (time: string) => void;
+  className?: string;
+}
+
+export function InvitationTimeSelect({
+  label,
+  value = '12:00',
+  onChange,
+  className = '',
+}: InvitationTimeSelectProps) {
+  const safeValue = value || '12:00';
+  const [currentHour = '12', currentMinute = '00'] = safeValue.split(':');
+
+  const handleHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(`${e.target.value}:${currentMinute}`);
+  };
+
+  const handleMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(`${currentHour}:${e.target.value}`);
+  };
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {label && (
+        <label className="block text-xs font-medium text-text-muted">{label}</label>
+      )}
+      
+      <div className="flex gap-2">
+        <select
+          value={currentHour}
+          onChange={handleHourChange}
+          className="h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm text-text outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10"
+        >
+          {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')).map((h) => (
+            <option key={h} value={h}>
+              {h}시
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={currentMinute}
+          onChange={handleMinuteChange}
+          className="h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm text-text outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10"
+        >
+          {['00', '30'].map((m) => (
+            <option key={m} value={m}>
+              {m}분
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
 interface InvitationTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
 }
