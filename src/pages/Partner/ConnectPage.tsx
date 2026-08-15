@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Link2Off, Mail } from 'lucide-react';
+import { Heart, Link2Off, Mail, Wallet, CalendarDays, Check, Calendar } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiFetch } from '../../lib/apiClient';
 import type { ApiEnvelope } from '../../lib/apiClient';
@@ -133,21 +133,26 @@ export default function ConnectPage() {
           <div className="p-6 md:p-10">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
               {[
-                { label: '예산 관리', to: '/budget',    emoji: '💰' },
-                { label: 'D-DAY',    to: '/dday',      emoji: '📅' },
-                { label: '체크리스트', to: '/checklist', emoji: '✅' },
-                { label: '일정 관리', to: '/calendar',  emoji: '🗓️' },
-              ].map((item) => (
-                <button
+                { label: '예산 관리', to: '/budget',    icon: Wallet },
+                { label: 'D-DAY',    to: '/dday',      icon: CalendarDays },
+                { label: '체크리스트', to: '/checklist', icon: Check },
+                { label: '일정 관리', to: '/calendar',  icon: Calendar },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
                   key={item.label}
                   type="button"
                   onClick={() => navigate(item.to)}
                   className="flex flex-col items-center gap-3 p-5 rounded-2xl border border-border hover:border-primary/30 hover:bg-primary-light/40 transition-all cursor-pointer"
                 >
-                  <span className="text-2xl">{item.emoji}</span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-light/60 text-primary">
+                    <Icon className="h-5 w-5" strokeWidth={1.8} />
+                  </div>
                   <span className="text-sm font-medium text-text whitespace-nowrap">{item.label}</span>
                 </button>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex justify-center">

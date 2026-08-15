@@ -22,6 +22,7 @@ import {
   InvitationAccountRow,
   InvitationAddButton,
   formatPhoneNumber,
+  InvitationTimeSelect,
 } from "./components/InvitationFormControls";
 
 type SectionKey =
@@ -404,11 +405,10 @@ export default function InvitationCreatePage() {
                     onChange={(e) => updateField("weddingDate", e.target.value)}
                   />
 
-                  <InvitationTextField
+                  <InvitationTimeSelect
                     label="예식 시간"
-                    type="time"
                     value={form.weddingTime}
-                    onChange={(e) => updateField("weddingTime", e.target.value)}
+                    onChange={(time) => updateField("weddingTime", time)}
                   />
 
                   <InvitationTextField
