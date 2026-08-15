@@ -125,6 +125,19 @@ export default function DDayPage() {
                 </button>
               </div>
             </div>
+          ) : todos.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
+              <div className="mt-6 mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
+                <ClipboardList className="h-6 w-6 text-primary" />
+              </div>
+              <p className="mb-1.5 text-sm text-text-muted">아직 체크리스트를 만들지 않으셨어요</p>
+              <Link
+                to="/checklist"
+                className="text-sm font-semibold text-primary no-underline hover:underline"
+              >
+                체크리스트 만들러 가기
+              </Link>
+            </div>
           ) : (
             <>
               <div className="flex flex-1 flex-col gap-5">

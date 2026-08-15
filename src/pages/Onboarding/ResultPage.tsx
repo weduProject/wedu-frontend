@@ -14,7 +14,7 @@ import { useOnboarding } from './OnboardingContext';
 import { Button } from '../../components';
 
 // ─── 스타일 데이터 ─────────────────────────────────────────────
-const STYLE_DATA: Record<string, {
+export const STYLE_DATA: Record<string, {
   Icon: LucideIcon;
   name: string;
   description: string;
@@ -140,7 +140,7 @@ function GradientBadge({ label }: { label: string }) {
 }
 
 // ─── 궁합 % 계산 ──────────────────────────────────────────────
-function computeCompatibility(moodType: string, partnerMbti: string) {
+export function computeCompatibility(moodType: string, partnerMbti: string) {
   const seed = (moodType + partnerMbti)
     .split('')
     .reduce((acc, c) => acc + c.charCodeAt(0), 0);

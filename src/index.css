@@ -20,6 +20,10 @@
   --color-rosegold-3: #9e5060;
   --color-rosegold-4: #cc9488;
 
+  /* 로고 그라디언트 전용 */
+  --color-primary-400: #F79689;
+  --color-primary-600: #C4675D;
+
   /* 랜딩 페이지 배경 레이어 */
   --color-background-50: #FAF8F7;
   --color-background-100: #F0EEED;
@@ -69,10 +73,11 @@ h1, h2, h3, h4, h5, h6 {
 /* 정적 그라디언트 배경 — 섹션·비버튼 요소에 사용 */
 /* 로즈골드 그라디언트 텍스트 */
 .text-rosegold {
-  background: linear-gradient(135deg, var(--color-rosegold-1) 0%, var(--color-rosegold-2) 25%, var(--color-rosegold-3) 50%, var(--color-rosegold-4) 75%, var(--color-rosegold-1) 100%);
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-family: var(--font-serif);
 }
 
 .gradient-primary-bg {
