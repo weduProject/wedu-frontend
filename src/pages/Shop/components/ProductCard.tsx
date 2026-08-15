@@ -28,14 +28,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div
       onClick={() => navigate(`/shop/${product.id}`)}
-      className="group block cursor-pointer overflow-hidden rounded-2xl border border-[#E7E4E3]/60 bg-white transition-colors hover:border-[#D9C9C6]"
+      className="group flex h-full flex-col cursor-pointer overflow-hidden rounded-2xl border border-[#E7E4E3]/60 bg-white transition-colors hover:border-[#D9C9C6]"
     >
       <div className="relative h-[231px] w-full overflow-hidden bg-[#F0EEED]">
         {product.image && (
           <img
             src={product.image}
             alt={product.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
           />
         )}
 
@@ -57,7 +57,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </button>
       </div>
 
-      <div className="p-5">
+      <div className="flex flex-1 flex-col p-5">
         <h3 className="mb-2 line-clamp-1 text-base font-semibold text-text">{product.title}</h3>
         <p className="mb-3 line-clamp-2 text-sm leading-6 text-[#7C6358]">{product.detailDescription}</p>
 
@@ -69,7 +69,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           ))}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="mt-auto flex items-center justify-between">
           <span className="text-lg font-bold text-[#0C0B0A]">{formatWon(product.price)}</span>
           <span className="rounded-full bg-[linear-gradient(111.47deg,#F79689_0%,#E8796C_33.33%,#FEABA0_66.67%,#E8796C_100%)] px-4 py-2 text-xs font-semibold text-white">
             상세보기

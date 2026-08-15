@@ -38,54 +38,58 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8 min-h-[calc(100dvh-80px)] md:min-h-[calc(100dvh-96px)] flex flex-col px-4 py-12">
-      <div className="w-full max-w-sm bg-surface rounded-3xl shadow-lg border border-gray-100 px-8 py-12 flex flex-col items-center mx-auto my-auto">
+    <div className="-mx-5 -mb-5 md:-mx-8 md:-mb-8 bg-gradient-to-b from-background-50 via-background-100 to-background-50">
+      <div className="flex min-h-[calc(100vh_-_80px)] items-stretch px-4 py-12 md:min-h-[calc(100vh_-_96px)]">
+        <div className="m-auto w-full max-w-md">
+          <div className="glass-card rounded-2xl border border-gray-100 p-8 shadow-lg md:p-10">
+            {/* 로고 */}
+            <div className="mb-8 flex flex-col items-center gap-0 text-center">
+              <img src={weduLogo} alt="WEDU 로고" className="h-28 w-28 object-contain" />
+<div
+  style={{ filter: 'drop-shadow(0 4px 20px rgba(183, 110, 121, 0.45))', opacity: 1 }}
+  className="-mt-8"
+>
+  <span className="text-rosegold text-3xl font-extrabold tracking-wide">WEDU</span>
+</div>
+              <p className="mt-1 text-xs text-gray-400">특별한 순간을 함께 준비해요</p>
+            </div>
 
-        {/* 로고 */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-0 mb-10">
-          <img src={weduLogo} alt="WEDU 로고" className="w-36 h-36 object-contain" />
-          <div style={{ filter: 'drop-shadow(0 4px 20px rgba(183, 110, 121, 0.45))', opacity: 1 }} className="-mt-3">
-            <span className="text-rosegold text-3xl font-extrabold tracking-wide">
-              WEDU
-            </span>
+            {/* 에러 */}
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+                <p className="text-center text-xs text-red-600">{error}</p>
+              </div>
+            )}
+
+            {/* 소셜 로그인 버튼 */}
+            <div className="flex w-full flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => handleSocialLogin('kakao')}
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full bg-[#FEE500] py-3 text-sm font-bold text-[#3C1E1E] shadow-[0_4px_14px_rgba(254,229,0,0.45)] transition hover:brightness-95"
+              >
+                <KakaoIcon />
+                카카오로 계속하기
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSocialLogin('google')}
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-gray-200 bg-white py-3 text-sm font-medium text-gray-700 shadow-[0_4px_14px_rgba(0,0,0,0.08)] transition hover:bg-gray-50"
+              >
+                <GoogleIcon />
+                구글로 계속하기
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/home')}
+                className="w-full cursor-pointer rounded-full bg-gray-100 py-3 text-sm text-gray-400 shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition hover:bg-gray-200 hover:text-gray-600"
+              >
+                비회원으로 둘러보기
+              </button>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 text-center">특별한 순간을 함께 준비해요</p>
-        </div>
-
-        {/* 에러 */}
-        {error && (
-          <div className="w-full mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-500 text-center">
-            {error}
-          </div>
-        )}
-
-        {/* 버튼 영역 */}
-        <div className="flex flex-col gap-3 w-full">
-          <button
-            type="button"
-            onClick={() => handleSocialLogin('kakao')}
-            className="flex items-center justify-center gap-3 w-full py-3 rounded-full bg-[#FEE500] text-sm font-bold text-[#3C1E1E] hover:brightness-95 transition cursor-pointer shadow-[0_4px_14px_rgba(254,229,0,0.45)]"
-          >
-            <KakaoIcon />
-            카카오로 계속하기
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSocialLogin('google')}
-            className="flex items-center justify-center gap-3 w-full py-3 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.08)]"
-          >
-            <GoogleIcon />
-            구글로 계속하기
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate('/home')}
-            className="w-full py-3 rounded-full bg-gray-100 text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
-          >
-            비회원으로 둘러보기
-          </button>
         </div>
       </div>
     </div>

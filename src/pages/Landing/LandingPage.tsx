@@ -1,4 +1,3 @@
-import Footer from '../../components/layout/Footer';
 import HeroSection from './components/HeroSection';
 import FeatureSection from './components/FeatureSection';
 import FeedSection from './components/PopularProposalFeed';
@@ -9,7 +8,7 @@ import CtaSection from './components/CtaSection';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="-m-5 min-h-screen bg-background-50 md:-m-8">
       <HeroSection />
       <FeatureSection />
       <FeedSection />
@@ -17,7 +16,6 @@ export default function LandingPage() {
       <VendorSection />
       <TestimonialSection />
       <CtaSection />
-      <Footer />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LayoutGrid, Gem, PartyPopper, Flower2, Camera, Mail, Music } from 'lucide-react';
 import ShopHero from './components/ShopHero';
 import CategoryFilter from './components/CategoryFilter';
@@ -21,37 +21,9 @@ const CATEGORIES = [
 
 const STYLE_TAGS = ['전체 스타일', '로맨틱', '우아한', '럭셔리', '감성적', '모던', '아늑한', '깜짝', '모험적'];
 
-function smoothScrollTo(target: HTMLElement | null, duration: number) {
-  if (!target) return;
-
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReducedMotion) {
-    target.scrollIntoView({ behavior: 'auto', block: 'start' });
-    return;
-  }
-
-  const startY = window.scrollY;
-  const targetY = target.getBoundingClientRect().top + window.scrollY - 40;
-  const distance = targetY - startY;
-  let startTime: number | null = null;
-
-  const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-
-  function step(currentTime: number) {
-    if (startTime === null) startTime = currentTime;
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    window.scrollTo(0, startY + distance * easeInOutQuad(progress));
-    if (elapsed < duration) requestAnimationFrame(step);
-  }
-
-  requestAnimationFrame(step);
-}
-
 export default function ShopPage() {
   const [filters, setFilters] = useState({ category: '전체', styleTag: '전체 스타일' });
   const [selectedTastes, setSelectedTastes] = useState<string[]>([]);
-  const gridRef = useRef<HTMLDivElement>(null);
   const [keyword, setKeyword] = useState('');
 
   const [allProducts, setAllProducts] = useState<DisplayProduct[]>([]);
@@ -69,10 +41,24 @@ export default function ShopPage() {
       .finally(() => setIsLoading(false));
   }, [filters.category, keyword]);
 
-  const toggleTaste = (label: string) => {
+  // "총 N개" 문구를 id로 타겟팅해서 scrollIntoView로 스크롤.
+  // 실제 여백은 아래 <div id="product-grid">의 scroll-mt-* 클래스(반응형)가 담당함.
+  function scrollToGrid() {
+    const el = document.getElementById('product-grid');
+    if (!el) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function handleCategoryChange(category: string) {
+    setFilters((prev) => ({ ...prev, category }));
+    scrollToGrid();
+  }
+
+  function toggleTaste(label: string) {
     setSelectedTastes((prev) => (prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]));
-    smoothScrollTo(gridRef.current, 800);
-  };
+    scrollToGrid();
+  }
 
   const products = allProducts.filter((product) => {
     const styleMatch = filters.styleTag === '전체 스타일' || product.styles.includes(filters.styleTag);
@@ -88,7 +74,7 @@ export default function ShopPage() {
         <CategoryFilter
           categories={CATEGORIES}
           activeCategory={filters.category}
-          onCategoryChange={(category) => setFilters((prev) => ({ ...prev, category }))}
+          onCategoryChange={handleCategoryChange}
         />
 
         <div className="mx-auto max-w-5xl px-5 md:px-8">
@@ -100,7 +86,7 @@ export default function ShopPage() {
             onKeywordChange={setKeyword}
           />
 
-          <div ref={gridRef} className="scroll-mt-6 pb-14 pt-6">
+          <div id="product-grid" className="scroll-mt-[130px] pb-14 pt-6 md:scroll-mt-[158px]">
             {isLoading ? (
               <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>
             ) : (

@@ -102,10 +102,10 @@ export default function ConnectPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl pt-6 md:pt-10">
 
       {/* 페이지 헤더 */}
-      <div className="text-center mb-10 md:mb-14">
+      <div className="text-center mb-6 md:mb-8">
         <p className="text-xs text-text-muted tracking-[0.25em] uppercase font-medium mb-3">
           Partner Connection
         </p>
@@ -118,7 +118,7 @@ export default function ConnectPage() {
       {/* 연결된 상태 */}
       {partner && (
         <div className="rounded-2xl bg-white border border-border overflow-hidden">
-          <div className="relative h-48 bg-gradient-to-br from-rose-300 via-pink-200 to-amber-100 flex flex-col justify-end p-6 md:p-8">
+          <div className="relative h-48 gradient-primary-bg flex flex-col justify-end p-6 md:p-8">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
                 <Heart className="w-4 h-4 text-white fill-white" strokeWidth={1.5} />
@@ -167,7 +167,7 @@ export default function ConnectPage() {
       {!partner && (
         <>
           <div className="rounded-2xl bg-white border border-border overflow-hidden mb-6">
-            <div className="relative h-56 bg-gradient-to-br from-rose-300 via-pink-200 to-amber-100 flex flex-col items-center justify-center text-center px-6">
+            <div className="relative h-56 gradient-primary-bg flex flex-col items-center justify-center text-center px-6">
               <Heart className="w-10 h-10 text-white mb-4" strokeWidth={1.5} />
               <p className="text-white font-semibold text-base leading-relaxed drop-shadow">
                 아직 파트너와 연결되지 않았어요.<br />

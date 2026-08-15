@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   User,
   CalendarCheck,
@@ -21,6 +21,7 @@ import {
   InvitationSectionTitle,
   InvitationAccountRow,
   InvitationAddButton,
+  formatPhoneNumber,
 } from "./components/InvitationFormControls";
 
 type SectionKey =
@@ -32,7 +33,7 @@ type SectionKey =
   | "message"
   | "design";
 
-const sections = [
+const ALL_SECTIONS = [
   { key: "basic" as SectionKey, label: "기본 정보", icon: User },
   { key: "wedding" as SectionKey, label: "예식 정보", icon: CalendarCheck },
   { key: "directions" as SectionKey, label: "오시는 길", icon: MapPin },
@@ -42,16 +43,32 @@ const sections = [
   { key: "design" as SectionKey, label: "디자인", icon: Palette },
 ];
 
+// index.css의 버튼/카테고리 탭 그라디언트 토큰(--color-btn-from/mid/to)을 그대로 재사용
+const ROSEGOLD_GRADIENT =
+  "linear-gradient(111deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)";
+
+// 각 옵션의 background = 커버 배경색(또는 그라디언트), accent = 구분선·강조 텍스트에 쓰는 포인트색
 const colorOptions = [
-  { name: "로즈골드", value: "#B76E79" },
-  { name: "세이지 그린", value: "#9CAD8E" },
-  { name: "소프트 핑크", value: "#E8C4C8" },
-  { name: "차콜 그레이", value: "#4A4A4A" },
-  { name: "네이비", value: "#2D3A4A" },
-  { name: "라벤더", value: "#C4C4E0" },
-  { name: "웜 아이보리", value: "#D4C5A9" },
-  { name: "피치", value: "#E8C8A0" },
+  { name: "로즈골드", background: "#E8796C", accent: "#E8796C", gradient: ROSEGOLD_GRADIENT as string | undefined },
+  { name: "세이지 그린", background: "#9CAD8E", accent: "#9CAD8E", gradient: undefined as string | undefined },
+  { name: "소프트 핑크", background: "#E8C4C8", accent: "#E8C4C8", gradient: undefined as string | undefined },
+  { name: "차콜 그레이", background: "#4A4A4A", accent: "#4A4A4A", gradient: undefined as string | undefined },
+  { name: "네이비", background: "#2D3A4A", accent: "#2D3A4A", gradient: undefined as string | undefined },
+  { name: "라벤더", background: "#C4C4E0", accent: "#C4C4E0", gradient: undefined as string | undefined },
+  { name: "웜 아이보리", background: "#D4C5A9", accent: "#D4C5A9", gradient: undefined as string | undefined },
+  { name: "피치", background: "#E8C8A0", accent: "#E8C8A0", gradient: undefined as string | undefined },
 ];
+
+// 배경색 밝기에 따라 위에 얹을 텍스트를 흰색/어두운색 중 대비가 되는 쪽으로 고름
+function getContrastTextColor(hex: string): string {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return "#ffffff";
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 165 ? "#221A18" : "#ffffff";
+}
 
 type Account = {
   bank: string;
@@ -59,55 +76,100 @@ type Account = {
   accountNumber: string;
 };
 
+interface InvitationFormState {
+  title: string;
+  groomName: string;
+  groomPhone: string;
+  brideName: string;
+  bridePhone: string;
+  groomFatherName: string;
+  groomMotherName: string;
+  brideFatherName: string;
+  brideMotherName: string;
+  weddingDate: string;
+  weddingTime: string;
+  venueName: string;
+  venueHall: string;
+  address: string;
+  addressDetail: string;
+  groomAccounts: Account[];
+  brideAccounts: Account[];
+  gallery: string[];
+  greetingMessage: string;
+  mainColor: string;
+  accentColor: string;
+  backgroundGradient?: string;
+}
+
+interface TemplateHandoff {
+  mainColor?: string;
+  accentColor?: string;
+  backgroundGradient?: string;
+  title?: string;
+  // "수정으로 돌아가기"로 재진입할 때, 이전에 입력하던 폼 전체가 여기 통째로 실려온다
+  restoredForm?: InvitationFormState;
+}
+
 export default function InvitationCreatePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const handoff = (location.state ?? {}) as TemplateHandoff;
 
-  const [activeSection, setActiveSection] =
-    useState<SectionKey>("basic");
+  // 템플릿을 골라 색상(mainColor)이 이미 정해진 채로 들어온 경우, 디자인 단계는 건너뛴다.
+  // (restoredForm으로 재진입한 경우는 템플릿 선택이 아니므로 디자인 단계를 그대로 유지)
+  const cameFromTemplate = Boolean(handoff.mainColor) && !handoff.restoredForm;
+  const sections = cameFromTemplate
+    ? ALL_SECTIONS.filter((section) => section.key !== "design")
+    : ALL_SECTIONS;
 
-  const [form, setForm] = useState({
-    title: "",
-    groomName: "",
-    groomPhone: "",
-    brideName: "",
-    bridePhone: "",
+  const [activeSection, setActiveSection] = useState<SectionKey>("basic");
 
-    groomFatherName: "",
-    groomMotherName: "",
-    brideFatherName: "",
-    brideMotherName: "",
+  const [form, setForm] = useState<InvitationFormState>(() => {
+    if (handoff.restoredForm) {
+      return { ...handoff.restoredForm };
+    }
 
-    weddingDate: "",
-    weddingTime: "",
-    venueName: "",
-    venueHall: "",
+    return {
+      title: handoff.title ?? "",
+      groomName: "",
+      groomPhone: "",
+      brideName: "",
+      bridePhone: "",
 
-    address: "",
-    addressDetail: "",
+      groomFatherName: "",
+      groomMotherName: "",
+      brideFatherName: "",
+      brideMotherName: "",
 
-    groomAccounts: [] as Account[],
-    brideAccounts: [] as Account[],
+      weddingDate: "",
+      weddingTime: "",
+      venueName: "",
+      venueHall: "",
 
-    gallery: [] as string[],
+      address: "",
+      addressDetail: "",
 
-    greetingMessage: "",
+      groomAccounts: [],
+      brideAccounts: [],
 
-    mainColor: "#B76E79",
+      gallery: [],
+
+      greetingMessage: "",
+
+      mainColor: handoff.mainColor ?? "#E8796C",
+      accentColor: handoff.accentColor ?? handoff.mainColor ?? "#E8796C",
+      backgroundGradient: handoff.backgroundGradient ?? ROSEGOLD_GRADIENT,
+    };
   });
 
-  const updateField = (
-    field: keyof typeof form,
-    value: string
-  ) => {
+  const updateField = (field: keyof InvitationFormState, value: string) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const addAccount = (
-    side: "groomAccounts" | "brideAccounts"
-  ) => {
+  const addAccount = (side: "groomAccounts" | "brideAccounts") => {
     setForm((prev) => ({
       ...prev,
       [side]: [
@@ -137,10 +199,7 @@ export default function InvitationCreatePage() {
     });
   };
 
-  const removeAccount = (
-    side: "groomAccounts" | "brideAccounts",
-    index: number
-  ) => {
+  const removeAccount = (side: "groomAccounts" | "brideAccounts", index: number) => {
     setForm((prev) => ({
       ...prev,
       [side]: prev[side].filter((_, i) => i !== index),
@@ -173,22 +232,24 @@ export default function InvitationCreatePage() {
     }));
   };
 
-  const currentIndex = sections.findIndex(
-    (section) => section.key === activeSection
-  );
+  const currentIndex = sections.findIndex((section) => section.key === activeSection);
 
   const goNext = () => {
     if (currentIndex < sections.length - 1) {
       setActiveSection(sections[currentIndex + 1].key);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   const goPrev = () => {
     if (currentIndex > 0) {
       setActiveSection(sections[currentIndex - 1].key);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handlePreview = () => {
+    navigate("/invitation/preview", { state: { form } });
   };
 
   return (
@@ -211,7 +272,7 @@ export default function InvitationCreatePage() {
       </section>
 
       {/* 단계 네비게이션 */}
-      <div className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
+      <div className="sticky top-16 md:top-20 z-30 border-b border-border bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-6xl overflow-x-auto px-4 py-3">
           <div className="flex min-w-max justify-center gap-2">
             {sections.map((section, index) => {
@@ -222,17 +283,16 @@ export default function InvitationCreatePage() {
                 <button
                   key={section.key}
                   type="button"
-                  onClick={() => setActiveSection(section.key)}
+                  onClick={() => {
+                    setActiveSection(section.key);
+                    document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
                   className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition md:text-sm ${
                     active ? "category-tab-active" : "category-tab-inactive"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
-
-                  <span className="hidden sm:inline">
-                    {index + 1}.
-                  </span>
-
+                  <span className="hidden sm:inline">{index + 1}.</span>
                   {section.label}
                 </button>
               );
@@ -245,20 +305,19 @@ export default function InvitationCreatePage() {
       <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
           {/* 입력 영역 */}
-          <section className="rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10">
+          <section
+            id="invitation-form-section"
+            className="scroll-mt-[130px] rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10 md:scroll-mt-[150px]"
+          >
             {/* 기본 정보 */}
             {activeSection === "basic" && (
               <div className="space-y-10">
-                <InvitationSectionTitle>
-                  기본 정보
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>기본 정보</InvitationSectionTitle>
 
                 <InvitationTextField
                   label="청첩장 제목"
                   value={form.title}
-                  onChange={(e) =>
-                    updateField("title", e.target.value)
-                  }
+                  onChange={(e) => updateField("title", e.target.value)}
                   placeholder="예: 저희 결혼합니다"
                 />
 
@@ -266,91 +325,65 @@ export default function InvitationCreatePage() {
                   <InvitationTextField
                     label="신랑 성함"
                     value={form.groomName}
-                    onChange={(e) =>
-                      updateField("groomName", e.target.value)
-                    }
+                    onChange={(e) => updateField("groomName", e.target.value)}
                     placeholder="홍길동"
                   />
 
                   <InvitationTextField
                     label="신랑 연락처"
+                    type="tel"
+                    inputMode="numeric"
                     value={form.groomPhone}
-                    onChange={(e) =>
-                      updateField("groomPhone", e.target.value)
-                    }
+                    onChange={(e) => updateField("groomPhone", formatPhoneNumber(e.target.value))}
                     placeholder="010-0000-0000"
                   />
 
                   <InvitationTextField
                     label="신부 성함"
                     value={form.brideName}
-                    onChange={(e) =>
-                      updateField("brideName", e.target.value)
-                    }
+                    onChange={(e) => updateField("brideName", e.target.value)}
                     placeholder="김철수"
                   />
 
                   <InvitationTextField
                     label="신부 연락처"
+                    type="tel"
+                    inputMode="numeric"
                     value={form.bridePhone}
-                    onChange={(e) =>
-                      updateField("bridePhone", e.target.value)
-                    }
+                    onChange={(e) => updateField("bridePhone", formatPhoneNumber(e.target.value))}
                     placeholder="010-0000-0000"
                   />
                 </div>
 
                 <div>
-                  <h3 className="mb-5 text-sm font-bold text-text">
-                    혼주 정보
-                  </h3>
+                  <h3 className="mb-5 text-sm font-bold text-text">혼주 정보</h3>
 
                   <div className="grid gap-6 md:grid-cols-2">
                     <InvitationTextField
                       label="신랑 아버님"
                       value={form.groomFatherName}
-                      onChange={(e) =>
-                        updateField(
-                          "groomFatherName",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => updateField("groomFatherName", e.target.value)}
                       placeholder="아버님 성함"
                     />
 
                     <InvitationTextField
                       label="신랑 어머님"
                       value={form.groomMotherName}
-                      onChange={(e) =>
-                        updateField(
-                          "groomMotherName",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => updateField("groomMotherName", e.target.value)}
                       placeholder="어머님 성함"
                     />
 
                     <InvitationTextField
                       label="신부 아버님"
                       value={form.brideFatherName}
-                      onChange={(e) =>
-                        updateField(
-                          "brideFatherName",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => updateField("brideFatherName", e.target.value)}
                       placeholder="아버님 성함"
                     />
 
                     <InvitationTextField
                       label="신부 어머님"
                       value={form.brideMotherName}
-                      onChange={(e) =>
-                        updateField(
-                          "brideMotherName",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => updateField("brideMotherName", e.target.value)}
                       placeholder="어머님 성함"
                     />
                   </div>
@@ -361,56 +394,34 @@ export default function InvitationCreatePage() {
             {/* 예식 정보 */}
             {activeSection === "wedding" && (
               <div className="space-y-8">
-                <InvitationSectionTitle>
-                  예식 정보
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>예식 정보</InvitationSectionTitle>
 
                 <div className="grid gap-6 md:grid-cols-2">
                   <InvitationTextField
                     label="예식 날짜"
                     type="date"
                     value={form.weddingDate}
-                    onChange={(e) =>
-                      updateField(
-                        "weddingDate",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => updateField("weddingDate", e.target.value)}
                   />
 
                   <InvitationTextField
                     label="예식 시간"
                     type="time"
                     value={form.weddingTime}
-                    onChange={(e) =>
-                      updateField(
-                        "weddingTime",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => updateField("weddingTime", e.target.value)}
                   />
 
                   <InvitationTextField
                     label="예식장"
                     value={form.venueName}
-                    onChange={(e) =>
-                      updateField(
-                        "venueName",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => updateField("venueName", e.target.value)}
                     placeholder="예: 더채플앳청담"
                   />
 
                   <InvitationTextField
                     label="홀"
                     value={form.venueHall}
-                    onChange={(e) =>
-                      updateField(
-                        "venueHall",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => updateField("venueHall", e.target.value)}
                     placeholder="예: 3층 그랜드홀"
                   />
                 </div>
@@ -420,41 +431,26 @@ export default function InvitationCreatePage() {
             {/* 오시는 길 */}
             {activeSection === "directions" && (
               <div className="space-y-8">
-                <InvitationSectionTitle>
-                  오시는 길
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>오시는 길</InvitationSectionTitle>
 
                 <InvitationTextField
                   label="주소"
                   value={form.address}
-                  onChange={(e) =>
-                    updateField("address", e.target.value)
-                  }
+                  onChange={(e) => updateField("address", e.target.value)}
                   placeholder="예: 서울특별시 강남구..."
                 />
 
                 <InvitationTextField
                   label="상세 위치"
                   value={form.addressDetail}
-                  onChange={(e) =>
-                    updateField(
-                      "addressDetail",
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => updateField("addressDetail", e.target.value)}
                   placeholder="예: 2호선 강남역 3번 출구 도보 5분"
                 />
 
                 <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
                   <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
-
-                  <p className="text-sm font-semibold text-text">
-                    지도 영역
-                  </p>
-
-                  <p className="mt-1 text-xs text-text-muted">
-                    실제 지도 API 연결은 추후 진행합니다.
-                  </p>
+                  <p className="text-sm font-semibold text-text">지도 영역</p>
+                  <p className="mt-1 text-xs text-text-muted">실제 지도 API 연결은 추후 진행합니다.</p>
                 </div>
               </div>
             )}
@@ -462,32 +458,18 @@ export default function InvitationCreatePage() {
             {/* 계좌 */}
             {activeSection === "account" && (
               <div className="space-y-10">
-                <InvitationSectionTitle>
-                  계좌 정보
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>계좌 정보</InvitationSectionTitle>
 
                 {(
                   [
-                    {
-                      key: "groomAccounts" as const,
-                      label: "신랑측 계좌",
-                    },
-                    {
-                      key: "brideAccounts" as const,
-                      label: "신부측 계좌",
-                    },
+                    { key: "groomAccounts" as const, label: "신랑측 계좌" },
+                    { key: "brideAccounts" as const, label: "신부측 계좌" },
                   ]
                 ).map(({ key, label }) => (
                   <div key={key}>
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-text">
-                        {label}
-                      </h3>
-
-                      <InvitationAddButton
-                        label="계좌 추가"
-                        onClick={() => addAccount(key)}
-                      />
+                      <h3 className="text-sm font-bold text-text">{label}</h3>
+                      <InvitationAddButton label="계좌 추가" onClick={() => addAccount(key)} />
                     </div>
 
                     {form[key].length === 0 ? (
@@ -497,25 +479,11 @@ export default function InvitationCreatePage() {
                     ) : (
                       <div className="space-y-3">
                         {form[key].map((account, index) => (
-                          <div
-                            key={index}
-                            className="relative"
-                          >
+                          <div key={index} className="relative">
                             <InvitationAccountRow
                               account={account}
-                              onChange={(next) =>
-                                updateAccount(
-                                  key,
-                                  index,
-                                  next
-                                )
-                              }
-                              onRemove={() =>
-                                removeAccount(
-                                  key,
-                                  index
-                                )
-                              }
+                              onChange={(next) => updateAccount(key, index, next)}
+                              onRemove={() => removeAccount(key, index)}
                             />
                           </div>
                         ))}
@@ -529,20 +497,13 @@ export default function InvitationCreatePage() {
             {/* 갤러리 */}
             {activeSection === "gallery" && (
               <div className="space-y-8">
-                <InvitationSectionTitle>
-                  갤러리
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>갤러리</InvitationSectionTitle>
 
                 <div className="rounded-2xl bg-surface p-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-bold text-text">
-                        사진 추가
-                      </p>
-
-                      <p className="mt-1 text-xs text-text-muted">
-                        청첩장에 보여줄 사진을 추가해주세요.
-                      </p>
+                      <p className="text-sm font-bold text-text">사진 추가</p>
+                      <p className="mt-1 text-xs text-text-muted">청첩장에 보여줄 사진을 추가해주세요.</p>
                     </div>
 
                     <Button variant="main" size="sm" onClick={addGallery}>
@@ -554,29 +515,16 @@ export default function InvitationCreatePage() {
                 {form.gallery.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border py-16 text-center">
                     <ImageIcon className="mx-auto mb-3 h-9 w-9 text-text-muted" />
-
-                    <p className="text-sm font-semibold text-text">
-                      아직 추가된 사진이 없어요.
-                    </p>
-
-                    <p className="mt-1 text-xs text-text-muted">
-                      사진 추가 버튼을 눌러주세요.
-                    </p>
+                    <p className="text-sm font-semibold text-text">아직 추가된 사진이 없어요.</p>
+                    <p className="mt-1 text-xs text-text-muted">사진 추가 버튼을 눌러주세요.</p>
                   </div>
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-2">
                     {form.gallery.map((image, index) => (
-                      <div
-                        key={index}
-                        className="relative rounded-2xl border border-border bg-white p-3"
-                      >
+                      <div key={index} className="relative rounded-2xl border border-border bg-white p-3">
                         {image ? (
                           <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-surface">
-                            <img
-                              src={image}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
+                            <img src={image} alt="" className="h-full w-full object-cover" />
                           </div>
                         ) : (
                           <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-surface">
@@ -586,21 +534,14 @@ export default function InvitationCreatePage() {
 
                         <input
                           value={image}
-                          onChange={(e) =>
-                            updateGallery(
-                              index,
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => updateGallery(index, e.target.value)}
                           placeholder="이미지 URL"
                           className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition focus:border-primary"
                         />
 
                         <button
                           type="button"
-                          onClick={() =>
-                            removeGallery(index)
-                          }
+                          onClick={() => removeGallery(index)}
                           className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-text-muted shadow-sm transition hover:text-red-500"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -615,20 +556,13 @@ export default function InvitationCreatePage() {
             {/* 인사말 */}
             {activeSection === "message" && (
               <div className="space-y-8">
-                <InvitationSectionTitle>
-                  인사말
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>인사말</InvitationSectionTitle>
 
                 <InvitationTextArea
                   label="하객들에게 전할 인사말"
                   rows={8}
                   value={form.greetingMessage}
-                  onChange={(e) =>
-                    updateField(
-                      "greetingMessage",
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => updateField("greetingMessage", e.target.value)}
                   placeholder={`서로를 향한 마음이 하나 되는 날,
 
 소중한 분들을 모시고
@@ -642,46 +576,36 @@ export default function InvitationCreatePage() {
             {/* 디자인 */}
             {activeSection === "design" && (
               <div className="space-y-8">
-                <InvitationSectionTitle>
-                  디자인
-                </InvitationSectionTitle>
+                <InvitationSectionTitle>디자인</InvitationSectionTitle>
 
                 <div>
-                  <p className="mb-4 text-sm font-bold text-text">
-                    메인 색상
-                  </p>
+                  <p className="mb-4 text-sm font-bold text-text">메인 색상</p>
 
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {colorOptions.map((color) => {
-                      const selected =
-                        form.mainColor === color.value;
+                      const selected = form.mainColor === color.background;
 
                       return (
                         <SelectableCard
-                          key={color.value}
+                          key={color.background}
                           isSelected={selected}
                           onClick={() =>
-                            updateField(
-                              "mainColor",
-                              color.value
-                            )
+                            setForm((prev) => ({
+                              ...prev,
+                              mainColor: color.background,
+                              accentColor: color.accent,
+                              backgroundGradient: color.gradient,
+                            }))
                           }
                           className="flex items-center gap-3"
                         >
                           <span
                             className="h-8 w-8 shrink-0 rounded-full border border-white shadow-sm"
-                            style={{
-                              backgroundColor:
-                                color.value,
-                            }}
+                            style={{ backgroundColor: color.background }}
                           />
 
                           <span
-                            className={`text-xs font-semibold ${
-                              selected
-                                ? "text-primary"
-                                : "text-text-muted"
-                            }`}
+                            className={`text-xs font-semibold ${selected ? "text-primary" : "text-text-muted"}`}
                           >
                             {color.name}
                           </span>
@@ -693,42 +617,28 @@ export default function InvitationCreatePage() {
 
                 {/* 미리보기 */}
                 <div className="rounded-[28px] bg-surface p-6">
-                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-text-muted">
-                    Preview
-                  </p>
+                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-text-muted">Preview</p>
 
-                  <div
-                    className="mx-auto max-w-sm overflow-hidden rounded-[28px] bg-white shadow-lg"
-                  >
+                  <div className="mx-auto max-w-sm overflow-hidden rounded-[28px] bg-white shadow-lg">
                     <div
-                      className="px-6 py-16 text-center text-white"
+                      className="px-5 py-14 text-center"
                       style={{
-                        backgroundColor: form.mainColor,
+                        background:
+                          form.backgroundGradient ??
+                          `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
+                        color: getContrastTextColor(form.mainColor),
                       }}
                     >
-                      <p className="mb-3 text-xs tracking-[0.3em] opacity-80">
-                        WEDDING INVITATION
-                      </p>
-
-                      <h3 className="text-2xl font-serif font-semibold">
-                        {form.title ||
-                          "저희 결혼합니다"}
-                      </h3>
+                      <p className="mb-3 text-xs tracking-[0.3em] opacity-80">WEDDING INVITATION</p>
+                      <h3 className="text-2xl font-serif font-semibold">{form.title || "저희 결혼합니다"}</h3>
                     </div>
 
                     <div className="px-6 py-10 text-center">
-                      <p className="text-lg font-semibold text-text">
-                        {form.groomName || "신랑"}{" "}
-                        <span className="mx-2 text-primary">
-                          &
-                        </span>{" "}
+                      <p className="font-serif text-lg font-semibold text-text">
+                        {form.groomName || "신랑"} <span className="mx-2 text-primary">&</span>{" "}
                         {form.brideName || "신부"}
                       </p>
-
-                      <p className="mt-3 text-sm text-text-muted">
-                        {form.weddingDate ||
-                          "2026. 00. 00."}
-                      </p>
+                      <p className="mt-3 text-sm text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
                     </div>
                   </div>
                 </div>
@@ -752,19 +662,12 @@ export default function InvitationCreatePage() {
               </span>
 
               {currentIndex < sections.length - 1 ? (
-                <Button
-                  variant="main"
-                  onClick={goNext}
-                  className="flex items-center gap-1"
-                >
+                <Button variant="main" onClick={goNext} className="flex items-center gap-1">
                   다음
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button
-                  variant="main"
-                  onClick={() => navigate("/invitation")}
-                >
+                <Button variant="main" onClick={handlePreview}>
                   미리보기
                 </Button>
               )}
@@ -774,58 +677,32 @@ export default function InvitationCreatePage() {
           {/* 오른쪽 미니 미리보기 */}
           <aside className="hidden lg:block">
             <div className="sticky top-24 rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)]">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-text-muted">
-                Preview
-              </p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-text-muted">Preview</p>
 
               <div className="overflow-hidden rounded-[24px] border border-border">
                 <div
-                  className="px-5 py-14 text-center text-white"
+                  className="px-5 py-14 text-center"
                   style={{
-                    backgroundColor: form.mainColor,
+                    background:
+                      form.backgroundGradient ??
+                      `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
+                    color: getContrastTextColor(form.mainColor),
                   }}
                 >
-                  <p className="text-[9px] tracking-[0.25em] opacity-80">
-                    WEDDING INVITATION
-                  </p>
-
-                  <h2 className="mt-3 font-serif text-xl">
-                    {form.title ||
-                      "저희 결혼합니다"}
-                  </h2>
+                  <p className="text-[9px] tracking-[0.25em] opacity-80">WEDDING INVITATION</p>
+                  <h2 className="mt-3 font-serif text-xl">{form.title || "저희 결혼합니다"}</h2>
                 </div>
 
                 <div className="px-5 py-8 text-center">
-                  <p className="text-sm font-semibold text-text">
-                    {form.groomName || "신랑"}{" "}
-                    <span className="mx-1 text-primary">
-                      &
-                    </span>{" "}
+                  <p className="font-serif text-sm font-semibold text-text">
+                    {form.groomName || "신랑"} <span className="mx-1 text-primary">&</span>{" "}
                     {form.brideName || "신부"}
                   </p>
-
                   <div className="mx-auto my-5 h-px w-10 bg-border" />
 
-                  <p className="text-xs leading-5 text-text-muted">
-                    {form.weddingDate ||
-                      "2026. 00. 00."}
-                  </p>
-
-                  <p className="mt-1 text-xs text-text-muted">
-                    {form.venueName ||
-                      "예식장"}
-                  </p>
+                  <p className="text-xs leading-5 text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
+                  <p className="mt-1 text-xs text-text-muted">{form.venueName || "예식장"}</p>
                 </div>
-              </div>
-
-              <div className="mt-5 rounded-2xl bg-surface p-4">
-                <p className="text-xs font-semibold text-text-muted">
-                  현재 단계
-                </p>
-
-                <p className="mt-1 text-sm font-bold text-primary">
-                  {sections[currentIndex].label}
-                </p>
               </div>
             </div>
           </aside>

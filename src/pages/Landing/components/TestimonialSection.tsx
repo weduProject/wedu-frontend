@@ -63,7 +63,7 @@ export default function TestimonialSection() {
   return (
     <section className="bg-[#F1EEE7] py-20 md:py-28">
       <div className="w-full px-6 md:px-16">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-6xl px-6 md:px-12">
           <h2 className="mb-10 text-3xl font-bold text-text md:text-4xl">( 실제 후기 )</h2>
 
           {/* 가로 슬라이드 영역 */}

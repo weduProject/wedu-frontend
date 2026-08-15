@@ -3,7 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 export default function StatsSection() {
   return (
     <section className="bg-[#F1EEE7] py-20 md:py-28">
-      <div className="w-full px-6 md:px-16">
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
         <div className="mb-12 md:mb-16">
           <span className="mb-3 block text-sm italic text-primary">About WEDU</span>
           <h2 className="text-3xl font-bold leading-tight text-text md:text-4xl lg:text-5xl">

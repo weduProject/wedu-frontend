@@ -126,7 +126,7 @@ export default function MypagePage() {
       </div>
 
       {/* 대시보드로 이동 */}
-      <div className="flex justify-center pt-2 pb-4">
+      <div className="flex justify-center pt-6 pb-4">
         <button
           type="button"
           onClick={() => navigate('/mypage/dashboard')}

@@ -11,8 +11,8 @@ const FEATURES = [
 
 export default function FeatureSection() {
   return (
-    <section className="bg-white py-20 md:py-28">
-      <div className="w-full px-6 md:px-16">
+    <section className="bg-background-50 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
         <div className="mb-16 text-center">
           <div className="mb-8 mx-auto flex h-40 w-40 items-center justify-center md:h-52 md:w-52">
             <img
@@ -39,9 +39,9 @@ export default function FeatureSection() {
             <Link
               key={title}
               to={link}
-              className="group rounded-xl border border-border bg-white p-6 no-underline transition-all duration-300 hover:border-primary/50 md:p-8"
+              className="group glass-card rounded-xl p-6 no-underline transition-all duration-300 hover:border-primary/50 md:p-8"
             >
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-light transition-colors group-hover:bg-primary/15">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary-100 transition-colors group-hover:bg-primary/15">
                 <Icon className="h-6 w-6 text-primary" strokeWidth={1.8} />
               </div>
               <h3 className="mb-2 whitespace-pre-line text-lg font-bold leading-snug text-text md:text-xl">
