@@ -11,7 +11,7 @@ export interface QuizAnswer {
 export interface QuizQuestion {
   id: string;
   text: string;
-  hint: string;
+  hint?: string;
   type: QuestionType;
   maxSelect?: number;
   maxOrder?: number;
@@ -83,7 +83,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q1',
     text: '어떤 분위기의 프로포즈를 가장 원하시나요?',
-    hint: '하나만 선택해주세요.',
     type: 'single',
     answers: [
       { label: '둘만의 조용하고 로맨틱한 프로포즈', value: 'ROMANTIC_PRIVATE' },
@@ -97,7 +96,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q2',
     text: '프로포즈를 하고 싶은 장소는 어디인가요?',
-    hint: '하나만 선택해주세요.',
     type: 'single',
     answers: [
       { label: '호텔 또는 프라이빗 객실', value: 'HOTEL' },
@@ -112,7 +110,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q3',
     text: '프로포즈를 어느 정도까지 직접 준비하고 싶나요?',
-    hint: '하나만 선택해주세요.',
     type: 'single',
     answers: [
       { label: '장소부터 장식과 진행까지 업체에 모두 맡기고 싶어요', value: 'FULL_SERVICE' },
@@ -126,7 +123,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q4',
     text: '업체에 맡기고 싶은 항목은 무엇인가요?',
-    hint: '최대 3개까지 선택해주세요.',
+    hint: '최대 3개까지 선택할 수 있어요.',
     type: 'multi',
     maxSelect: 3,
     answers: [
@@ -145,7 +142,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q5',
     text: '프로포즈에서 가장 중요하게 생각하는 것은 무엇인가요?',
-    hint: '가장 중요한 항목 2개를 순서대로 선택해주세요.',
+    hint: '가장 중요한 2가지를 순서대로 선택해주세요.',
     type: 'ordered',
     maxOrder: 2,
     answers: [
@@ -176,7 +173,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q7',
     text: '상대방이 부담스러워하거나\n원하지 않을 것 같은 요소가 있나요?',
-    hint: '복수 선택할 수 있습니다.',
+    hint: '여러 개 선택할 수 있어요.',
     type: 'multi',
     answers: [
       { label: '사람이 많은 장소에서 하는 공개 프로포즈', value: 'PUBLIC_EVENT' },
@@ -194,7 +191,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q8',
     text: '프로포즈 예정 시기는 언제인가요?',
-    hint: '하나만 선택해주세요.',
     type: 'single',
     answers: [
       { label: '2주 이내', value: 'WITHIN_2_WEEKS' },

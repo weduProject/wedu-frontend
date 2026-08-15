@@ -212,9 +212,9 @@ export default function SharePage() {
 
         {/* D-day */}
         {data.dday && (
-          <section className="rounded-2xl bg-gradient-to-br from-rose-300 via-pink-200 to-amber-100 p-6 text-white">
+          <section className="h-36 flex flex-col justify-center rounded-2xl gradient-primary-bg p-6 text-white">
             <p className="text-xs tracking-[0.2em] uppercase font-medium text-white/80 mb-1">Wedding D-day</p>
-            <h2 className="text-3xl font-bold mb-1">D-{data.dday.daysRemaining}</h2>
+            <h2 className="text-3xl font-bold mb-2">D-{data.dday.daysRemaining}</h2>
             <p className="text-sm text-white/80">{formatDate(data.dday.weddingDate)}</p>
           </section>
         )}

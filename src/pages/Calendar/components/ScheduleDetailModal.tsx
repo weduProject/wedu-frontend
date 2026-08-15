@@ -1,6 +1,9 @@
 
 import { Button } from '../../../components';
 import type { ScheduleItem } from '../CalendarPage';
+import ConfirmDeleteModal from '../../../components/ui/ConfirmDeleteModal';
+import { useState } from 'react';
+
 interface ScheduleDetailModalProps {
   schedules: ScheduleItem[];
   onClose: () => void;
@@ -9,6 +12,7 @@ interface ScheduleDetailModalProps {
 }
 
 export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDelete }: ScheduleDetailModalProps) {
+  const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
   const displayDate = schedules[0]?.date || '';
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -41,7 +45,7 @@ export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDele
                 <Button
                   type="button"
                   variant='secondary'
-                  onClick={() => onDelete(schedule.id)}
+                  onClick={() => setScheduleToDelete(schedule.id)}
                 >
                   삭제
                 </Button>
@@ -86,6 +90,16 @@ export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDele
         </div>
         
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!scheduleToDelete}
+        onClose={() => setScheduleToDelete(null)}
+        onConfirm={() => {
+          if (scheduleToDelete) {
+            onDelete(scheduleToDelete);
+            setScheduleToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

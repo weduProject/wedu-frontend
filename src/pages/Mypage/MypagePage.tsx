@@ -2,13 +2,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { PenLine, MessageCircle, Heart, Bookmark, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
+const hasOnboardingToken = Boolean(localStorage.getItem('wedu_onboarding'));
+
 const MENU_ITEMS = [
   {
     icon: <Heart className="h-4 w-4 text-primary" strokeWidth={1.8} />,
     bg: 'bg-primary-light',
     title: '심리테스트 결과',
     desc: '나의 프로포즈 스타일 확인',
-    to: '/onboarding',
+    to: hasOnboardingToken ? '/onboarding/result' : '/onboarding',
   },
   {
     icon: <Bookmark className="h-4 w-4 text-amber-500" strokeWidth={1.8} />,
@@ -28,7 +30,7 @@ const MENU_ITEMS = [
     icon: <MessageCircle className="h-4 w-4 text-text-muted" strokeWidth={1.8} />,
     bg: 'bg-gray-100',
     title: '프로필 수정',
-    desc: '이름, 결혼식 날짜 변경',
+    desc: '이름·결혼식 날짜 변경 / 파트너·공유 링크 연결',
     to: '/mypage/edit',
   },
 ];
