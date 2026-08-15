@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, MessageCircle, User } from "lucide-react";
+import { CategoryBadge } from "../../components";
 import type { CommunityPost } from "./CommunityContext";
 
 interface Props {
@@ -16,7 +17,7 @@ export default function CommunityCard({ post }: Props) {
     >
       {/* 카테고리 / 날짜 */}
       <div className="mb-1 flex items-center gap-3">
-        <span className="rounded-full bg-rosegold-1/40 px-3 py-1 text-[11px] font-bold text-rosegold-3">
+        <span className="rounded-full bg-primary-light px-3.5 py-1.5 text-xs font-bold text-primary">
           {post.category}
         </span>
         <span className="text-xs font-medium text-text-muted">{post.date}</span>

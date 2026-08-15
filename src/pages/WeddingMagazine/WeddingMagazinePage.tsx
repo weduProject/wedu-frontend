@@ -12,7 +12,7 @@ import img7 from '../../assets/magazine/7.png';
 import img8 from '../../assets/magazine/8.png';
 import img9 from '../../assets/magazine/9.png';
 import img10 from '../../assets/magazine/10.png';
-import heroImg from '../../assets/magazine/hero.png';
+import heroImg from '../../assets/magazine/hero.jpg';
 
 interface MagazinePost {
   id: string | number;
@@ -164,25 +164,25 @@ export default function WeddingMagazinePage() {
   return (
     <div className="-mx-5 md:-mx-8 -mt-5 md:-mt-8 -mb-5 md:-mb-8">
       {/* ── Hero (full bleed) ── */}
-<section className="relative h-[658px] flex items-center justify-center overflow-hidden">
-  <img src={heroImg} alt="매거진 히어로" className="absolute inset-0 w-full h-full object-cover" />
-  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/5 to-black/30" />
-  <div className="relative z-10 text-center px-6 max-w-2xl">
-    <span className="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/25 text-white/90 text-xs font-medium tracking-[0.2em] uppercase mb-6">
-      Wedding Magazine
-    </span>
-    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-      박람회 &amp; 플래너<br />웨딩 매거진
-    </h1>
-    <p className="mt-5 text-white/70 text-sm md:text-base leading-relaxed">
-      믿을 수 있는 웨딩 박람회 일정부터 플래너 선택 꿀팁까지,
-      <br className="hidden md:block" />
-      예비부부를 위한 리얼 정보를 만나보세요.
-    </p>
-  </div>
-</section>
+      <section className="relative h-[658px] flex items-center justify-center overflow-hidden">
+        <img src={heroImg} alt="매거진 히어로" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/5 to-black/30" />
+        <div className="relative z-10 text-center px-6 max-w-2xl">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/25 text-white/90 text-xs font-medium tracking-[0.2em] uppercase mb-6">
+            Wedding Magazine
+          </span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            박람회 &amp; 플래너<br />웨딩 매거진
+          </h1>
+          <p className="mt-5 text-white/70 text-sm md:text-base leading-relaxed">
+            믿을 수 있는 웨딩 박람회 일정부터 플래너 선택 꿀팁까지,
+            <br className="hidden md:block" />
+            예비부부를 위한 리얼 정보를 만나보세요.
+          </p>
+        </div>
+      </section>
 
-{/* ── Sticky category tabs (full bleed) ── */}
+      {/* ── Sticky category tabs (full bleed) ── */}
       <section className="sticky top-16 z-30 border-b border-[#E7E4E3]/60 bg-[#FAF8F8]/80 backdrop-blur-[12px] md:top-20">
         <div className="mx-auto max-w-5xl px-5 md:px-8">
           <div className="flex items-center gap-3 overflow-x-auto py-4 scrollbar-hide">

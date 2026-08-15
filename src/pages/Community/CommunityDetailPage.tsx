@@ -53,10 +53,11 @@ export default function CommunityDetailPage() {
     <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       <div className="mx-auto w-full max-w-4xl px-5 py-10 md:px-8">
         <button
+          type="button"
           onClick={() => navigate(backPath)}
-          className="mb-6 flex w-fit items-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-[13px] font-bold text-text-muted shadow-sm transition-colors hover:text-text"
+          className="mb-6 flex w-fit items-center gap-1.5 rounded-full border border-border bg-white/90 px-4 py-2 text-xs font-medium text-text-muted shadow-md backdrop-blur transition-colors hover:text-primary"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
           {backLabel}
         </button>
 
