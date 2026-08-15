@@ -59,7 +59,7 @@ const FOOTER_COLUMNS = [
 const CUSTOMER_SERVICE_ITEMS = ['이용약관', '개인정보처리방침', '1:1 문의'];
 
 const SOCIAL_LINKS = [
-  { label: '인스타그램', Icon: InstagramIcon, href: 'https://www.instagram.com/wedu_official' },
+  { label: '인스타그램', Icon: InstagramIcon, href: 'https://www.instagram.com/wedu_startup?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==' },
   { label: '카카오톡 채널', Icon: ChatIcon, href: '#' },
   { label: '유튜브', Icon: YoutubeIcon, href: '#' },
   { label: '이메일 문의', Icon: Mail, href: 'mailto:hello@wedu.com' },
