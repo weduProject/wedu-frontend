@@ -16,18 +16,18 @@ export interface BudgetItem {
 
 const CATEGORY_TO_ENUM: Record<BudgetCategory, string> = {
   '웨딩홀/예식장': 'VENUE',
-  '스튜디오/드레스': 'DRESS',
+  '스튜디오/드레스': 'STUDIO_DRESS',
   '허니문': 'HONEYMOON',
-  '예물/예단': 'JEWELRY',
-  '기타': 'ETC',
+  '예물/예단': 'JEWELRY_GIFTS',
+  '기타': 'OTHER',
 };
 
 const ENUM_TO_CATEGORY: Record<string, BudgetCategory> = {
   VENUE: '웨딩홀/예식장',
-  DRESS: '스튜디오/드레스',
+  STUDIO_DRESS: '스튜디오/드레스',
   HONEYMOON: '허니문',
-  JEWELRY: '예물/예단',
-  ETC: '기타',
+  JEWELRY_GIFTS: '예물/예단',
+  OTHER: '기타',
 };
 
 interface BudgetContextType {
@@ -158,6 +158,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     if (!target) return;
 
     const newIsPaid = !target.isPaid;
+    const newPaidAmount = newIsPaid ? target.budgetAmount : 0;
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isPaid: newIsPaid, paidAmount: newIsPaid ? item.budgetAmount : 0 } : item
@@ -165,9 +166,21 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     );
 
     try {
-      await apiFetch(`/api/budget-items/${id}/completion`, {
-        method: 'PATCH',
-      });
+      await Promise.all([
+        apiFetch(`/api/budget-items/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: target.title,
+            category: CATEGORY_TO_ENUM[target.category],
+            plannedAmount: target.budgetAmount,
+            spentAmount: newPaidAmount,
+          }),
+        }),
+        apiFetch(`/api/budget-items/${id}/completion`, {
+          method: 'PATCH',
+          body: JSON.stringify({ completed: newIsPaid }),
+        }),
+      ]);
     } catch (error) {
       console.error('상태 변경 에러:', error);
       fetchBudgetData();
@@ -179,18 +192,37 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     const currentItem = items.find(i => i.id === id);
     if (!currentItem) return;
 
+    const updatedTitle = updates.title ?? currentItem.title;
+    const updatedCategory = updates.category ?? currentItem.category;
+    const updatedBudgetAmount = updates.budgetAmount ?? currentItem.budgetAmount;
+    const updatedPaidAmount = updates.paidAmount ?? currentItem.paidAmount;
+    const newIsPaid = updates.isPaid !== undefined ? updates.isPaid : updatedPaidAmount > 0;
+
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
 
     try {
-      await apiFetch(`/api/budget-items/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          title: updates.title ?? currentItem.title,
-          category: updates.category ? CATEGORY_TO_ENUM[updates.category] : CATEGORY_TO_ENUM[currentItem.category],
-          plannedAmount: updates.budgetAmount ?? currentItem.budgetAmount,
-          spentAmount: updates.paidAmount ?? currentItem.paidAmount,
+      const requests: Promise<Response>[] = [
+        apiFetch(`/api/budget-items/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: updatedTitle,
+            category: CATEGORY_TO_ENUM[updatedCategory],
+            plannedAmount: updatedBudgetAmount,
+            spentAmount: updatedPaidAmount,
+          }),
         }),
-      });
+      ];
+
+      if (newIsPaid !== currentItem.isPaid) {
+        requests.push(
+          apiFetch(`/api/budget-items/${id}/completion`, {
+            method: 'PATCH',
+            body: JSON.stringify({ completed: newIsPaid }),
+          })
+        );
+      }
+
+      await Promise.all(requests);
     } catch (error) {
       console.error('항목 수정 에러:', error);
       fetchBudgetData();
