@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
-import { Plus, X } from "lucide-react";
-import type { InvitationAccount } from "../invitationApi";
+import { Plus } from "lucide-react";
+import type { InvitationGalleryImage } from "../invitationApi";
 
 interface InvitationTextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -47,7 +47,7 @@ export function InvitationTimeSelect({
       {label && (
         <label className="block text-xs font-medium text-text-muted">{label}</label>
       )}
-      
+
       <div className="flex gap-2">
         <select
           value={currentHour}
@@ -97,59 +97,6 @@ export function InvitationSectionTitle({ children }: { children: React.ReactNode
   return <h2 className="mb-6 text-base font-bold text-text font-serif">{children}</h2>;
 }
 
-interface InvitationAccountRowProps {
-  account: InvitationAccount;
-  onChange: (account: InvitationAccount) => void;
-  onRemove: () => void;
-}
-
-export function InvitationAccountRow({ account, onChange, onRemove }: InvitationAccountRowProps) {
-  return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <label className="mb-2 block text-xs font-medium text-text-muted">은행</label>
-          <input
-            value={account.bank}
-            onChange={(e) => onChange({ ...account, bank: e.target.value })}
-            placeholder="은행명"
-            className="h-10 w-full rounded-lg border border-border bg-white px-3 text-sm outline-none placeholder:text-text-muted/50 focus:border-primary"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-xs font-medium text-text-muted">예금주</label>
-          <input
-            value={account.accountHolder}
-            onChange={(e) => onChange({ ...account, accountHolder: e.target.value })}
-            placeholder="예금주"
-            className="h-10 w-full rounded-lg border border-border bg-white px-3 text-sm outline-none placeholder:text-text-muted/50 focus:border-primary"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-xs font-medium text-text-muted">계좌번호</label>
-          <div className="flex gap-2">
-            <input
-              value={account.accountNumber}
-              onChange={(e) => onChange({ ...account, accountNumber: e.target.value })}
-              placeholder="계좌번호"
-              className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-white px-3 text-sm outline-none placeholder:text-text-muted/50 focus:border-primary"
-            />
-            <button
-              type="button"
-              onClick={onRemove}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-white text-text-muted transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function InvitationAddButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
@@ -164,30 +111,54 @@ export function InvitationAddButton({ label, onClick }: { label: string; onClick
 }
 
 // 청첩장 작성 폼 데이터 형태 — CreatePage(작성)와 DetailPage(미리보기)가 공유
+// ⚠️ 실제 백엔드 DTO(InvitationDraft)와 필드명을 그대로 맞춤 (2026-08-17 스웨거 확정 기준)
 export interface InvitationDraftForm {
+  id?: number;
+  status?: "DRAFT" | "PUBLISHED";
+  templateId: string;
   title: string;
+
   groomName: string;
-  groomPhone: string;
   brideName: string;
-  bridePhone: string;
-  groomFatherName: string;
-  groomMotherName: string;
-  brideFatherName: string;
-  brideMotherName: string;
+  groomPhoto: string;
+  bridePhoto: string;
+  groomContact: string;
+  brideContact: string;
+
+  groomParents: string;
+  brideParents: string;
+  groomParentContact: string;
+  brideParentContact: string;
+
   weddingDate: string;
   weddingTime: string;
   venueName: string;
-  venueHall: string;
-  address: string;
-  addressDetail: string;
-  groomAccounts: InvitationAccount[];
-  brideAccounts: InvitationAccount[];
-  gallery: string[];
-  greetingMessage: string;
+  venueAddress: string;
+  venueDetail: string;
+
+  mainGreeting: string;
+  invitationMessage: string;
+  additionalMessage: string;
+
+  transportGuide: string;
+  parkingGuide: string;
+  publicTransportGuide: string;
+
+  // 계좌는 신랑측/신부측 각 1개만 지원 (배열 아님)
+  groomBank: string;
+  groomAccount: string;
+  groomAccountHolder: string;
+  brideBank: string;
+  brideAccount: string;
+  brideAccountHolder: string;
+
+  gallery: InvitationGalleryImage[];
+
   mainColor: string;
-  // 배경(mainColor)과 별개로 구분선·강조 텍스트에 쓰는 포인트 색. 없으면 mainColor를 그대로 씀
+  // 배경(mainColor)과 별개로 구분선·강조 텍스트에 쓰는 포인트 색. 백엔드엔 없는 프론트 전용 값이라
+  // 저장 시에는 InvitationDraft로 변환하면서 제외한다. 없으면 mainColor를 그대로 씀
   accentColor?: string;
-  // 템플릿에서 넘어온 원본 3단 그라디언트 CSS 값. 있으면 mainColor/accentColor 조합 대신 이걸 그대로 씀
+  // 템플릿에서 넘어온 원본 3단 그라디언트 CSS 값(프론트 전용). 저장 시 제외됨
   backgroundGradient?: string;
 }
 
