@@ -363,9 +363,9 @@ export default function InvitationDetailPage() {
                 <ImageIcon className="h-4 w-4 text-primary" />
                 <h2 className="font-serif text-lg font-semibold text-text">갤러리</h2>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {galleryImages.map((url, idx) => (
-                  <div key={idx} className="aspect-square overflow-hidden rounded-xl bg-primary-light">
+                  <div key={idx} className="aspect-square w-[calc(50%-6px)] overflow-hidden rounded-xl bg-primary-light">
                     <img src={url} alt={`gallery-${idx + 1}`} className="h-full w-full object-cover" />
                   </div>
                 ))}
