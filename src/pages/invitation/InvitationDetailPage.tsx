@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Music, Heart, MapPin, Landmark, ArrowLeft, Share2, Mail, Loader2, Send, CalendarCheck, Users, Image as ImageIcon } from "lucide-react";
 import { Button } from "../../components";
@@ -37,6 +37,7 @@ const FALLBACK_DRAFT: InvitationDraftForm = {
   brideBank: "",
   brideAccount: "",
   brideAccountHolder: "",
+  bgmUrl: "",
   gallery: [],
   mainColor: "#B76E79",
   accentColor: "#B76E79",
@@ -127,6 +128,7 @@ export default function InvitationDetailPage() {
             mainColor: invitation.mainColor ?? "#B76E79",
             accentColor: matchedColor?.accent ?? invitation.mainColor ?? "#B76E79",
             backgroundGradient: matchedColor?.gradient,
+            bgmUrl: invitation.bgmUrl ?? "",
             gallery,
           });
         }
@@ -143,9 +145,17 @@ export default function InvitationDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   const toggleBgm = useCallback(() => {
+    if (!draft.bgmUrl) return;
+    if (bgmPlaying) {
+      audioRef.current?.pause();
+    } else {
+      audioRef.current?.play().catch(() => {});
+    }
     setBgmPlaying((prev) => !prev);
-  }, []);
+  }, [bgmPlaying, draft.bgmUrl]);
 
   const handleShare = useCallback(() => {
     const url = window.location.href;
@@ -203,12 +213,17 @@ export default function InvitationDetailPage() {
         </div>
       )}
 
-      <button
-        onClick={toggleBgm}
-        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white/90 shadow-lg backdrop-blur-md transition-transform hover:scale-105 cursor-pointer"
-      >
-        <Music className={`h-5 w-5 ${bgmPlaying ? "text-primary" : "text-text-muted"}`} strokeWidth={2} />
-      </button>
+      {draft.bgmUrl && (
+        <>
+          <audio ref={audioRef} src={draft.bgmUrl} loop />
+          <button
+            onClick={toggleBgm}
+            className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white/90 shadow-lg backdrop-blur-md transition-transform hover:scale-105 cursor-pointer"
+          >
+            <Music className={`h-5 w-5 ${bgmPlaying ? "text-primary" : "text-text-muted"}`} strokeWidth={2} />
+          </button>
+        </>
+      )}
 
       {/* 청첩장 카드 */}
       <div className="mx-auto max-w-md px-4 pt-8 md:pt-12">
