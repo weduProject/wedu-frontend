@@ -254,12 +254,11 @@ export default function InvitationPage() {
                   <p className="font-serif text-lg text-[#7d6b5b]">
                     Hello together.
                   </p>
-                  <Heart className="my-5 h-5 w-5 fill-primary text-primary" />
-                  <p className="font-serif text-2xl font-semibold text-[#393333]">
+                  <p className="mt-5 font-serif text-2xl font-semibold text-[#393333]">
                     수지
                   </p>
-
-                  <p className="mt-1 font-serif text-2xl font-semibold text-[#393333]">
+                  <Heart className="my-2 h-5 w-5 fill-primary text-primary" />
+                  <p className="font-serif text-2xl font-semibold text-[#393333]">
                     인준
                   </p>
                   <p className="mt-5 text-[10px] tracking-[0.12em] text-text-muted">
@@ -432,7 +431,7 @@ export default function InvitationPage() {
                 우리의 특별한 날까지
               </p>
               <h3 className="mt-3 text-center text-3xl font-bold">
-                수지 <span className="text-primary">&</span> 인준
+                수지 <Heart className="mx-2 inline h-6 w-6 fill-primary text-primary" /> 인준
               </h3>
               <p className="mt-2 text-center text-xs text-text-muted">
                 2026.05.24 SAT 2:00PM
