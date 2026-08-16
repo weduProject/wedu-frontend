@@ -160,6 +160,7 @@ export interface InvitationDraftForm {
   accentColor?: string;
   // 템플릿에서 넘어온 원본 3단 그라디언트 CSS 값(프론트 전용). 저장 시 제외됨
   backgroundGradient?: string;
+  bgmUrl: string;
 }
 
 // 숫자만 추출해서 010-0000-0000 형태로 자동 하이픈을 넣어줌.

@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 
 import { Button, SelectableCard } from "../../components";
@@ -126,7 +127,8 @@ function createEmptyForm(handoff: TemplateHandoff): InvitationDraftForm {
     brideBank: "",
     brideAccount: "",
     brideAccountHolder: "",
-
+    bgmUrl: "",
+  
     gallery: [],
 
     mainColor: handoff.mainColor ?? "#E8796C",
@@ -171,6 +173,7 @@ function draftToForm(draft: InvitationDraft): Partial<InvitationDraftForm> {
     brideBank: draft.brideBank ?? "",
     brideAccount: draft.brideAccount ?? "",
     brideAccountHolder: draft.brideAccountHolder ?? "",
+    bgmUrl: draft.bgmUrl ?? "",
     mainColor: draft.mainColor ?? "#E8796C",
     accentColor: matchedColor?.accent ?? draft.mainColor ?? "#E8796C",
     backgroundGradient: matchedColor?.gradient,
@@ -211,6 +214,7 @@ function formToDraft(form: InvitationDraftForm): InvitationDraft {
     brideAccount: form.brideAccount,
     brideAccountHolder: form.brideAccountHolder,
     mainColor: form.mainColor,
+    bgmUrl: form.bgmUrl,
   };
 }
 
@@ -222,9 +226,7 @@ export default function InvitationCreatePage() {
   // 템플릿을 골라 색상(mainColor)이 이미 정해진 채로 들어온 경우, 디자인 단계는 건너뛴다.
   // (restoredForm으로 재진입한 경우는 템플릿 선택이 아니므로 디자인 단계를 그대로 유지)
   const cameFromTemplate = Boolean(handoff.mainColor) && !handoff.restoredForm;
-  const sections = cameFromTemplate
-    ? ALL_SECTIONS.filter((section) => section.key !== "design")
-    : ALL_SECTIONS;
+  const sections = ALL_SECTIONS;
 
   const [activeSection, setActiveSection] = useState<SectionKey>("basic");
   const [form, setForm] = useState<InvitationDraftForm>(() =>
@@ -372,6 +374,15 @@ export default function InvitationCreatePage() {
       {/* 상단 헤더 */}
       <section className="border-b border-border bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 md:px-8 md:py-14">
+          <button
+            type="button"
+            onClick={() => navigate("/invitation")}
+            aria-label="청첩장 페이지로 돌아가기"
+            className="-mt-4 mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-text-muted shadow-sm transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+
           <div className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
             INVITATION
           </div>
@@ -761,6 +772,15 @@ export default function InvitationCreatePage() {
 
                 <div>
                   <p className="mb-4 text-sm font-bold text-text">메인 색상</p>
+
+                  <div className="mt-4 mb-4">
+                    <InvitationTextField
+                      label="배경음악 URL"
+                      value={form.bgmUrl}
+                      onChange={(e) => updateField("bgmUrl", e.target.value)}
+                      placeholder="mp3 파일 URL을 입력해주세요"
+                    />
+                  </div>
 
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {colorOptions.map((color) => {
