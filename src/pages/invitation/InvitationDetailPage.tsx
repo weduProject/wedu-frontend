@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Music, Heart, MapPin, Landmark, ArrowLeft, Share2, Mail, Loader2, Send, MessageCircleHeart, CalendarCheck, Users, Image as ImageIcon } from "lucide-react";
+import { Music, Heart, MapPin, Landmark, ArrowLeft, Share2, Mail, Loader2, Send, CalendarCheck, Users, Image as ImageIcon } from "lucide-react";
 import { Button } from "../../components";
 import type { InvitationDraftForm } from "./components/InvitationFormControls";
 import { fetchMyInvitation, fetchInvitationGallery, publishInvitation } from "./invitationApi";
