@@ -57,7 +57,7 @@ const ROSEGOLD_GRADIENT =
   "linear-gradient(111deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)";
 
 // 각 옵션의 background = 커버 배경색(또는 그라디언트), accent = 구분선·강조 텍스트에 쓰는 포인트색
-const colorOptions = [
+export const colorOptions = [
   { name: "로즈골드", templateId: "rosegold", background: "#E8796C", accent: "#E8796C", gradient: ROSEGOLD_GRADIENT as string | undefined },
   { name: "세이지 그린", templateId: "sage-green", background: "#9CAD8E", accent: "#9CAD8E", gradient: undefined as string | undefined },
   { name: "소프트 핑크", templateId: "soft-pink", background: "#E8C4C8", accent: "#E8C4C8", gradient: undefined as string | undefined },
@@ -252,11 +252,23 @@ export default function InvitationCreatePage() {
 
         if (cancelled) return;
 
-        setForm((prev) => ({
-          ...prev,
-          ...(existing ? draftToForm(existing) : {}),
-          gallery,
-        }));
+        setForm((prev) => {
+          const merged = {
+            ...prev,
+            ...(existing ? draftToForm(existing) : {}),
+            gallery,
+          };
+
+          // 템플릿을 새로 선택하고 들어온 경우, 저장된 색상 대신 방금 고른 템플릿 색상을 적용
+          if (cameFromTemplate) {
+            merged.templateId = handoff.templateId ?? merged.templateId;
+            merged.mainColor = handoff.mainColor ?? merged.mainColor;
+            merged.accentColor = handoff.accentColor ?? merged.accentColor;
+            merged.backgroundGradient = handoff.backgroundGradient ?? merged.backgroundGradient;
+          }
+
+          return merged;
+        });
       } catch (error) {
         console.warn("[invitation] 초기 데이터 불러오기 실패:", error);
       } finally {
