@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import {
   ArrowRight,
   Heart,
@@ -15,6 +14,8 @@ import {
 
 import { Button } from "../../components";
 import invitationHeroBg from "../../assets/invitation/hero.jpg";
+import { fetchMyInvitation } from "./invitationApi";
+import { useEffect, useState } from "react";
 
 interface InvitationTemplate {
   name: string;
@@ -135,6 +136,19 @@ export default function InvitationPage() {
   const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState<InvitationTemplate | null>(null);
 
+  const [hasExistingInvitation, setHasExistingInvitation] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const existing = await fetchMyInvitation();
+      setHasExistingInvitation(Boolean(existing));
+    })();
+  }, []);
+
+  const handlePreviewClick = () => {
+    navigate(hasExistingInvitation ? "/invitation/preview" : "/invitation/create");
+  };
+
   return (
     <div className="bg-surface text-text -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       <style>
@@ -162,21 +176,21 @@ export default function InvitationPage() {
           HERO
       ========================= */}
       <section className="relative min-h-[720px] overflow-hidden">
-  <div className="absolute inset-0">
-    <img
-      src={invitationHeroBg}
-      alt="모바일 청첩장"
-      className="h-full w-full object-cover"
-    />
-    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35" />
-  </div>
+        <div className="absolute inset-0">
+          <img
+            src={invitationHeroBg}
+            alt="모바일 청첩장"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35" />
+        </div>
 
-  {/* 패브릭 느낌 장식은 이미지 위에 살짝 겹치는 용도라 그대로 유지해도 되고, 이미지 톤과 안 맞으면 삭제해도 됩니다 */}
-  <div className="absolute inset-0 opacity-20">
-    <div className="absolute -left-20 top-20 h-[450px] w-[700px] rotate-[-12deg] rounded-[45%] bg-white/60 blur-3xl" />
-    <div className="absolute -right-32 bottom-0 h-[400px] w-[600px] rotate-[15deg] rounded-[50%] bg-[#c3ad93]/50 blur-3xl" />
-  </div>
-  ...
+        {/* 패브릭 느낌 장식은 이미지 위에 살짝 겹치는 용도라 그대로 유지해도 되고, 이미지 톤과 안 맞으면 삭제해도 됩니다 */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute -left-20 top-20 h-[450px] w-[700px] rotate-[-12deg] rounded-[45%] bg-white/60 blur-3xl" />
+          <div className="absolute -right-32 bottom-0 h-[400px] w-[600px] rotate-[15deg] rounded-[50%] bg-[#c3ad93]/50 blur-3xl" />
+        </div>
+        ...
 
         <div className="absolute left-[8%] top-[13%] text-white/80">
           <Sparkles className="h-8 w-8" />
@@ -461,7 +475,7 @@ export default function InvitationPage() {
               </div>
 
               <div className="mt-7 flex justify-center">
-                <ShineButton onClick={() => navigate("/invitation/create")}>
+                <ShineButton onClick={handlePreviewClick}>
                   청첩장 미리보기
                   <ArrowRight className="h-4 w-4" />
                 </ShineButton>
@@ -611,17 +625,15 @@ export default function InvitationPage() {
                     setSelectedTemplate(null);
                     navigate("/invitation/create", {
                       state: {
-                        // colors[0]: 배경(가장 옅은 톤), accent: 구분선·강조 텍스트용 포인트색
                         mainColor: selectedTemplate.colors[0],
                         accentColor: selectedTemplate.accent,
-                        // 템플릿 카드에 쓰던 원본 3단 그라디언트를 그대로 커버 배경에 적용
                         backgroundGradient: selectedTemplate.bg,
                       },
                     });
                   }}
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    이 템플릿으로 시작하기
+                    {hasExistingInvitation ? "이 템플릿으로 변경하기" : "이 템플릿으로 시작하기"}
                     <ArrowRight className="h-4 w-4" />
                   </span>
                 </Button>
