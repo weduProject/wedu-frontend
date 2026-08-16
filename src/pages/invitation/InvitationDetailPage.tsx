@@ -4,6 +4,7 @@ import { Music, Heart, MapPin, Landmark, ArrowLeft, Share2, Mail, Loader2, Send,
 import { Button } from "../../components";
 import type { InvitationDraftForm } from "./components/InvitationFormControls";
 import { fetchMyInvitation, fetchInvitationGallery, publishInvitation } from "./invitationApi";
+import { colorOptions } from "./InvitationCreatePage";
 
 // state 없이(새로고침 등) 이 페이지에 접근했을 때 보여줄 기본값
 const FALLBACK_DRAFT: InvitationDraftForm = {
@@ -89,6 +90,7 @@ export default function InvitationDetailPage() {
         if (cancelled) return;
 
         if (invitation) {
+          const matchedColor = colorOptions.find((c) => c.background === invitation.mainColor);
           setDraft({
             ...FALLBACK_DRAFT,
             id: invitation.id,
@@ -123,6 +125,8 @@ export default function InvitationDetailPage() {
             brideAccount: invitation.brideAccount ?? "",
             brideAccountHolder: invitation.brideAccountHolder ?? "",
             mainColor: invitation.mainColor ?? "#B76E79",
+            accentColor: matchedColor?.accent ?? invitation.mainColor ?? "#B76E79",
+            backgroundGradient: matchedColor?.gradient,
             gallery,
           });
         }
@@ -186,15 +190,15 @@ export default function InvitationDetailPage() {
 
   return (
     <div className="-mx-5 -mt-5 -mb-5 min-h-screen bg-[#F0EEED] pb-16 md:-mx-8 md:-mt-8 md:-mb-8">
-      {isPreview && (
+      {!isPreview && !isLoading && (
         <div className="fixed left-6 top-24 z-40 flex items-center gap-2 md:top-28">
           <button
             type="button"
-            onClick={() => navigate("/invitation/create", { state: { restoredForm: draft } })}
+            onClick={() => navigate("/invitation")}
             className="flex items-center gap-1.5 rounded-full border border-border bg-white/90 px-4 py-2 text-xs font-medium text-text-muted shadow-md backdrop-blur transition-colors hover:text-primary"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            수정으로 돌아가기
+            돌아가기
           </button>
         </div>
       )}
