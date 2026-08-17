@@ -1,5 +1,6 @@
 import BaseCard from '../../../components/ui/BaseCard';
 import type { ScheduleItem } from '../CalendarPage';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CalendarGridProps {
   schedules: ScheduleItem[];
@@ -27,11 +28,21 @@ export default function CalendarGrid({ schedules, onScheduleClick, year, month, 
   return (
     <BaseCard className="p-5 md:p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-center">
-        <button onClick={onPrevMonth} className="text-text-muted hover:text-text cursor-pointer">&lt;</button>
+        <button 
+          onClick={onPrevMonth}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-text cursor-pointer transition-colors"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
         <h3 className="mx-8 text-lg font-bold font-serif text-text">
           {year}년 {month}월
         </h3>
-        <button onClick={onNextMonth} className="text-text-muted hover:text-text cursor-pointer">&gt;</button>
+        <button 
+          onClick={onNextMonth}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-text cursor-pointer transition-colors"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
       </div>
 
       <div className="grid grid-cols-7 gap-2 text-center text-sm">

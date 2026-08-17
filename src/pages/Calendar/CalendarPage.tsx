@@ -10,6 +10,8 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import EmptyState from '../../components/ui/EmptyState.tsx';
+import CalendarPageContent from './components/CalendarPageContent.tsx';
+import ShareLinkCard from '../../components/ui/ShareLinkCard.tsx';
 
 
 export type CategoryType = '웨딩홀/예식장' | '스튜디오/드레스' | '허니문' | '예물/예단' | '기타';
@@ -32,7 +34,7 @@ export default function CalendarPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
 
-  const { user } = useAuth();
+  const { user, isLoading: authIsLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleAddModalOpen = () => {
@@ -41,21 +43,26 @@ export default function CalendarPage() {
         return;
         }
         setIsAddModalOpen(true)
-      }
+  }
 
-  const { schedules: rawSchedules, addSchedule, deleteSchedule, updateSchedule, year, month, goToPrevMonth, goToNextMonth } = useSchedules();
+  const { schedules: rawSchedules, isLoading: scheduleIsLoading, addSchedule, deleteSchedule, updateSchedule, year, month, goToPrevMonth, goToNextMonth } = useSchedules();
 
   const schedules = user ? rawSchedules : [];
 
-  // 필터링 로직
-  const filteredSchedules = schedules.filter((item) => {
-    return activeCategory === '전체' || item.category === activeCategory;
-  })
-  .sort((a,b) => {
-    const datetimeA = new Date(`${a.date}T${a.time}`).getTime();
-    const datetimeB = new Date(`${b.date}T${b.time}`).getTime();
-    return datetimeA - datetimeB; // 시간순 정렬
-  });
+  const isPageLoading = authIsLoading || (user && scheduleIsLoading);
+  if (isPageLoading) {
+    return <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>;
+  }
+
+  // // 필터링 로직
+  // const filteredSchedules = schedules.filter((item) => {
+  //   return activeCategory === '전체' || item.category === activeCategory;
+  // })
+  // .sort((a,b) => {
+  //   const datetimeA = new Date(`${a.date}T${a.time}`).getTime();
+  //   const datetimeB = new Date(`${b.date}T${b.time}`).getTime();
+  //   return datetimeA - datetimeB; // 시간순 정렬
+  // });
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -72,7 +79,25 @@ export default function CalendarPage() {
         </Button>
       </div>
 
-      <div className="mt-6">
+      <CalendarPageContent
+        schedules={schedules}
+        year={year}
+        month={month}
+        onPrevMonth={goToPrevMonth}
+        onNextMonth={goToNextMonth}
+        onViewSchedules={setViewSchedules}
+        fallbackUI={
+          !user ? (
+            <EmptyState
+              icon={Calendar}
+              title="나의 일정을 관리하세요"
+              description="로그인 후 카테고리별 일정을 관리하고 다가오는 일정을 확인할 수 있습니다."
+            />
+          ) : undefined
+        }
+      />
+
+      {/* <div className="mt-6">
         <CalendarFilter 
           activeCategory={activeCategory} 
           onCategoryChange={setActiveCategory} 
@@ -96,16 +121,22 @@ export default function CalendarPage() {
           onScheduleClick={(schedules) => setViewSchedules([schedules])}
           />
         </div>
-      </div>
+      </div> */}
 
       {/* 비회원일 때 보여줄 빈 화면 멘트 */}
-        {!user && (
+        {/* {!user && (
           <EmptyState
             icon={Calendar}
             title="나의 일정을 관리하세요"
             description="로그인 후 카테고리별 일정을 관리하고 다가오는 일정을 확인할 수 있습니다."
           />
-        )}
+        )} */}
+
+      {user && (
+        <div className="mt-8">
+          <ShareLinkCard pageName="일정 관리" sharePath="/shared/calendar" />
+        </div>
+      )}
 
       {/* 1. 새 일정 추가 모달 (isAddModalOpen이 true일 때 뜸) */}
       {isAddModalOpen && (

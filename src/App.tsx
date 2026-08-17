@@ -59,6 +59,7 @@ import { CartProvider } from './pages/Shop/CartContext';
 
 import ScrollToTop from './components/ScrollToTop';
 import SharedBudgetPage from './pages/Budget/SharedBudgetPage';
+import SharedCalendarPage from './pages/Calendar/SharedCalendarPage';
 
 function OnboardingRoutes() {
   return (
@@ -147,6 +148,10 @@ export default function App() {
                         element={<SharedChecklistPage />}
                       />
                       <Route path="/calendar" element={<CalendarPage />} />
+                      <Route
+                        path="/shared/calendar/:token"
+                        element={<SharedCalendarPage />}
+                      />
                       <Route path="/budget" element={<BudgetPage />} />
                       <Route
                         path="/shared/budget/:token"

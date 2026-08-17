@@ -19,12 +19,12 @@ interface ScheduleContextType {
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading: authIsLoading } = useAuth();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchSchedules = useCallback(async () => {
     if (!getToken()) {
@@ -53,10 +53,14 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }, [year, month]);
 
   useEffect(() => {
+    if (authIsLoading) return;
+
     if (user) {
       fetchSchedules();
+    } else {
+      setIsLoading(false);
     }
-  }, [fetchSchedules, user]);
+  }, [fetchSchedules, user, authIsLoading]);
 
   const goToPrevMonth = () => {
     if (month === 1) {

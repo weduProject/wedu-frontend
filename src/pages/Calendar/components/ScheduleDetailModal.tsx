@@ -6,12 +6,13 @@ import { useState } from 'react';
 
 interface ScheduleDetailModalProps {
   schedules: ScheduleItem[];
+  readOnly?: boolean;
   onClose: () => void;
   onEdit: (item: ScheduleItem) => void;
   onDelete: (id: string) => void;
 }
 
-export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDelete }: ScheduleDetailModalProps) {
+export default function ScheduleDetailModal({ schedules, readOnly, onClose, onEdit, onDelete }: ScheduleDetailModalProps) {
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
   const displayDate = schedules[0]?.date || '';
@@ -34,40 +35,45 @@ export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDele
           {schedules.map((schedule) => (
             <div key={schedule.id} className="relative rounded-xl border border-border bg-gray-50/50 p-5">
               
-              {/* 개별 일정의 우측 상단 수정/삭제 버튼 */}
-              <div className="absolute right-4 top-4 flex gap-3">
-                <Button 
-                  type="button"
-                  onClick={() => onEdit(schedule)} 
-                >
-                  수정
-                </Button>
-                <Button
-                  type="button"
-                  variant='secondary'
-                  onClick={() => setScheduleToDelete(schedule.id)}
-                >
-                  삭제
-                </Button>
-              </div>
+              {!readOnly && (
+                <>
+                {/* 개별 일정의 우측 상단 수정/삭제 버튼 */}
+                <div className="absolute right-4 top-4 flex gap-3">
+                  <Button 
+                    type="button"
+                    onClick={() => onEdit(schedule)} 
+                  >
+                    수정
+                  </Button>
+                  <Button
+                    type="button"
+                    variant='secondary'
+                    onClick={() => setScheduleToDelete(schedule.id)}
+                  >
+                    삭제
+                  </Button>
+                </div>
+                </>
+              )}
+              
 
               {/* 일정 세부 내용 */}
-              <div className="flex flex-col gap-2 pr-20">
-                <div className="flex flex-col gap-5 ">
-                  <div>
-                    <p className="text-xl font-semibold text-text">{schedule.title}</p>
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-5">
+                  <div className='pr-36'>
+                    <p className="text-xl font-semibold text-text wrap-break-word leading-snug">{schedule.title}</p>
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-[#968178]">시간</label>
+                    <label className="mb-1.5 block text-xs font-medium text-text-muted">시간</label>
                     <p className="text-sm text-text">{schedule.time}</p>
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-[#968178]">카테고리</label>
+                    <label className="mb-1.5 block text-xs font-medium text-text-muted">카테고리</label>
                     <p className="text-sm text-text">{schedule.category}</p>
                   </div>
                   <div>
-                    <label className="mb-1.5 text-xs font-medium text-[#968178]">메모</label>
-                    <p className="whitespace-pre-wrap text-sm text-text">{schedule.memo || '등록된 메모가 없습니다.'}</p>
+                    <label className="mb-1.5 text-xs font-medium text-text-muted">메모</label>
+                    <p className="whitespace-pre-wrap wrap-break-word text-sm text-text">{schedule.memo || '등록된 메모가 없습니다.'}</p>
                   </div>
                 </div>
               </div>
@@ -90,16 +96,18 @@ export default function ScheduleDetailModal({ schedules, onClose, onEdit, onDele
         </div>
         
       </div>
-      <ConfirmDeleteModal
-        isOpen={!!scheduleToDelete}
-        onClose={() => setScheduleToDelete(null)}
-        onConfirm={() => {
-          if (scheduleToDelete) {
-            onDelete(scheduleToDelete);
-            setScheduleToDelete(null);
-          }
-        }}
+      {!readOnly && onDelete && (
+        <ConfirmDeleteModal
+          isOpen={!!scheduleToDelete}
+          onClose={() => setScheduleToDelete(null)}
+          onConfirm={() => {
+            if (scheduleToDelete) {
+              onDelete(scheduleToDelete);
+              setScheduleToDelete(null);
+            }
+          }}
       />
+      )}
     </div>
   );
 }
