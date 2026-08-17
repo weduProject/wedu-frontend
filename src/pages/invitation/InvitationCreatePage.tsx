@@ -137,7 +137,7 @@ function createEmptyForm(handoff: TemplateHandoff): InvitationDraftForm {
   };
 }
 
-function draftToForm(draft: InvitationDraft): Partial<InvitationDraftForm> {
+export function draftToForm(draft: InvitationDraft): Partial<InvitationDraftForm> {
   // mainColor에 해당하는 컬러 옵션을 찾아서 accentColor/backgroundGradient도 같이 복원
   const matchedColor = colorOptions.find((c) => c.background === draft.mainColor);
 
