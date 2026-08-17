@@ -60,6 +60,7 @@ const ENUM_TO_CATEGORY: Record<string, CategoryType> = {
 
 interface ChecklistContextType {
   todos: TodoItem[];
+  isLoading: boolean;
   addTodo: (text: string, category: CategoryType) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
@@ -69,8 +70,9 @@ interface ChecklistContextType {
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
 
 export function ChecklistProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading: authIsLoading } = useAuth();
   const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 1. 조회 (GET)
   const fetchTodos = useCallback(async () => {
@@ -78,6 +80,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    setIsLoading(true);
     try {
       const res = await apiFetch('/api/checklist-items');
       if (!res.ok) throw new Error('체크리스트 로드 실패');
@@ -97,10 +100,14 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.warn('API 호출 실패', error);
       setTodos([]);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    if (authIsLoading) return;
+    
     if (user) {
       fetchTodos();
     } else {
