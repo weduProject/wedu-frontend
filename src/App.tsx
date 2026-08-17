@@ -58,6 +58,7 @@ import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 
 import ScrollToTop from './components/ScrollToTop';
+import SharedBudgetPage from './pages/Budget/SharedBudgetPage';
 
 function OnboardingRoutes() {
   return (
@@ -147,6 +148,10 @@ export default function App() {
                       />
                       <Route path="/calendar" element={<CalendarPage />} />
                       <Route path="/budget" element={<BudgetPage />} />
+                      <Route
+                        path="/shared/budget/:token"
+                        element={<SharedBudgetPage />}
+                      />
 
                       <Route path="/community" element={<CommunityPage />} />
                       <Route

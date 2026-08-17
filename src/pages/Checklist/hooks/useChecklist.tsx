@@ -125,7 +125,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       const res = await apiFetch('/api/checklist-items', {
         method: 'POST',
         body: JSON.stringify({
-          title: text, // 백엔드 DTO에 맞게 필드명 변경 필요할 수 있음
+          title: text,
           category: CATEGORY_TO_ENUM[category],
         }),
       });

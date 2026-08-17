@@ -5,7 +5,7 @@ import { apiFetch } from '../../lib/apiClient';
 
 interface ShareLinkCardProps {
   pageName: string;
-  sharePath: string; // 예: '/shared/checklist'
+  sharePath: string;
 }
 
 export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProps) {
