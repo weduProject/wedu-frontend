@@ -43,6 +43,7 @@ import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
 import InvitationPage from './pages/invitation/InvitationPage';
 import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
 import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
+import InvitationPublicViewPage from './pages/invitation/InvitationPublicViewPage';
 
 import ConnectPage from './pages/Partner/ConnectPage';
 import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
@@ -91,6 +92,8 @@ export default function App() {
                       element={<AuthCallbackPage />}
                     />
                     <Route path="/share/:token" element={<SharePage />} />
+                    {/* 헤더/네비게이션 없는 조회 전용 청첩장 공유 페이지 (로그인 여부와 무관하게 접근 가능) */}
+                    <Route path="/invitation/view/:id" element={<InvitationPublicViewPage />} />
 
                     <Route element={<OnboardingRoutes />}>
                       <Route path="/onboarding" element={<OnboardingStartPage />} />

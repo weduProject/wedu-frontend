@@ -9,7 +9,86 @@
  * -------------------------------------------------------------------------
  */
 
-import { apiRequest } from "../../lib/apiClient";
+const INVITATION_API_BASE = "https://api.wedu.io.kr";
+
+/**
+ * 청첩장 전용 API 요청 함수.
+ * 공용 apiClient는 wedu_access_token만 읽는데, 현재 OAuth 콜백에서는
+ * accessToken이라는 키로 저장되는 경우가 있어 청첩장에서는 두 저장 방식을 모두 지원한다.
+ * (src/pages/invitation 폴더 밖은 수정하지 않기 위한 방어 로직)
+ */
+function getInvitationTokens(): string[] {
+  const keys = ["wedu_access_token", "accessToken", "access_token", "token"];
+  const values: string[] = [];
+
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (const key of keys) {
+      try {
+        const value = storage.getItem(key)?.trim();
+        if (value && !values.includes(value)) values.push(value);
+      } catch {
+        // storage 접근이 제한된 환경에서는 다음 저장소/키를 계속 확인한다.
+      }
+    }
+  }
+
+  return values;
+}
+
+async function invitationRequest<T>(
+  path: string,
+  options: RequestInit = {},
+  fallbackErrorMessage = "청첩장 요청에 실패했습니다.",
+): Promise<T> {
+  const tokens = getInvitationTokens();
+  // 토큰이 여러 키에 남아 있는 경우 401이면 다음 토큰으로 재시도한다.
+  const candidates = tokens.length > 0 ? tokens : [null];
+  let lastStatus = 0;
+
+  for (const token of candidates) {
+    const headers = new Headers(options.headers);
+    if (!headers.has("Content-Type") && options.body !== undefined) {
+      headers.set("Content-Type", "application/json");
+    }
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    let response: Response;
+    try {
+      response = await fetch(`${INVITATION_API_BASE}${path}`, { ...options, headers });
+    } catch {
+      throw new Error("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
+    }
+
+    lastStatus = response.status;
+
+    if (response.status === 401 && candidates.length > 1) {
+      continue;
+    }
+
+    if (response.status === 204) return undefined as T;
+
+    let body: unknown = null;
+    try {
+      body = await response.json();
+    } catch {
+      if (!response.ok) throw new Error(`${fallbackErrorMessage} (${response.status})`);
+      return undefined as T;
+    }
+
+    const envelope = body as ApiEnvelope<T> | null;
+    if (!response.ok || !body || envelope?.success === false) {
+      throw new Error(envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`);
+    }
+
+    // 백엔드 공통 래퍼({success,data,error})와 raw 응답 모두 대응한다.
+    if (envelope && typeof envelope === "object" && "success" in envelope) {
+      return envelope as T;
+    }
+    return body as T;
+  }
+
+  throw new Error(`${fallbackErrorMessage} (${lastStatus || 401})`);
+}
 
 /** 백엔드 공통 응답 래퍼 */
 interface ApiEnvelope<T> {
@@ -127,7 +206,7 @@ export interface InvitationGalleryImage {
 export async function fetchMyInvitation(): Promise<InvitationDraft | null> {
   try {
     const data = await unwrap(
-      apiRequest<ApiEnvelope<InvitationDraft>>(
+      invitationRequest<ApiEnvelope<InvitationDraft>>(
         "/api/invitations/me",
         { method: "GET" },
         "청첩장 조회에 실패했습니다.",
@@ -147,7 +226,7 @@ export async function fetchMyInvitation(): Promise<InvitationDraft | null> {
  */
 export async function createInvitation(draft: InvitationDraft): Promise<InvitationDraft> {
   return unwrap(
-    apiRequest<ApiEnvelope<InvitationDraft>>(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
       "/api/invitations",
       {
         method: "POST",
@@ -166,7 +245,7 @@ export async function updateInvitation(
   draft: Partial<InvitationDraft>,
 ): Promise<InvitationDraft> {
   return unwrap(
-    apiRequest<ApiEnvelope<InvitationDraft>>(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
       "/api/invitations/me",
       {
         method: "PATCH",
@@ -210,7 +289,7 @@ export async function saveInvitation(draft: InvitationDraft): Promise<Invitation
  */
 export async function publishInvitation(): Promise<InvitationDraft> {
   return unwrap(
-    apiRequest<ApiEnvelope<InvitationDraft>>(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
       "/api/invitations/me/publish",
       { method: "PATCH" },
       "청첩장 발행에 실패했습니다.",
@@ -225,7 +304,7 @@ export async function publishInvitation(): Promise<InvitationDraft> {
 export async function fetchInvitationGallery(): Promise<InvitationGalleryImage[]> {
   try {
     const data = await unwrap(
-      apiRequest<ApiEnvelope<InvitationGalleryImage[]>>(
+      invitationRequest<ApiEnvelope<InvitationGalleryImage[]>>(
         "/api/invitations/me/gallery",
         { method: "GET" },
         "갤러리 조회에 실패했습니다.",
@@ -248,7 +327,7 @@ export async function addInvitationGalleryImage(
   sortOrder?: number,
 ): Promise<InvitationGalleryImage> {
   return unwrap(
-    apiRequest<ApiEnvelope<InvitationGalleryImage>>(
+    invitationRequest<ApiEnvelope<InvitationGalleryImage>>(
       "/api/invitations/me/gallery",
       {
         method: "POST",
@@ -276,12 +355,20 @@ export async function syncInvitationGallery(
 }
 
 /**
+ * 공개 청첩장 조회 API는 현재 Swagger에 없으므로 네트워크 요청을 하지 않는다.
+ * 공유 페이지는 URL에 포함된 제작 데이터 또는 작성 브라우저의 캐시를 사용한다.
+ */
+export async function fetchInvitationById(_id: number | string): Promise<InvitationDraft | null> {
+  return null;
+}
+
+/**
  * 플래너 조회 전용 공유 링크 발급/조회
  * GET /api/share-links/me
  */
 export async function fetchMyShareLink(): Promise<string | null> {
   try {
-    const data = await apiRequest<{ url?: string; token?: string }>(
+    const data = await invitationRequest<{ url?: string; token?: string }>(
       "/api/share-links/me",
       { method: "GET" },
       "공유 링크 조회에 실패했습니다.",
