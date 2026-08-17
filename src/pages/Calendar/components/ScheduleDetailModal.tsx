@@ -8,8 +8,8 @@ interface ScheduleDetailModalProps {
   schedules: ScheduleItem[];
   readOnly?: boolean;
   onClose: () => void;
-  onEdit: (item: ScheduleItem) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (item: ScheduleItem) => void;
+  onDelete?: (id: string) => void;
 }
 
 export default function ScheduleDetailModal({ schedules, readOnly, onClose, onEdit, onDelete }: ScheduleDetailModalProps) {
@@ -41,7 +41,7 @@ export default function ScheduleDetailModal({ schedules, readOnly, onClose, onEd
                 <div className="absolute right-4 top-4 flex gap-3">
                   <Button 
                     type="button"
-                    onClick={() => onEdit(schedule)} 
+                    onClick={() => onEdit?.(schedule)} 
                   >
                     수정
                   </Button>

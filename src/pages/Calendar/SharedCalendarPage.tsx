@@ -62,7 +62,6 @@ export default function SharedCalendarPage() {
         onViewSchedules={setViewSchedules}
       />
 
-      {/* ✨ 상세보기 팝업 띄울 때 readOnly 속성 부여 */}
       {viewSchedules && viewSchedules.length > 0 && (
         <ScheduleDetailModal
           schedules={viewSchedules}

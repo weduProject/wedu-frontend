@@ -5,7 +5,7 @@ import ScheduleDetailModal from './components/ScheduleDetailModal.tsx';
 import { Button } from '../../components/index.ts';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Divide } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import EmptyState from '../../components/ui/EmptyState.tsx';
 import CalendarPageContent from './components/CalendarPageContent.tsx';
 import ShareLinkCard from '../../components/ui/ShareLinkCard.tsx';
