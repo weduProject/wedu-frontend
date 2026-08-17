@@ -77,6 +77,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
   // 1. 조회 (GET)
   const fetchTodos = useCallback(async () => {
     if (!getToken()) {
+      setIsLoading(false);
       return;
     }
 
@@ -111,9 +112,10 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     if (user) {
       fetchTodos();
     } else {
-      setTodos([]);
+      setTodos([])
+      setIsLoading(false);;
     }
-  }, [fetchTodos, user]);
+  }, [fetchTodos, user, authIsLoading]);
 
   // 2. 생성 (POST)
   const addTodo = async (text: string, category: CategoryType) => {
@@ -208,7 +210,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, updateTodo }}>
+    <ChecklistContext.Provider value={{ todos, isLoading, addTodo, toggleTodo, deleteTodo, updateTodo }}>
       {children}
     </ChecklistContext.Provider>
   );

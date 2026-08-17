@@ -37,7 +37,7 @@ export default function ChecklistPage() {
   };
 
   if (authIsLoading || checklistIsLoading) {
-    return <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>;
+    return <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>
   }
 
   return (

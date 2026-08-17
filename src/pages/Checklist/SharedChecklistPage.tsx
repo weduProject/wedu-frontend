@@ -20,21 +20,38 @@ export default function SharedChecklistPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
-    apiFetch(`/api/checklist-items/shared/${token}`)
-      .then((res) => res.json())
-      .then((body) => {
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchSharedChecklist = async () => {
+      try {
+        const res = await apiFetch(`/api/checklist-items/shared/${token}`);
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+
+        const body = await res.json();
         const rawItems = body.data?.items || [];
+        
         const mappedTodos: TodoItem[] = rawItems.map((item: any) => ({
           id: String(item.itemId),
           text: item.title,
           category: ENUM_TO_CATEGORY[item.category] || '기본',
           isCompleted: item.completed,
         }));
+
         setTodos(mappedTodos);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+      } catch (err) {
+        console.error('공유 체크리스트 로드 실패:', err);
+      } finally {
+        setIsLoading(false);
+      } 
+    };
+
+    fetchSharedChecklist();
   }, [token]);
 
   if (isLoading) return <p className="py-20 text-center text-sm text-text-muted">불러오는 중...</p>;
