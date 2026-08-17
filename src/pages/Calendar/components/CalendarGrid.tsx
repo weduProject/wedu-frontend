@@ -26,7 +26,7 @@ export default function CalendarGrid({ schedules, onScheduleClick, year, month, 
   const actualDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
-    <BaseCard className="p-5 md:p-6 shadow-sm">
+    <BaseCard className="p-5 md:p-6">
       <div className="mb-6 flex items-center justify-center">
         <button 
           onClick={onPrevMonth}

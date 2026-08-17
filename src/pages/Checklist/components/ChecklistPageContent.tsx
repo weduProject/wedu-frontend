@@ -66,7 +66,7 @@ export default function ChecklistPageContent({
   return (
     <div>
       {/* 1. 진행률 카드 */}
-      <BaseCard className="mb-6 p-6 shadow-sm md:p-8">
+      <BaseCard className="mb-6 p-6 md:p-8">
         <div className="mb-3 flex items-end justify-between">
           <span className="text-sm font-semibold text-text md:text-base">전체 진행률</span>
           <span className="text-2xl font-bold font-serif text-primary md:text-3xl">{progressPercentage}%</span>
@@ -141,7 +141,7 @@ export default function ChecklistPageContent({
       </div>
 
       {/* 4. 체크리스트 목록 영역 */}
-      <BaseCard className="p-6 shadow-sm">
+      <BaseCard className="p-6">
         <div className="flex flex-col gap-3">
           {filteredTodos.length === 0 ? (
             <p className="py-10 text-center text-sm text-text-muted">해당 카테고리에 등록된 할 일이 없습니다.</p>

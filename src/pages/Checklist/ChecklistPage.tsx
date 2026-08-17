@@ -52,7 +52,7 @@ export default function ChecklistPage() {
         <>
       {/* 웨딩 체크리스트 추천 UI 영역 */}
       {showRecommendations && (
-        <BaseCard className="mb-8 p-6 shadow-sm md:p-8">
+        <BaseCard className="mb-8 p-6 md:p-8">
           <div className="mb-6 flex items-center gap-2">
             <Lightbulb className="h-6 w-6 text-primary" />
             <h3 className="text-xl font-bold text-text">추천 웨딩 체크리스트</h3>

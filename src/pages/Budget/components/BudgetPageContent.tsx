@@ -54,7 +54,7 @@ export default function BudgetPageContent({
       {/* 1. 상단 요약 카드 3개 */}
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* 전체 예산 카드 */}
-        <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
+        <BaseCard className="flex h-full flex-col justify-between p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/50">
             <Wallet className="h-5 w-5 text-primary" />
           </div>
@@ -75,7 +75,7 @@ export default function BudgetPageContent({
         </BaseCard>
 
         {/* 집행 금액 카드 */}
-        <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
+        <BaseCard className="flex h-full flex-col justify-between p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/50">
             <Receipt className="h-5 w-5 text-[#d29b53]" />
           </div>
@@ -88,7 +88,7 @@ export default function BudgetPageContent({
         </BaseCard>
 
         {/* 결제 완료 카드 */}
-        <BaseCard className="flex h-full flex-col justify-between p-5 shadow-sm">
+        <BaseCard className="flex h-full flex-col justify-between p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/50">
             <CheckCircle2 className="h-5 w-5 text-[#c382a4]" />
           </div>
@@ -102,7 +102,7 @@ export default function BudgetPageContent({
       </div>
 
       {/* 2. 전체 집행률 프로그레스 바 */}
-      <BaseCard className="mb-6 p-6 shadow-sm md:p-8">
+      <BaseCard className="mb-6 p-6 md:p-8">
         <div className="mb-3 flex items-end justify-between">
           <span className="text-sm font-semibold text-text md:text-base">전체 집행률</span>
           <span className="text-2xl font-bold font-serif text-primary md:text-3xl">{overallProgress}%</span>
@@ -131,7 +131,7 @@ export default function BudgetPageContent({
           const Icon = CATEGORY_ICONS[category];
 
           return (
-            <BaseCard key={category} className="p-6 shadow-sm">
+            <BaseCard key={category} className="p-6">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light/30">
