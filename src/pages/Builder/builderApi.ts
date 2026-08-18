@@ -1,16 +1,21 @@
 /**
- * ⚠️ 스키마 관련 참고
+ * ⚠️ 2026-08-17 데모데이 점검 결과 반영
  * -------------------------------------------------------------------------
- * 이 파일은 Swagger UI의 "엔드포인트 목록"(경로 + 설명)만 전달받은 상태에서 작성되었습니다.
- * 요청/응답 바디의 정확한 필드명은 실제 백엔드 스키마(swagger.json)를 확인하지 못해
- * 합리적으로 추론한 값입니다.
+ * 스웨거를 확인한 결과 "옵션 선택 저장(POST /api/proposals/options)"과
+ * "심리테스트 기반 추천(GET /api/recommendations)"에 대응하는 백엔드 API가
+ * 아직 존재하지 않는 것으로 확인되었습니다. (매 옵션 클릭마다 400 네트워크 에러가
+ * 발생하고, 추천 결과는 항상 로딩 후 실패로 끝나던 원인)
  *
- * 만약 실제 응답 필드명이 다르다면 아래 3곳만 고치면 됩니다.
- *   1) ProposalMeResponse / RecommendedProductDto 타입 정의
- *   2) normalizeProposal() / normalizeProduct() 매핑 함수
- *   3) PROPOSAL_CATEGORY 매핑 상수
- * 나머지 코드(BuilderContext, BuilderPage, BuilderCartPage)는 이 파일이 export 하는
- * 정규화된 타입만 사용하므로 영향을 받지 않습니다.
+ * 그래서 지금은:
+ *   1) 옵션을 선택해도 서버로 저장 요청을 보내지 않습니다 (로컬 상태만 사용).
+ *   2) 추천 상품은 네트워크 호출 없이 로컬 카탈로그(RECOMMENDATION_CATALOG)에서
+ *      선택한 태그 + 예산 범위로 직접 계산해서 보여줍니다.
+ *
+ * 아래 selectProposalOption / cancelProposalOption / fetchMyProposal /
+ * fetchRecommendations 함수 자체는 백엔드 API가 준비되면 바로 쓸 수 있도록
+ * 그대로 남겨뒀습니다 (현재는 아무 곳에서도 호출하지 않음). 백엔드 연동이 되면
+ * BuilderContext.tsx / BuilderPage.tsx / BuilderCartPage.tsx 에서
+ * getLocalRecommendations(...) 호출을 fetchRecommendations(...) 로 바꿔주면 됩니다.
  * -------------------------------------------------------------------------
  */
 
@@ -172,6 +177,73 @@ export async function fetchRecommendations(params: {
   );
 
   return (raw ?? []).map(normalizeProduct);
+}
+
+/**
+ * 로컬 추천 카탈로그.
+ * builderDummy.ts 의 장소/분위기/음식 태그와 겹치도록 태그를 맞춰뒀다.
+ * 백엔드 추천 API가 준비되기 전까지 이 목록에서 점수 계산으로 추천 상품을 뽑는다.
+ */
+interface CatalogEntry {
+  id: number;
+  title: string;
+  category: string;
+  price: number;
+  tags: string[];
+}
+
+const RECOMMENDATION_CATALOG: CatalogEntry[] = [
+  { id: 101, title: "루프탑 프라이빗 세팅", category: "공간/이벤트", price: 450_000, tags: ["야경", "루프탑", "분위기", "감성", "럭셔리"] },
+  { id: 102, title: "한강 피크닉 박스", category: "공간/이벤트", price: 180_000, tags: ["피크닉", "야외", "감성", "힐링"] },
+  { id: 103, title: "이벤트 플로럴 데코", category: "플라워", price: 220_000, tags: ["꽃", "장미", "로맨틱", "감성"] },
+  { id: 104, title: "캔들 & 조명 세팅", category: "플라워", price: 150_000, tags: ["캔들", "조명", "아늑", "로맨틱"] },
+  { id: 105, title: "스냅 촬영 패키지", category: "사진/영상", price: 350_000, tags: ["사진", "이벤트", "감성", "추억"] },
+  { id: 106, title: "이벤트 영상 편지", category: "사진/영상", price: 280_000, tags: ["영상", "감성", "서프라이즈"] },
+  { id: 107, title: "호텔 스위트룸 프로포즈", category: "공간/이벤트", price: 800_000, tags: ["럭셔리", "호텔", "우아", "프리미엄", "야경"] },
+  { id: 108, title: "파인다이닝 코스 예약", category: "다이닝", price: 400_000, tags: ["양식", "와인", "럭셔리", "우아"] },
+  { id: 109, title: "오마카세 프라이빗 룸", category: "다이닝", price: 500_000, tags: ["일식", "프리미엄", "프라이빗"] },
+  { id: 110, title: "한강 야경 유람선 대관", category: "공간/이벤트", price: 900_000, tags: ["야경", "이벤트", "특별", "럭셔리"] },
+  { id: 111, title: "커플 반지 각인 서비스", category: "주얼리", price: 250_000, tags: ["반지", "각인", "기념"] },
+  { id: 112, title: "서프라이즈 풍선 데코", category: "공간/이벤트", price: 120_000, tags: ["파티", "이벤트", "활발"] },
+  { id: 113, title: "홈파티 케이터링 세트", category: "다이닝", price: 300_000, tags: ["뷔페", "가족", "파티"] },
+  { id: 114, title: "디저트 & 케이크 세트", category: "다이닝", price: 90_000, tags: ["카페", "디저트", "달콤"] },
+  { id: 115, title: "라이브 연주 섭외", category: "이벤트", price: 500_000, tags: ["감성", "로맨틱", "특별", "음악"] },
+];
+
+/**
+ * 태그 겹침 점수 + 예산 범위로 로컬 카탈로그에서 추천 상품을 계산한다.
+ * 네트워크 호출이 없어 항상 즉시, 안정적으로 결과를 반환한다.
+ */
+export function getLocalRecommendations(
+  builder: BuilderState,
+  limit = 5,
+): RecommendedProduct[] {
+  const { genres, minPrice, maxPrice } = buildRecommendationParams(builder);
+  const genreSet = new Set(genres.map((g) => g.toLowerCase()));
+
+  const scored = RECOMMENDATION_CATALOG.map((entry) => {
+    const overlap = entry.tags.filter((tag) => genreSet.has(tag.toLowerCase())).length;
+    return { entry, overlap };
+  });
+
+  const withinBudget = scored.filter(({ entry }) => {
+    if (typeof minPrice === "number" && entry.price < minPrice * 0.3) return false;
+    if (typeof maxPrice === "number" && entry.price > maxPrice) return false;
+    return true;
+  });
+
+  const pool = withinBudget.length > 0 ? withinBudget : scored;
+
+  return pool
+    .sort((a, b) => b.overlap - a.overlap || a.entry.price - b.entry.price)
+    .slice(0, limit)
+    .map(({ entry }) => ({
+      id: entry.id,
+      title: entry.title,
+      category: entry.category,
+      price: entry.price,
+      iconKey: categoryToIconKey(entry.category),
+    }));
 }
 
 /**

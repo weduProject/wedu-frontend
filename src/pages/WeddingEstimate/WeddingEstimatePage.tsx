@@ -19,16 +19,26 @@ interface EstimateItem {
 
 // 초기 템플릿 더미 데이터
 const INITIAL_ITEMS: EstimateItem[] = [
-  { id: '1', category: '예식장', item_name: '웨딩홀 대관료', planned: 15000000, actual: 0, is_paid: false },
-  { id: '2', category: '예식장', item_name: '식사 비용', planned: 8000000, actual: 8000000, is_paid: true },
-  { id: '3', category: '예식장', item_name: '꽃 장식', planned: 3000000, actual: 2500000, is_paid: true },
-  { id: '4', category: '예식장', item_name: '사회자/축가', planned: 1000000, actual: 0, is_paid: false },
-  { id: '5', category: '예식장', item_name: '웨딩 촬영', planned: 2000000, actual: 0, is_paid: false },
+  // 예식장 (Venue & Ceremony)
+  { id: '1', category: '예식장', item_name: '웨딩홀 대관료', planned: 2500000, actual: 0, is_paid: false },
+  { id: '2', category: '예식장', item_name: '웨딩홀 식대 (보증인원 기준)', planned: 12000000, actual: 0, is_paid: false },
+  { id: '3', category: '예식장', item_name: '스튜디오/드레스/메이크업', planned: 3500000, actual: 0, is_paid: false },
+  { id: '4', category: '예식장', item_name: '본식 스냅 및 DVD 영상', planned: 1200000, actual: 0, is_paid: false },
+  { id: '5', category: '예식장', item_name: '전문 사회자 및 축가', planned: 500000, actual: 0, is_paid: false },
+  { id: '6', category: '예식장', item_name: '부케 및 본식 생화 장식', planned: 300000, actual: 0, is_paid: false },
   
-  { id: '6', category: '예물', item_name: '예복 (드레스)', planned: 1500000, actual: 0, is_paid: false },
-  { id: '7', category: '예물', item_name: '예복 (턱시도)', planned: 500000, actual: 0, is_paid: false },
-  { id: '8', category: '예물', item_name: '예단/예물 세트', planned: 3000000, actual: 0, is_paid: false },
-  { id: '9', category: '예물', item_name: '예물 보관함', planned: 200000, actual: 0, is_paid: false },
+  // 예물 (Jewelry & Gifts)
+  { id: '7', category: '예물', item_name: '웨딩 밴드 (커플링)', planned: 2500000, actual: 0, is_paid: false },
+  { id: '8', category: '예물', item_name: '신랑 맞춤 예복', planned: 1200000, actual: 0, is_paid: false },
+  { id: '9', category: '예물', item_name: '양가 혼주 한복 대여', planned: 800000, actual: 0, is_paid: false },
+  { id: '10', category: '예물', item_name: '신부 예물 세트', planned: 3000000, actual: 0, is_paid: false },
+  { id: '11', category: '예물', item_name: '양가 부모님 감사 선물', planned: 1000000, actual: 0, is_paid: false },
+  
+  // 신혼여행 (Honeymoon)
+  { id: '12', category: '신혼여행', item_name: '왕복 항공권', planned: 3000000, actual: 0, is_paid: false },
+  { id: '13', category: '신혼여행', item_name: '숙박비 (호텔/리조트)', planned: 2500000, actual: 0, is_paid: false },
+  { id: '14', category: '신혼여행', item_name: '현지 투어 및 액티비티', planned: 1000000, actual: 0, is_paid: false },
+  { id: '15', category: '신혼여행', item_name: '현지 체류비 (식대/교통 등)', planned: 1500000, actual: 0, is_paid: false },
 ];
 
 const formatWon = (n: number) => '₩' + n.toLocaleString('ko-KR');
@@ -137,23 +147,23 @@ export default function WeddingEstimatePage() {
       </div>
 
       {/* 2. 전체 요약 카드 */}
-      <div className="mb-10 mx-auto flex w-full max-w-4xl items-center justify-center rounded-[3rem] border border-border bg-white px-6 py-8 shadow-sm md:px-12 md:py-10">
+      <div className="mb-10 mx-auto flex w-full max-w-4xl items-center justify-center rounded-[3rem] border border-border bg-white px-6 py-8 md:px-12 md:py-10">
         <div className="flex w-full flex-row items-center justify-center">
           <div className="flex flex-1 flex-col items-start">
             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-text-muted md:text-xs">전체 예상 비용</p>
-            <p className="font-serif text-xl font-semibold text-text sm:text-2xl md:text-4xl">{formatWon(totalPlanned)}</p>
+            <p className="text-lg font-serif font-semibold text-text sm:text-2xl md:text-4xl">{formatWon(totalPlanned)}</p>
           </div>
           <div className="mx-2 h-10 w-px bg-border md:mx-6 md:h-16" />
           <div className="flex flex-1 flex-col items-start">
             <p className="mb-2 text-sm  font-semibold uppercase tracking-widest text-text-muted md:text-xs">실제 지출</p>
-            <p className="font-serif text-xl font-semibold text-primary sm:text-2xl md:text-4xl">{formatWon(totalActual)}</p>
+            <p className="text-lg font-serif font-semibold text-primary sm:text-2xl md:text-4xl">{formatWon(totalActual)}</p>
           </div>
           <div className="mx-2 h-10 w-px bg-border md:mx-6 md:h-16" />
           <div className="flex flex-1 flex-col items-start">
             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-text-muted md:text-xs">
               {remainingBudget >= 0 ? '남은 예산' : '초과 금액'}
             </p>
-            <p className={clsx('font-serif text-xl font-semibold sm:text-2xl md:text-4xl', remainingBudget >= 0 ? 'text-[#C89B7B]' : 'text-red-500')}>
+            <p className={clsx('font-serif text-lg font-semibold sm:text-2xl md:text-4xl', remainingBudget >= 0 ? 'text-[#C89B7B]' : 'text-error')}>
               {formatWon(Math.abs(remainingBudget))}
             </p>
           </div>
@@ -162,7 +172,7 @@ export default function WeddingEstimatePage() {
 
       {/* 3. 탭 버튼 */}
       <div className="mb-8 flex justify-center">
-        <div className="inline-flex rounded-full border border-border bg-white p-1 shadow-sm">
+        <div className="inline-flex rounded-full border border-border bg-white p-1 shadow-xs">
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -181,8 +191,7 @@ export default function WeddingEstimatePage() {
       </div>
 
       {/* 4. 항목 리스트 카드 */}
-      <div className="mb-10 mx-auto flex flex-col w-full max-w-4xl rounded-[3rem] border border-border bg-white shadow-sm overflow-hidden">
-      {/* <BaseCard className="overflow-hidden shadow-sm rounded-[3rem]"> */}
+      <div className="mb-10 mx-auto flex flex-col w-full max-w-4xl rounded-[3rem] border border-border bg-white overflow-hidden">
         
         {/* 카드 헤더 */}
         <div className="flex items-center justify-between border-b border-border p-6">
@@ -213,7 +222,7 @@ export default function WeddingEstimatePage() {
                 onChange={(e) => setNewItemPlanned(e.target.value)}
               />
             </div>
-            <Button type="submit" disabled={!newItemName.trim() || !newItemPlanned.trim()} className="h-10.5 sm:w-24">
+            <Button type="submit" disabled={!newItemName.trim() || !newItemPlanned.trim()} className="rounded-lg h-10.5 sm:w-24">
               추가
             </Button>
           </form>
@@ -273,7 +282,7 @@ export default function WeddingEstimatePage() {
                       
                       {/* 텍스트 정보 */}
                       <div className="min-w-0">
-                        <p className={clsx('truncate text-md font-bold', item.is_paid ? 'text-text' : 'text-text')}>
+                        <p className={clsx('truncate text-md font-medium', item.is_paid ? 'text-text-muted' : 'text-text')}>
                           {item.item_name}
                         </p>
                         <p className="mt-0.5 flex items-center text-sm text-text-muted">
@@ -315,7 +324,7 @@ export default function WeddingEstimatePage() {
         {/* 하단 소계 */}
         {filteredItems.length > 0 && (
           <div className="flex items-center justify-between bg-[#FAFAFA] p-6">
-            <span className="text-md font-bold text-text">{activeTab} 소계</span>
+            <span className="text-md font-medium text-text">{activeTab} 소계</span>
             <div className="text-right">
               <p className="text-base font-bold text-text">{formatWon(tabSubtotalPlanned)}</p>
               {tabSubtotalActual > 0 && (

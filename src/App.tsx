@@ -43,6 +43,7 @@ import WeddingEstimatePage from './pages/WeddingEstimate/WeddingEstimatePage';
 import InvitationPage from './pages/invitation/InvitationPage';
 import InvitationCreatePage from './pages/invitation/InvitationCreatePage';
 import InvitationDetailPage from './pages/invitation/InvitationDetailPage';
+import InvitationPublicViewPage from './pages/invitation/InvitationPublicViewPage';
 
 import ConnectPage from './pages/Partner/ConnectPage';
 import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
@@ -58,6 +59,9 @@ import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 
 import ScrollToTop from './components/ScrollToTop';
+import SharedBudgetPage from './pages/Budget/SharedBudgetPage';
+import SharedCalendarPage from './pages/Calendar/SharedCalendarPage';
+import SharedDDayPage from './pages/Dashboard/SharedDDayPage';
 
 function OnboardingRoutes() {
   return (
@@ -91,6 +95,8 @@ export default function App() {
                       element={<AuthCallbackPage />}
                     />
                     <Route path="/share/:token" element={<SharePage />} />
+                    {/* 헤더/네비게이션 없는 조회 전용 청첩장 공유 페이지 (로그인 여부와 무관하게 접근 가능) */}
+                    <Route path="/invitation/view/:id" element={<InvitationPublicViewPage />} />
 
                     <Route element={<OnboardingRoutes />}>
                       <Route path="/onboarding" element={<OnboardingStartPage />} />
@@ -103,6 +109,10 @@ export default function App() {
                     <Route element={<PageLayout />}>
                       <Route path="/home" element={<LandingPage />} />
                       <Route path="/dday" element={<DDayPage />} />
+                      <Route
+                        path="/shared/dday/:token"
+                        element={<SharedDDayPage />}
+                      />
 
                       <Route path="/shop" element={<ShopPage />} />
                       <Route path="/shop/:id" element={<ShopDetailPage />} />
@@ -146,7 +156,15 @@ export default function App() {
                         element={<SharedChecklistPage />}
                       />
                       <Route path="/calendar" element={<CalendarPage />} />
+                      <Route
+                        path="/shared/calendar/:token"
+                        element={<SharedCalendarPage />}
+                      />
                       <Route path="/budget" element={<BudgetPage />} />
+                      <Route
+                        path="/shared/budget/:token"
+                        element={<SharedBudgetPage />}
+                      />
 
                       <Route path="/community" element={<CommunityPage />} />
                       <Route
