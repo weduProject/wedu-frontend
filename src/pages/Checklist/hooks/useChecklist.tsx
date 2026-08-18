@@ -60,7 +60,6 @@ const ENUM_TO_CATEGORY: Record<string, CategoryType> = {
 
 interface ChecklistContextType {
   todos: TodoItem[];
-  isLoading: boolean;
   addTodo: (text: string, category: CategoryType) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
@@ -70,18 +69,15 @@ interface ChecklistContextType {
 const ChecklistContext = createContext<ChecklistContextType | undefined>(undefined);
 
 export function ChecklistProvider({ children }: { children: ReactNode }) {
-  const { user, isLoading: authIsLoading } = useAuth();
+  const { user } = useAuth();
   const [todos, setTodos] = useState<TodoItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // 1. 조회 (GET)
   const fetchTodos = useCallback(async () => {
     if (!getToken()) {
-      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
     try {
       const res = await apiFetch('/api/checklist-items');
       if (!res.ok) throw new Error('체크리스트 로드 실패');
@@ -101,21 +97,16 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.warn('API 호출 실패', error);
       setTodos([]);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (authIsLoading) return;
-    
     if (user) {
       fetchTodos();
     } else {
-      setTodos([])
-      setIsLoading(false);;
+      setTodos([]);
     }
-  }, [fetchTodos, user, authIsLoading]);
+  }, [fetchTodos, user]);
 
   // 2. 생성 (POST)
   const addTodo = async (text: string, category: CategoryType) => {
@@ -127,7 +118,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       const res = await apiFetch('/api/checklist-items', {
         method: 'POST',
         body: JSON.stringify({
-          title: text,
+          title: text, // 백엔드 DTO에 맞게 필드명 변경 필요할 수 있음
           category: CATEGORY_TO_ENUM[category],
         }),
       });
@@ -210,7 +201,7 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ChecklistContext.Provider value={{ todos, isLoading, addTodo, toggleTodo, deleteTodo, updateTodo }}>
+    <ChecklistContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, updateTodo }}>
       {children}
     </ChecklistContext.Provider>
   );

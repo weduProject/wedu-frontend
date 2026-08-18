@@ -12,7 +12,8 @@ import { Button } from "../../components";
 import { useBuilder } from "./BuilderContext";
 import { BuilderIcon } from "./builderIcons";
 import {
-  getLocalRecommendations,
+  buildRecommendationParams,
+  fetchRecommendations,
   fetchWishlistProductIds,
   addToWishlist,
   removeFromWishlist,
@@ -23,32 +24,41 @@ export default function BuilderCartPage() {
   const navigate = useNavigate();
   const { builder } = useBuilder();
 
-  // 백엔드에 추천 API가 아직 없어 네트워크 호출 없이 로컬에서 즉시 계산한다.
-  // (API가 준비되면 여기를 fetchRecommendations(...)로 바꾸면 됨)
-  const recommendedProducts = getLocalRecommendations(builder);
-
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // 상품별 찜 상태 + 처리중 여부
   const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
 
-  /** 이미 찜해둔 상품 목록을 불러온다. 실패해도 화면 전체가 막히지 않도록 빈 목록으로 처리한다. */
-  const loadWishlist = async () => {
+  /**
+   * 빌더에서 선택한 장르 + 예산 기준으로 실제 추천 상품과, 이미 찜해둔 상품 목록을 함께 불러온다.
+   */
+  const loadData = async () => {
     setIsLoading(true);
+    setLoadError(null);
+
     try {
-      const wishlistIds = await fetchWishlistProductIds();
+      const { genres, minPrice, maxPrice } = buildRecommendationParams(builder);
+
+      const [products, wishlistIds] = await Promise.all([
+        fetchRecommendations({ genres, minPrice, maxPrice }),
+        fetchWishlistProductIds().catch(() => new Set<number>()),
+      ]);
+
+      setRecommendedProducts(products);
       setWishlistedIds(wishlistIds);
     } catch (error) {
-      console.warn("찜 목록 조회 실패(빈 목록으로 진행):", error);
-      setWishlistedIds(new Set());
+      console.error("추천 상품 조회 실패:", error);
+      setLoadError("추천 상품을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadWishlist();
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -179,7 +189,14 @@ export default function BuilderCartPage() {
           {isLoading ? (
             <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-text-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
-              찜 목록을 불러오는 중...
+              추천 상품을 불러오는 중...
+            </div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center">
+              <p className="text-sm text-text-muted">{loadError}</p>
+              <Button variant="secondary" size="sm" onClick={loadData}>
+                다시 시도
+              </Button>
             </div>
           ) : recommendedProducts.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-text-muted">

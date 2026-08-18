@@ -1,13 +1,19 @@
+import DDayCard from "./components/DDayCard";
+import BaseCard from "../../components/ui/BaseCard";
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, ClipboardList, CheckCircle2, Circle, ArrowRight, X, Gift, Crown, Luggage, Check } from 'lucide-react';
 import { useChecklist } from "../Checklist/hooks/useChecklist";
 import { useDDay } from "../../contexts/DDayContext";
 import { useAuth } from "../../contexts/AuthContext";
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
-import DDayPageContent from "./components/DDayPageContent";
-import ShareLinkCard from "../../components/ui/ShareLinkCard";
-import { Button } from "../../components";
+
+const ANNIVERSARIES = [
+  { id: 1, title: '처음 만난 날', desc: '운명적인 첫 만남, 모든 것이 시작된 순간.', icon: <Heart className="h-4 w-4" /> },
+  { id: 2, title: '프로포즈', desc: '평생 잊지 못할 가장 특별한 순간.', icon: <Gift className="h-4 w-4" /> },
+  { id: 3, title: '결혼식', desc: '사랑의 약속을 세상 앞에 선언하는 날.', icon: <Crown className="h-4 w-4" /> },
+  { id: 4, title: '신혼여행', desc: '둘만의 달콤한 여행, 새로운 시작.', icon: <Luggage className="h-4 w-4" /> },
+];
 
 export default function DDayPage() {
   const { dday, createDDay, hasDDay, updateDDay, deleteDDay } = useDDay();
@@ -20,6 +26,8 @@ export default function DDayPage() {
   const [tempDate, setTempDate] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const previewTodos = todos.slice(0, 5);
 
   function handleOpenModal() {
     setTempDate(dday?.weddingDate ?? '');
@@ -57,20 +65,114 @@ export default function DDayPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <DDayPageContent
-        targetDate={dday?.weddingDate ?? null}
-        todos={todos}
-        isLoggedIn={!!user}
+      <DDayCard
+        targetDate={dday?.weddingDate ?? ''}
+        showEditButton={true}
         onEditClick={handleOpenModal}
-        onTodoToggle={toggleTodo}
-        onLoginClick={() => navigate('/login')}
       />
 
-      {user && (
-        <div className="mt-8">
-          <ShareLinkCard pageName="D-day" sharePath="/shared/dday" />
-        </div>
-      )}
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+        {/* 소중한 기억들 */}
+        <BaseCard className="flex h-full flex-col p-6 md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-pink-50 text-primary">
+              <Heart className="h-5 w-5" strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-text">소중한 기억들</h2>
+              <p className="mt-0.5 text-xs text-text-muted">함께 걸어온 특별한 순간들</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {ANNIVERSARIES.map((item) => (
+              <div key={item.id} className="flex flex-col rounded-2xl border border-gray-100 bg-[#FAFAFA] p-5 transition-colors hover:border-primary-light">
+                <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-pink-50 text-primary">
+                  {item.icon}
+                </div>
+                <h3 className="mb-1.5 text-sm font-bold text-text">{item.title}</h3>
+                <p className="text-[11px] leading-relaxed text-text-muted">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </BaseCard>          
+
+        {/* 웨딩 체크리스트 */}
+        <BaseCard className="flex h-full flex-col p-6 md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+              <ClipboardList className="h-5 w-5" strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-text">웨딩 체크리스트</h2>
+              <p className="mt-0.5 text-xs text-text-muted">준비해야 할 핵심 일정</p>
+            </div>
+          </div>
+          {!user ? (
+            <div className="flex h-full flex-col p-6">
+              <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
+                  <Check className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-sm text-text-muted">할 일을 등록하고<br />진행률을 확인하세요</p>
+              </div>
+              <div className="mt-4 border-t border-border pt-4 text-center">
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigate('/login'); }}
+                  className="text-sm font-semibold text-primary hover:underline"
+                >
+                  로그인하고 시작하기
+                </button>
+              </div>
+            </div>
+          ) : todos.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
+              <div className="mt-6 mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light/30">
+                <ClipboardList className="h-6 w-6 text-primary" />
+              </div>
+              <p className="mb-1.5 text-sm text-text-muted">아직 체크리스트를 만들지 않으셨어요</p>
+              <Link
+                to="/checklist"
+                className="text-sm font-semibold text-primary no-underline hover:underline"
+              >
+                체크리스트 만들러 가기
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-1 flex-col gap-5">
+                {previewTodos.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => toggleTodo(item.id)}
+                    className="flex cursor-pointer items-center justify-between border-b border-gray-50 pb-3 transition-opacity hover:opacity-70 last:border-0 last:pb-0"
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="flex w-12 shrink-0 items-center justify-center rounded-full bg-red-50 py-1 text-[11px] font-bold text-primary">
+                        {item.category}
+                      </span>
+                      <p className={`text-sm ${item.isCompleted ? 'text-gray-400 line-through' : 'font-medium text-text'}`}>
+                        {item.text}
+                      </p>
+                    </div>
+                    {item.isCompleted ? (
+                      <CheckCircle2 className="h-5 w-5 text-primary" fill="currentColor" color="white" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-gray-300" />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 border-t border-gray-100 pt-5">
+                <Link to="/checklist" className="flex items-center gap-1 text-sm font-semibold text-primary transition-opacity hover:opacity-80">
+                  전체 체크리스트 보기 <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </>
+          )}
+        </BaseCard>
+
+      </div>
 
       {/* 날짜 설정 모달 */}
       {isModalOpen && (
@@ -97,27 +199,26 @@ export default function DDayPage() {
               {hasDDay && (
                 <button 
                   onClick={() => setIsDeleteModalOpen(true)}
-                  className="text-xs text-text-muted underline underline-offset-2 transition-colors cursor-pointer hover:text-gray-600"
+                  className="text-xs text-text-muted underline underline-offset-2 transition-colors hover:text-gray-600"
                 >
                   내 D-day 삭제하기
                 </button>
               )}
             </div>
             <div className="mt-6 flex gap-3">
-              <Button
-                variant="secondary"
+              <button
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 rounded-xl py-3.5"
+                className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-semibold text-text hover:bg-gray-200"
               >
                 취소
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={handleSaveDate}
                 disabled={isSaving || !tempDate}
-                className="flex-1 rounded-xl py-3.5"
+                className="flex-1 rounded-xl bg-linear-to-r from-[#F4A4A4] to-[#E58080] py-3.5 text-sm font-bold text-white disabled:opacity-50 hover:opacity-90 shadow-sm shadow-primary/30"
               >
                 {isSaving ? '저장 중...' : '저장하기'}
-              </Button>
+              </button>
             </div>
           </div>
         </div>
