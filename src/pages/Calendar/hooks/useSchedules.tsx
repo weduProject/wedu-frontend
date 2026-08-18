@@ -19,12 +19,12 @@ interface ScheduleContextType {
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading: authIsLoading } = useAuth();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchSchedules = useCallback(async () => {
     if (!getToken()) {
@@ -42,21 +42,22 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
 
       setSchedules(list.map(fromBackendEvent));
     } catch (error) {
-      console.warn('API 호출 실패, 임시 더미데이터를 유지합니다.', error);
-      setSchedules([
-        { id: '1', title: '드레스 2차 피팅', date: '2026-07-12', time: '14:00', category: '스튜디오/드레스', memo: '' },
-        { id: '2', title: '웨딩밴드 픽업', date: '2026-07-20', time: '13:30', category: '예물/예단', memo: '종로 웨듀다이아' },
-      ]);
+      console.warn('API 호출 실패', error);
+      setSchedules([]);
     } finally {
       setIsLoading(false);
     }
   }, [year, month]);
 
   useEffect(() => {
+    if (authIsLoading) return;
+
     if (user) {
       fetchSchedules();
+    } else {
+      setIsLoading(false);
     }
-  }, [fetchSchedules, user]);
+  }, [fetchSchedules, user, authIsLoading]);
 
   const goToPrevMonth = () => {
     if (month === 1) {

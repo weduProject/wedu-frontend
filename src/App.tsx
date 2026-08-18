@@ -59,6 +59,9 @@ import { WishlistProvider } from './pages/Shop/WishlistContext';
 import { CartProvider } from './pages/Shop/CartContext';
 
 import ScrollToTop from './components/ScrollToTop';
+import SharedBudgetPage from './pages/Budget/SharedBudgetPage';
+import SharedCalendarPage from './pages/Calendar/SharedCalendarPage';
+import SharedDDayPage from './pages/Dashboard/SharedDDayPage';
 
 function OnboardingRoutes() {
   return (
@@ -106,6 +109,10 @@ export default function App() {
                     <Route element={<PageLayout />}>
                       <Route path="/home" element={<LandingPage />} />
                       <Route path="/dday" element={<DDayPage />} />
+                      <Route
+                        path="/shared/dday/:token"
+                        element={<SharedDDayPage />}
+                      />
 
                       <Route path="/shop" element={<ShopPage />} />
                       <Route path="/shop/:id" element={<ShopDetailPage />} />
@@ -149,7 +156,15 @@ export default function App() {
                         element={<SharedChecklistPage />}
                       />
                       <Route path="/calendar" element={<CalendarPage />} />
+                      <Route
+                        path="/shared/calendar/:token"
+                        element={<SharedCalendarPage />}
+                      />
                       <Route path="/budget" element={<BudgetPage />} />
+                      <Route
+                        path="/shared/budget/:token"
+                        element={<SharedBudgetPage />}
+                      />
 
                       <Route path="/community" element={<CommunityPage />} />
                       <Route
