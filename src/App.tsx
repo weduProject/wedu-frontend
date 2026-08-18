@@ -60,6 +60,7 @@ import { CartProvider } from './pages/Shop/CartContext';
 import ScrollToTop from './components/ScrollToTop';
 import SharedBudgetPage from './pages/Budget/SharedBudgetPage';
 import SharedCalendarPage from './pages/Calendar/SharedCalendarPage';
+import SharedDDayPage from './pages/Dashboard/SharedDDayPage';
 
 function OnboardingRoutes() {
   return (
@@ -105,6 +106,10 @@ export default function App() {
                     <Route element={<PageLayout />}>
                       <Route path="/home" element={<LandingPage />} />
                       <Route path="/dday" element={<DDayPage />} />
+                      <Route
+                        path="/shared/dday/:token"
+                        element={<SharedDDayPage />}
+                      />
 
                       <Route path="/shop" element={<ShopPage />} />
                       <Route path="/shop/:id" element={<ShopDetailPage />} />

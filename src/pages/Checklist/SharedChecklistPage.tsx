@@ -59,7 +59,7 @@ export default function SharedChecklistPage() {
   return (
     <div className="mx-auto max-w-5xl p-6">
       <div className="mb-8">
-        <h2 className="mb-2 text-2xl font-bold font-serif text-text">공유된 웨딩 체크리스트</h2>
+        <h2 className="md:text-3xl mb-2 text-2xl font-bold font-serif text-text">공유된 웨딩 체크리스트</h2>
         <p className="text-sm text-text-muted">조회 전용 페이지입니다.</p>
       </div>
 
