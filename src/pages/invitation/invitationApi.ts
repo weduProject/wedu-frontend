@@ -40,7 +40,8 @@ async function invitationRequest<T>(
     try {
       response = await fetch(`${INVITATION_API_BASE}${path}`, { ...options, headers });
     } catch {
-      throw new Error("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
+      // 네트워크 자체가 끊긴 경우라 HTTP status가 없음. status는 undefined로 둔다.
+      throw new InvitationApiError("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
     }
 
     lastStatus = response.status;
@@ -55,13 +56,20 @@ async function invitationRequest<T>(
     try {
       body = await response.json();
     } catch {
-      if (!response.ok) throw new Error(`${fallbackErrorMessage} (${response.status})`);
+      if (!response.ok) {
+        // 본문이 JSON이 아니라 서버 error.code는 알 수 없지만, status는 응답에서 확인 가능하다.
+        throw new InvitationApiError(`${fallbackErrorMessage} (${response.status})`, response.status);
+      }
       return undefined as T;
     }
 
     const envelope = body as ApiEnvelope<T> | null;
     if (!response.ok || !body || envelope?.success === false) {
-      throw new Error(envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`);
+      throw new InvitationApiError(
+        envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`,
+        response.status,
+        envelope?.error?.code,
+      );
     }
 
     // 백엔드 공통 래퍼({success,data,error})와 raw 응답 모두 대응한다.
@@ -71,7 +79,7 @@ async function invitationRequest<T>(
     return body as T;
   }
 
-  throw new Error(`${fallbackErrorMessage} (${lastStatus || 401})`);
+  throw new InvitationApiError(`${fallbackErrorMessage} (${lastStatus || 401})`, lastStatus || 401);
 }
 
 /** 백엔드 공통 응답 래퍼 */
@@ -81,12 +89,31 @@ interface ApiEnvelope<T> {
   error?: { code: string; message: string };
 }
 
+// HTTP status / 서버 에러 code를 함께 담는 에러 클래스
+export class InvitationApiError extends Error {
+  status?: number;
+  code?: string;
+
+  constructor(message: string, status?: number, code?: string) {
+    super(message);
+    this.name = "InvitationApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 async function unwrap<T>(promise: Promise<ApiEnvelope<T> | T>): Promise<T> {
   const res = await promise;
   if (res && typeof res === "object" && "success" in res) {
     const envelope = res as ApiEnvelope<T>;
     if (!envelope.success) {
-      throw new Error(envelope.error?.message ?? "요청 처리에 실패했습니다.");
+      // invitationRequest를 거치지 않고 unwrap이 단독으로 쓰이는 경우를 대비한 방어 코드.
+      // status는 이 시점에 알 수 없어 undefined로 둔다.
+      throw new InvitationApiError(
+        envelope.error?.message ?? "요청 처리에 실패했습니다.",
+        undefined,
+        envelope.error?.code,
+      );
     }
     return envelope.data;
   }

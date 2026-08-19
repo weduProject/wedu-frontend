@@ -34,6 +34,7 @@ import {
   saveInvitation,
   syncInvitationGallery,
   deleteInvitationGalleryImage,
+  InvitationApiError,
   type InvitationDraft,
 } from "./invitationApi";
 
@@ -264,6 +265,12 @@ export default function InvitationCreatePage() {
   const location = useLocation();
   const handoff = (location.state ?? {}) as TemplateHandoff;
 
+  useEffect(() => {
+    if (handoff.restoredForm) {
+      window.history.replaceState({}, "");
+    }
+  }, []);
+
   // 템플릿을 골라 색상(mainColor)이 이미 정해진 채로 들어온 경우, 디자인 단계는 건너뛴다.
   // (restoredForm으로 재진입한 경우는 템플릿 선택이 아니므로 디자인 단계를 그대로 유지)
   const cameFromTemplate = Boolean(handoff.mainColor) && !handoff.restoredForm;
@@ -282,52 +289,64 @@ export default function InvitationCreatePage() {
   const [confirmDeleteIndex, setConfirmDeleteIndex] = useState<number | null>(null);
   const [deletingGalleryId, setDeletingGalleryId] = useState<number | null>(null);
 
-  // 마운트 시 기존에 작성 중인 청첩장이 있으면 불러와서 폼을 채운다.
-  // (수정으로 돌아가기로 진입한 경우엔 이미 폼이 채워져 있으니 다시 불러오지 않음)
-  useEffect(() => {
-    if (handoff.restoredForm) return;
-
+useEffect(() => {
+  if (handoff.restoredForm) {
     let cancelled = false;
-
     (async () => {
       try {
-        const [existing, gallery] = await Promise.all([
-          fetchMyInvitation(),
-          fetchInvitationGallery(),
-        ]);
-
-        if (cancelled) return;
-
-        setForm((prev) => {
-          const merged = {
-            ...prev,
-            ...(existing ? draftToForm(existing) : {}),
-            gallery,
-          };
-
-          // 템플릿을 새로 선택하고 들어온 경우, 저장된 색상 대신 방금 고른 템플릿 색상을 적용
-          if (cameFromTemplate) {
-            merged.templateId = handoff.templateId ?? merged.templateId;
-            merged.mainColor = handoff.mainColor ?? merged.mainColor;
-            merged.accentColor =
-              handoff.accentColor ?? deriveAccentColor(handoff.mainColor ?? merged.mainColor);
-            merged.backgroundGradient = handoff.backgroundGradient ?? merged.backgroundGradient;
-          }
-
-          return merged;
-        });
+        const gallery = await fetchInvitationGallery();
+        if (!cancelled) {
+          setForm((prev) => ({ ...prev, gallery }));
+        }
       } catch (error) {
-        console.warn("[invitation] 초기 데이터 불러오기 실패:", error);
-      } finally {
-        if (!cancelled) setIsLoading(false);
+        console.warn("[invitation] 갤러리 재조회 실패:", error);
       }
     })();
-
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }
+
+  let cancelled = false;
+
+  (async () => {
+    try {
+      const [existing, gallery] = await Promise.all([
+        fetchMyInvitation(),
+        fetchInvitationGallery(),
+      ]);
+
+      if (cancelled) return;
+
+      setForm((prev) => {
+        const merged = {
+          ...prev,
+          ...(existing ? draftToForm(existing) : {}),
+          gallery,
+        };
+
+        if (cameFromTemplate) {
+          merged.templateId = handoff.templateId ?? merged.templateId;
+          merged.mainColor = handoff.mainColor ?? merged.mainColor;
+          merged.accentColor =
+            handoff.accentColor ?? deriveAccentColor(handoff.mainColor ?? merged.mainColor);
+          merged.backgroundGradient = handoff.backgroundGradient ?? merged.backgroundGradient;
+        }
+
+        return merged;
+      });
+    } catch (error) {
+      console.warn("[invitation] 초기 데이터 불러오기 실패:", error);
+    } finally {
+      if (!cancelled) setIsLoading(false);
+    }
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const updateField = <K extends keyof InvitationDraftForm>(field: K, value: InvitationDraftForm[K]) => {
     setForm((prev) => ({
@@ -387,8 +406,19 @@ const handleConfirmGalleryDelete = async () => {
       await deleteInvitationGalleryImage(image.id);
       removeGalleryLocal(confirmDeleteIndex);
     } catch (error) {
-      console.error("[invitation] 갤러리 이미지 삭제 실패:", error);
-      alert("이미지 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      // 서버에 이미 없는 이미지(404)라면 재시도해도 계속 실패하므로,
+      // 화면 상태를 서버와 맞춰 바로 제거하고 별도 안내를 띄운다.
+      const isAlreadyDeleted =
+        error instanceof InvitationApiError &&
+        (error.status === 404 || error.code === "INVITATION_GALLERY_404");
+
+      if (isAlreadyDeleted) {
+        removeGalleryLocal(confirmDeleteIndex);
+        alert("이미 삭제된 이미지예요. 화면을 최신 상태로 갱신했어요.");
+      } else {
+        console.error("[invitation] 갤러리 이미지 삭제 실패:", error);
+        alert("이미지 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
     } finally {
       setDeletingGalleryId(null);
       setConfirmDeleteIndex(null);
