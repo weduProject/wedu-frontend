@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Loader2,
   ArrowLeft,
+  Heart,
 } from "lucide-react";
 
 import { Button, SelectableCard } from "../../components";
@@ -907,7 +908,11 @@ export default function InvitationCreatePage() {
                       )}
 
                       <p className="font-serif text-lg font-semibold text-text">
-                        {form.groomName || "신랑"} <span className="mx-2 text-primary">&</span>{" "}
+                        {form.groomName || "신랑"}
+                        <Heart
+                          className="mx-2 inline h-4 w-4 fill-current"
+                          style={{ color: form.accentColor ?? form.mainColor }}
+                        />
                         {form.brideName || "신부"}
                       </p>
                       <p className="mt-3 text-sm text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
@@ -1000,7 +1005,11 @@ export default function InvitationCreatePage() {
                   )}
 
                   <p className="font-serif text-sm font-semibold text-text">
-                    {form.groomName || "신랑"} <span className="mx-1 text-primary">&</span>{" "}
+                    {form.groomName || "신랑"}
+                    <Heart
+                      className="mx-1 inline h-3.5 w-3.5 fill-current"
+                      style={{ color: form.accentColor ?? form.mainColor }}
+                    />
                     {form.brideName || "신부"}
                   </p>
                   <div className="mx-auto my-5 h-px w-10 bg-border" />
