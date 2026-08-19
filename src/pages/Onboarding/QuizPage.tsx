@@ -6,13 +6,11 @@ import { Button, ProgressBar } from '../../components';
 import SelectableCard from '../../components/ui/SelectableCard';
 import { useOnboarding, QUIZ_QUESTIONS, TRAVEL_REGIONS } from './OnboardingContext';
 import type { QuizAnswers, QuizAnswer } from './OnboardingContext';
-import { useAuth } from '../../contexts/AuthContext';
 
 const EXCLUSIVE_NONE = ['NO_SERVICE', 'NONE', 'UNKNOWN'];
 
 export default function QuizPage() {
   const navigate = useNavigate();
-  const { markOnboardingComplete } = useAuth();
   const { setQuizAnswers } = useOnboarding();
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
@@ -95,7 +93,6 @@ export default function QuizPage() {
       setCurrent(current + 1);
     } else {
       setQuizAnswers(answers);
-      markOnboardingComplete();
       navigate('/onboarding/partner');
     }
   }

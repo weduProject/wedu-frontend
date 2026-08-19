@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useOnboarding } from './OnboardingContext';
 import { apiFetch } from '../../lib/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
 
 const MBTI_STEPS = [
@@ -58,6 +59,7 @@ const ALL_MBTI = [
 
 export default function PartnerMbtiPage() {
   const navigate = useNavigate();
+  const { user, markOnboardingComplete } = useAuth();
   const { setPartnerMbti, quizAnswers } = useOnboarding();
 
   const [mode, setMode] = useState<'step' | 'direct'>('step');
@@ -75,6 +77,17 @@ export default function PartnerMbtiPage() {
     setLoading(true);
 
     try {
+      // 온보딩 완료 여부 확인 후 API 호출 (중복 요청 방지)
+      if (!user?.onboardingCompleted) {
+        const onboardingRes = await apiFetch('/api/users/me/onboarding', { method: 'POST' });
+        if (!onboardingRes.ok && onboardingRes.status !== 409) {
+          // 온보딩 실패 시 psychological-tests 호출 중단
+          navigate('/onboarding/result');
+          return;
+        }
+        markOnboardingComplete();
+      }
+
       const priorityValues = ((quizAnswers.q5 as string[]) ?? []).map((val, idx) => ({
         value: val,
         rank: idx + 1,

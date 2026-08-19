@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CalendarDays, CheckCircle2, Circle, DollarSign, AlertCircle } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Circle, DollarSign, AlertCircle, Clock } from 'lucide-react';
 import weduLogo from '../../assets/wedu-logo.png';
+import ProgressBar from '../../components/ui/ProgressBar';
+import BaseCard from '../../components/ui/BaseCard';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
@@ -55,6 +57,7 @@ interface DDayData {
 interface ShareData {
   dday: DDayData | null;
   budget: BudgetItem[];
+  targetBudget: number;
   checklist: ChecklistItem[];
   events: CalendarEvent[];
 }
@@ -83,6 +86,7 @@ export default function SharePage() {
   const [data, setData] = useState<ShareData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     if (!token) { setError('유효하지 않은 링크예요.'); setIsLoading(false); return; }
@@ -144,10 +148,10 @@ export default function SharePage() {
           )
           .sort((a, b) => a.date.localeCompare(b.date));
 
-        setData({ dday: ddayRaw, budget, checklist, events });
+        setData({ dday: ddayRaw, budget, targetBudget: budgetRaw?.totalBudget ?? 0, checklist, events });
       } catch (e) {
         if (e instanceof Error && e.message === 'INVALID_TOKEN') {
-          setError('링크가 만료됐거나 유효하지 않아요.');
+          setIsExpired(true);
         } else {
           setError('데이터를 불러오는 중 오류가 발생했어요.');
         }
@@ -172,7 +176,7 @@ export default function SharePage() {
     );
   }
 
-  if (error || !data) {
+  if (isExpired || error || !data) {
     return (
       <div className="flex min-h-screen flex-col bg-[#FAFAFA]">
         <div className="bg-white border-b border-border px-4 py-4 flex items-center gap-2 sticky top-0 z-50">
@@ -180,20 +184,50 @@ export default function SharePage() {
           <span className="text-2xl font-bold text-rosegold">WEDU</span>
         </div>
         <div className="flex flex-1 items-center justify-center px-4">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
-              <AlertCircle className="w-7 h-7 text-red-400" strokeWidth={1.8} />
+          {isExpired ? (
+            <BaseCard className="py-10 px-12 mx-auto">
+              <div className="flex flex-col items-center gap-4">
+                <Clock className="w-10 h-10 text-text-muted" strokeWidth={1.5} />
+                <p className="text-base font-semibold text-text">Link Expired</p>
+              </div>
+            </BaseCard>
+          ) : (
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
+                <AlertCircle className="w-7 h-7 text-red-400" strokeWidth={1.8} />
+              </div>
+              <h1 className="text-lg font-bold text-text mb-2">링크를 열 수 없어요</h1>
+              <p className="text-sm text-text-muted">{error ?? '알 수 없는 오류가 발생했어요.'}</p>
             </div>
-            <h1 className="text-lg font-bold text-text mb-2">링크를 열 수 없어요</h1>
-            <p className="text-sm text-text-muted">{error ?? '알 수 없는 오류가 발생했어요.'}</p>
-          </div>
+          )}
         </div>
       </div>
     );
   }
 
-  const totalBudget = data.budget.reduce((s, i) => s + i.budgetAmount, 0);
-  const paidBudget = data.budget.reduce((s, i) => s + i.paidAmount, 0);
+  const isEmpty = !data.dday && data.budget.length === 0 && data.checklist.length === 0 && data.events.length === 0;
+
+  if (isEmpty) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[#FAFAFA]">
+        <div className="bg-white border-b border-border px-4 py-4 flex items-center gap-2 sticky top-0 z-50">
+          <img src={weduLogo} alt="WEDU" className="h-10 w-10 object-contain" />
+          <span className="text-2xl font-bold text-rosegold">WEDU</span>
+        </div>
+        <div className="flex flex-1 items-center justify-center px-4">
+          <BaseCard className="py-10 px-12 mx-auto">
+            <div className="flex flex-col items-center gap-4">
+              <Clock className="w-10 h-10 text-text-muted" strokeWidth={1.5} />
+              <p className="text-base font-semibold text-text">Link Expired</p>
+            </div>
+          </BaseCard>
+        </div>
+      </div>
+    );
+  }
+
+  const totalBudget = data.targetBudget;
+  const paidBudget = data.budget.filter(i => i.isPaid).reduce((s, i) => s + (i.paidAmount || i.budgetAmount), 0);
   const completedCount = data.checklist.filter((i) => i.isCompleted).length;
 
   return (
@@ -221,11 +255,20 @@ export default function SharePage() {
 
         {/* 예산 */}
         <section className="rounded-2xl bg-white border border-border p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-xl bg-primary-light flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-primary" strokeWidth={1.8} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-primary-light flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-primary" strokeWidth={1.8} />
+              </div>
+              <h3 className="text-base font-bold text-text">예산 현황</h3>
             </div>
-            <h3 className="text-base font-bold text-text">예산 현황</h3>
+            {data.budget.length > 0 && (
+              <div className="text-right">
+                <p className="text-xs text-text-muted">전체 예산 <span className="font-semibold text-text">{formatMoney(totalBudget)}</span></p>
+                <p className="text-xs text-text-muted">사용 <span className="font-semibold text-primary">{formatMoney(paidBudget)}</span></p>
+                <p className="text-xs text-text-muted">잔여 <span className="font-semibold text-text">{formatMoney(totalBudget - paidBudget)}</span></p>
+              </div>
+            )}
           </div>
           {data.budget.length === 0 ? (
             <p className="text-sm text-text-muted">등록된 예산 항목이 없어요.</p>
@@ -235,21 +278,19 @@ export default function SharePage() {
                 <span className="text-text-muted">결제 완료</span>
                 <span className="font-semibold text-text">{formatMoney(paidBudget)} / {formatMoney(totalBudget)}</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: totalBudget > 0 ? `${Math.min(100, (paidBudget / totalBudget) * 100)}%` : '0%' }}
-                />
-              </div>
+              <ProgressBar value={paidBudget} max={totalBudget} />
               <div className="mt-4 flex flex-col gap-2">
                 {data.budget.map((item) => (
                   <div key={item.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                     <div>
-                      <p className={`text-sm ${item.isPaid ? 'text-text-muted line-through' : 'text-text font-medium'}`}>{item.title}</p>
+                      <p
+                        className={`text-sm ${item.isPaid ? 'text-text-muted' : 'text-text font-medium'}`}
+                        style={item.isPaid ? { textDecoration: 'line-through', textDecorationThickness: '2px' } : undefined}
+                      >{item.title}</p>
                       <p className="text-xs text-text-muted mt-0.5">{item.category}</p>
                     </div>
                     <span className={`text-sm font-semibold ${item.isPaid ? 'text-primary' : 'text-text-muted'}`}>
-                      {formatMoney(item.budgetAmount)}
+                      {formatMoney(item.isPaid ? (item.paidAmount || item.budgetAmount) : item.budgetAmount)}
                     </span>
                   </div>
                 ))}

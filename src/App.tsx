@@ -47,6 +47,7 @@ import InvitationPublicViewPage from './pages/invitation/InvitationPublicViewPag
 
 import ConnectPage from './pages/Partner/ConnectPage';
 import WeddingMagazinePage from './pages/WeddingMagazine/WeddingMagazinePage';
+import WeddingMagazineDetailPage from './pages/WeddingMagazine/WeddingMagazineDetailPage';
 import SharePage from './pages/Share/SharePage';
 
 import { DDayProvider } from './contexts/DDayContext';
@@ -188,6 +189,7 @@ export default function App() {
 
                       <Route path="/connect" element={<ConnectPage />} />
                       <Route path="/magazine" element={<WeddingMagazinePage />} />
+                      <Route path="/magazine/:id" element={<WeddingMagazineDetailPage />} />
 
                       <Route path="/invitation" element={<InvitationPage />} />
                       <Route
