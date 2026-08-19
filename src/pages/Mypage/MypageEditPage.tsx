@@ -30,9 +30,9 @@ export default function MypageEditPage() {
   const [isLoadingToken, setIsLoadingToken] = useState(true);
   const [isCopyingLink, setIsCopyingLink] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
   const [isReissuingLink, setIsReissuingLink] = useState(false);
   const [showReissueConfirm, setShowReissueConfirm] = useState(false);
+  const [showLinkErrorModal, setShowLinkErrorModal] = useState(false);
 
   // GET /api/share-links/me — 마운트 시 토큰 조회
   useEffect(() => {
@@ -77,14 +77,13 @@ export default function MypageEditPage() {
   async function handleCopyShareLink() {
     if (!shareToken) return;
     setIsCopyingLink(true);
-    setLinkError(null);
     try {
       const url = `${window.location.origin}/share/${shareToken}`;
       await navigator.clipboard.writeText(url);
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
-      setLinkError('링크 복사에 실패했어요.');
+      setShowLinkErrorModal(true);
     } finally {
       setIsCopyingLink(false);
     }
@@ -94,17 +93,16 @@ export default function MypageEditPage() {
   async function handleReissueLink() {
     setIsReissuingLink(true);
     setShowReissueConfirm(false);
-    setLinkError(null);
     try {
       const res = await apiFetch('/api/share-links/me/reissue', { method: 'POST' });
       const body: ApiEnvelope<{ token: string }> = await res.json();
       if (res.ok && body.success && body.data?.token) {
         setShareToken(body.data.token);
       } else {
-        throw new Error(body.error?.message ?? '재발급에 실패했어요.');
+        setShowLinkErrorModal(true);
       }
     } catch {
-      setLinkError('링크 재발급에 실패했어요.');
+      setShowLinkErrorModal(true);
     } finally {
       setIsReissuingLink(false);
     }
@@ -314,7 +312,6 @@ export default function MypageEditPage() {
               <RefreshCw className={`h-4 w-4 ${isReissuingLink ? 'animate-spin' : ''}`} strokeWidth={1.8} />
               {isReissuingLink ? '재발급 중...' : '링크 재발급'}
             </Button>
-            {linkError && <p className="text-xs text-red-500 text-center">{linkError}</p>}
           </div>
         </BaseCard>
 
@@ -328,6 +325,15 @@ export default function MypageEditPage() {
       title="링크를 재발급할까요?"
       message="기존 링크는 더 이상 사용할 수 없게 됩니다."
       confirmLabel="재발급"
+      danger={false}
+    />
+    <ConfirmDeleteModal
+      isOpen={showLinkErrorModal}
+      onClose={() => setShowLinkErrorModal(false)}
+      onConfirm={() => setShowLinkErrorModal(false)}
+      title="링크 재발급에 실패했습니다"
+      message="잠시 후 다시 시도해주세요."
+      confirmLabel="확인"
       danger={false}
     />
     </>

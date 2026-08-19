@@ -205,27 +205,6 @@ export default function SharePage() {
     );
   }
 
-  const isEmpty = !data.dday && data.budget.length === 0 && data.checklist.length === 0 && data.events.length === 0;
-
-  if (isEmpty) {
-    return (
-      <div className="flex min-h-screen flex-col bg-[#FAFAFA]">
-        <div className="bg-white border-b border-border px-4 py-4 flex items-center gap-2 sticky top-0 z-50">
-          <img src={weduLogo} alt="WEDU" className="h-10 w-10 object-contain" />
-          <span className="text-2xl font-bold text-rosegold">WEDU</span>
-        </div>
-        <div className="flex flex-1 items-center justify-center px-4">
-          <BaseCard className="py-10 px-12 mx-auto">
-            <div className="flex flex-col items-center gap-4">
-              <Clock className="w-10 h-10 text-text-muted" strokeWidth={1.5} />
-              <p className="text-base font-semibold text-text">Link Expired</p>
-            </div>
-          </BaseCard>
-        </div>
-      </div>
-    );
-  }
-
   const totalBudget = data.targetBudget;
   const paidBudget = data.budget.filter(i => i.isPaid).reduce((s, i) => s + (i.paidAmount || i.budgetAmount), 0);
   const completedCount = data.checklist.filter((i) => i.isCompleted).length;

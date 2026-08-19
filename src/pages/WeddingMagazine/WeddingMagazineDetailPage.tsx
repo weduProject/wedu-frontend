@@ -39,8 +39,8 @@ export default function WeddingMagazineDetailPage() {
       </div>
 
       {/* 본문 */}
-      <div className="mx-auto max-w-2xl px-5 md:px-8 py-8 md:py-12">
-        <BaseCard className="p-6 md:p-10">
+      <div className="mx-auto max-w-4xl px-5 md:px-8 py-10">
+        <BaseCard className="p-8 md:p-12">
           <h1 className="text-2xl md:text-3xl font-bold text-text leading-tight mb-4">
             {post.title}
           </h1>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Copy, Share2, CheckCheck, RefreshCw } from 'lucide-react';
 import Button from './Button';
+import BaseCard from './BaseCard';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { apiFetch } from '../../lib/apiClient';
 
@@ -25,6 +26,7 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
   const [isCopied, setIsCopied] = useState(false);
   const [isReissuing, setIsReissuing] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const shareUrl = token ? `${window.location.origin}${sharePath}/${token}` : null;
 
@@ -33,7 +35,9 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
     async function fetchToken() {
       try {
         const res = await apiFetch('/api/share-links/me');
+        if (!res.ok) return;
         const body = await res.json();
+        if (!body.success) return;
         const t = extractToken(body.data);
         if (t) setToken(t);
       } catch {
@@ -58,11 +62,19 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
     setShowConfirm(false);
     try {
       const res = await apiFetch('/api/share-links/me/reissue', { method: 'POST' });
+      if (!res.ok) {
+        setShowErrorModal(true);
+        return;
+      }
       const body = await res.json();
+      if (!body.success) {
+        setShowErrorModal(true);
+        return;
+      }
       const t = extractToken(body.data);
       if (t) setToken(t);
     } catch {
-      alert('링크 재발급에 실패했습니다.');
+      setShowErrorModal(true);
     } finally {
       setIsReissuing(false);
     }
@@ -70,7 +82,7 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
 
   return (
     <>
-      <div className="mt-5 p-1 flex flex-col gap-4">
+      <BaseCard className="mt-5 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light/50">
             <Share2 className="h-5 w-5 text-primary" strokeWidth={2} />
@@ -83,17 +95,20 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
 
         {/* URL 표시 + 복사 버튼 */}
         <div className="flex items-center gap-2">
-          <div className="flex-1 min-w-0 rounded-xl border border-border bg-gray-50 px-3 py-2.5 text-sm text-text-muted truncate">
-            {isFetching ? '링크 불러오는 중...' : (shareUrl ?? '링크를 불러올 수 없어요.')}
-          </div>
+          <BaseCard className="flex-1 !min-w-0 !bg-gray-50 !py-2.5 !px-3 overflow-hidden">
+            <span className="text-sm text-text-muted truncate block">
+              {isFetching ? '링크 불러오는 중...' : (shareUrl ?? '링크를 불러올 수 없어요.')}
+            </span>
+          </BaseCard>
           <Button
             onClick={handleCopy}
             disabled={isFetching || !shareUrl}
             variant="main"
-            className="shrink-0 flex items-center gap-2"
+            size="md"
+            className="shrink-0 flex items-center justify-center gap-2 w-[11rem]"
           >
             {isCopied
-              ? <><CheckCheck className="h-4 w-4" />복사됨</>
+              ? <><CheckCheck className="h-4 w-4" />복사됐어요!</>
               : <><Copy className="h-4 w-4" />복사</>
             }
           </Button>
@@ -103,16 +118,16 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
         <div className="flex justify-end">
           <Button
             variant="secondary"
-            size="sm"
+            size="md"
             onClick={() => setShowConfirm(true)}
             disabled={isFetching || isReissuing}
-            className="flex items-center gap-1.5"
+            className="flex items-center justify-center gap-2 w-[11rem]"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isReissuing ? 'animate-spin' : ''}`} strokeWidth={2} />
+            <RefreshCw className={`h-4 w-4 ${isReissuing ? 'animate-spin' : ''}`} strokeWidth={2} />
             {isReissuing ? '재발급 중...' : '링크 재발급'}
           </Button>
         </div>
-      </div>
+      </BaseCard>
 
       <ConfirmDeleteModal
         isOpen={showConfirm}
@@ -121,6 +136,15 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
         title="링크를 재발급할까요?"
         message="기존 링크는 더 이상 사용할 수 없게 됩니다."
         confirmLabel="재발급"
+        danger={false}
+      />
+      <ConfirmDeleteModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        onConfirm={() => setShowErrorModal(false)}
+        title="링크 재발급에 실패했습니다"
+        message="잠시 후 다시 시도해주세요."
+        confirmLabel="확인"
         danger={false}
       />
     </>
