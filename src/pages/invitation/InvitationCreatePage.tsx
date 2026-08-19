@@ -1,3 +1,4 @@
+import ConfirmDeleteModal from "../../components/ui/ConfirmDeleteModal";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -32,6 +33,7 @@ import {
   fetchInvitationGallery,
   saveInvitation,
   syncInvitationGallery,
+  deleteInvitationGalleryImage,
   type InvitationDraft,
 } from "./invitationApi";
 
@@ -276,6 +278,9 @@ export default function InvitationCreatePage() {
   // state는 리렌더링 전까지 업데이트가 반영 안 돼서, 짧은 간격의 중복 클릭을 못 막을 수 있음.
   // 동기적으로 즉시 막아주는 ref 가드를 별도로 둔다.
   const isSubmittingRef = useRef(false);
+  // 갤러리 삭제 관련 상태
+  const [confirmDeleteIndex, setConfirmDeleteIndex] = useState<number | null>(null);
+  const [deletingGalleryId, setDeletingGalleryId] = useState<number | null>(null);
 
   // 마운트 시 기존에 작성 중인 청첩장이 있으면 불러와서 폼을 채운다.
   // (수정으로 돌아가기로 진입한 경우엔 이미 폼이 채워져 있으니 다시 불러오지 않음)
@@ -350,11 +355,44 @@ export default function InvitationCreatePage() {
     });
   };
 
-  const removeGallery = (index: number) => {
+  const removeGalleryLocal = (index: number) => {
     setForm((prev) => ({
       ...prev,
       gallery: prev.gallery.filter((_, i) => i !== index),
     }));
+  };
+
+  // 삭제 버튼 클릭 시: 저장된 이미지(id 있음)는 확인 모달을 띄우고,
+// 아직 서버에 등록 안 된 이미지는 바로 로컬에서 지운다.
+const requestRemoveGallery = (index: number) => {
+  const image = form.gallery[index];
+  if (image?.id) {
+    setConfirmDeleteIndex(index);
+  } else {
+    removeGalleryLocal(index);
+  }
+};
+
+// 확인 모달에서 "삭제"를 눌렀을 때 실제 DELETE API 호출
+const handleConfirmGalleryDelete = async () => {
+  if (confirmDeleteIndex === null) return;
+  const image = form.gallery[confirmDeleteIndex];
+  if (!image?.id) {
+    setConfirmDeleteIndex(null);
+    return;
+  }
+
+  setDeletingGalleryId(image.id);
+    try {
+      await deleteInvitationGalleryImage(image.id);
+      removeGalleryLocal(confirmDeleteIndex);
+    } catch (error) {
+      console.error("[invitation] 갤러리 이미지 삭제 실패:", error);
+      alert("이미지 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setDeletingGalleryId(null);
+      setConfirmDeleteIndex(null);
+    }
   };
 
   const isTitleValid = form.title.trim().length > 0;
@@ -412,621 +450,629 @@ export default function InvitationCreatePage() {
   }
 
   return (
-    <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
-      {/* 상단 헤더 */}
-      <section className="border-b border-border bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 md:px-8 md:py-14">
-          <button
-            type="button"
-            onClick={() => navigate("/invitation")}
-            aria-label="청첩장 페이지로 돌아가기"
-            className="-mt-4 mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-text-muted shadow-sm transition-colors hover:text-primary"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
+    <>
+      <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
+        {/* 상단 헤더 */}
+        <section className="border-b border-border bg-white">
+          <div className="mx-auto max-w-6xl px-5 py-10 md:px-8 md:py-14">
+            <button
+              type="button"
+              onClick={() => navigate("/invitation")}
+              aria-label="청첩장 페이지로 돌아가기"
+              className="-mt-4 mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-text-muted shadow-sm transition-colors hover:text-primary"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
 
-          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            INVITATION
+            <div className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+              INVITATION
+            </div>
+
+            <h1 className="text-2xl font-bold tracking-tight text-text md:text-4xl">
+              모바일 청첩장 만들기
+            </h1>
+
+            <p className="mt-3 text-sm leading-6 text-text-muted md:text-base">
+              소중한 순간을 담은 나만의 모바일 청첩장을 만들어보세요.
+            </p>
           </div>
+        </section>
 
-          <h1 className="text-2xl font-bold tracking-tight text-text md:text-4xl">
-            모바일 청첩장 만들기
-          </h1>
+        {/* 단계 네비게이션 */}
+        <div className="sticky top-16 md:top-20 z-30 border-b border-border bg-white/95 backdrop-blur">
+          <div className="mx-auto max-w-6xl overflow-x-auto px-4 py-3">
+            <div className="flex min-w-max justify-center gap-2">
+              {sections.map((section, index) => {
+                const Icon = section.icon;
+                const active = activeSection === section.key;
 
-          <p className="mt-3 text-sm leading-6 text-text-muted md:text-base">
-            소중한 순간을 담은 나만의 모바일 청첩장을 만들어보세요.
-          </p>
-        </div>
-      </section>
-
-      {/* 단계 네비게이션 */}
-      <div className="sticky top-16 md:top-20 z-30 border-b border-border bg-white/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl overflow-x-auto px-4 py-3">
-          <div className="flex min-w-max justify-center gap-2">
-            {sections.map((section, index) => {
-              const Icon = section.icon;
-              const active = activeSection === section.key;
-
-              return (
-                <button
-                  key={section.key}
-                  type="button"
-                  onClick={() => {
-                    setActiveSection(section.key);
-                    document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition md:text-sm ${
-                    active ? "category-tab-active" : "category-tab-inactive"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{index + 1}.</span>
-                  {section.label}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={section.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveSection(section.key);
+                      document.getElementById("invitation-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition md:text-sm ${
+                      active ? "category-tab-active" : "category-tab-inactive"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{index + 1}.</span>
+                    {section.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 본문 */}
-      <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-          {/* 입력 영역 */}
-          <section
-            id="invitation-form-section"
-            className="scroll-mt-[130px] rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10 md:scroll-mt-[150px]"
-          >
-            {/* 기본 정보 */}
-            {activeSection === "basic" && (
-              <div className="space-y-10">
-                <InvitationSectionTitle>기본 정보</InvitationSectionTitle>
-
-                <InvitationTextField
-                  label="청첩장 제목"
-                  value={form.title}
-                  onChange={(e) => updateField("title", e.target.value)}
-                  placeholder="예: 저희 결혼합니다"
-                />
-
-                <div className="grid gap-6 md:grid-cols-2">
-                  <InvitationTextField
-                    label="신랑 성함"
-                    value={form.groomName}
-                    onChange={(e) => updateField("groomName", e.target.value)}
-                    placeholder="홍길동"
-                  />
+        {/* 본문 */}
+        <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
+            {/* 입력 영역 */}
+            <section
+              id="invitation-form-section"
+              className="scroll-mt-[130px] rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)] md:p-10 md:scroll-mt-[150px]"
+            >
+              {/* 기본 정보 */}
+              {activeSection === "basic" && (
+                <div className="space-y-10">
+                  <InvitationSectionTitle>기본 정보</InvitationSectionTitle>
 
                   <InvitationTextField
-                    label="신랑 연락처"
-                    type="tel"
-                    inputMode="numeric"
-                    value={form.groomContact}
-                    onChange={(e) => updateField("groomContact", formatPhoneNumber(e.target.value))}
-                    placeholder="010-0000-0000"
+                    label="청첩장 제목"
+                    value={form.title}
+                    onChange={(e) => updateField("title", e.target.value)}
+                    placeholder="예: 저희 결혼합니다"
                   />
-
-                  <InvitationTextField
-                    label="신부 성함"
-                    value={form.brideName}
-                    onChange={(e) => updateField("brideName", e.target.value)}
-                    placeholder="김철수"
-                  />
-
-                  <InvitationTextField
-                    label="신부 연락처"
-                    type="tel"
-                    inputMode="numeric"
-                    value={form.brideContact}
-                    onChange={(e) => updateField("brideContact", formatPhoneNumber(e.target.value))}
-                    placeholder="010-0000-0000"
-                  />
-
-                  <InvitationTextField
-                    label="신랑 사진 URL"
-                    value={form.groomPhoto}
-                    onChange={(e) => updateField("groomPhoto", e.target.value)}
-                    placeholder="이미지 URL"
-                  />
-
-                  <InvitationTextField
-                    label="신부 사진 URL"
-                    value={form.bridePhoto}
-                    onChange={(e) => updateField("bridePhoto", e.target.value)}
-                    placeholder="이미지 URL"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="mb-5 text-sm font-bold text-text">혼주 정보</h3>
 
                   <div className="grid gap-6 md:grid-cols-2">
                     <InvitationTextField
-                      label="신랑측 혼주"
-                      value={form.groomParents}
-                      onChange={(e) => updateField("groomParents", e.target.value)}
-                      placeholder="예: 홍판서 · 김씨 부부의 장남"
+                      label="신랑 성함"
+                      value={form.groomName}
+                      onChange={(e) => updateField("groomName", e.target.value)}
+                      placeholder="홍길동"
                     />
 
                     <InvitationTextField
-                      label="신랑측 혼주 연락처"
+                      label="신랑 연락처"
                       type="tel"
                       inputMode="numeric"
-                      value={form.groomParentContact}
-                      onChange={(e) => updateField("groomParentContact", formatPhoneNumber(e.target.value))}
+                      value={form.groomContact}
+                      onChange={(e) => updateField("groomContact", formatPhoneNumber(e.target.value))}
                       placeholder="010-0000-0000"
                     />
 
                     <InvitationTextField
-                      label="신부측 혼주"
-                      value={form.brideParents}
-                      onChange={(e) => updateField("brideParents", e.target.value)}
-                      placeholder="예: 김판서 · 이씨 부부의 장녀"
+                      label="신부 성함"
+                      value={form.brideName}
+                      onChange={(e) => updateField("brideName", e.target.value)}
+                      placeholder="김철수"
                     />
 
                     <InvitationTextField
-                      label="신부측 혼주 연락처"
+                      label="신부 연락처"
                       type="tel"
                       inputMode="numeric"
-                      value={form.brideParentContact}
-                      onChange={(e) => updateField("brideParentContact", formatPhoneNumber(e.target.value))}
+                      value={form.brideContact}
+                      onChange={(e) => updateField("brideContact", formatPhoneNumber(e.target.value))}
                       placeholder="010-0000-0000"
                     />
+
+                    <InvitationTextField
+                      label="신랑 사진 URL"
+                      value={form.groomPhoto}
+                      onChange={(e) => updateField("groomPhoto", e.target.value)}
+                      placeholder="이미지 URL"
+                    />
+
+                    <InvitationTextField
+                      label="신부 사진 URL"
+                      value={form.bridePhoto}
+                      onChange={(e) => updateField("bridePhoto", e.target.value)}
+                      placeholder="이미지 URL"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="mb-5 text-sm font-bold text-text">혼주 정보</h3>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <InvitationTextField
+                        label="신랑측 혼주"
+                        value={form.groomParents}
+                        onChange={(e) => updateField("groomParents", e.target.value)}
+                        placeholder="예: 홍판서 · 김씨 부부의 장남"
+                      />
+
+                      <InvitationTextField
+                        label="신랑측 혼주 연락처"
+                        type="tel"
+                        inputMode="numeric"
+                        value={form.groomParentContact}
+                        onChange={(e) => updateField("groomParentContact", formatPhoneNumber(e.target.value))}
+                        placeholder="010-0000-0000"
+                      />
+
+                      <InvitationTextField
+                        label="신부측 혼주"
+                        value={form.brideParents}
+                        onChange={(e) => updateField("brideParents", e.target.value)}
+                        placeholder="예: 김판서 · 이씨 부부의 장녀"
+                      />
+
+                      <InvitationTextField
+                        label="신부측 혼주 연락처"
+                        type="tel"
+                        inputMode="numeric"
+                        value={form.brideParentContact}
+                        onChange={(e) => updateField("brideParentContact", formatPhoneNumber(e.target.value))}
+                        placeholder="010-0000-0000"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 예식 정보 */}
-            {activeSection === "wedding" && (
-              <div className="space-y-8">
-                <InvitationSectionTitle>예식 정보</InvitationSectionTitle>
+              {/* 예식 정보 */}
+              {activeSection === "wedding" && (
+                <div className="space-y-8">
+                  <InvitationSectionTitle>예식 정보</InvitationSectionTitle>
 
-                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <InvitationTextField
+                      label="예식 날짜"
+                      type="date"
+                      value={form.weddingDate}
+                      onChange={(e) => updateField("weddingDate", e.target.value)}
+                    />
+
+                    <InvitationTimeSelect
+                      label="예식 시간"
+                      value={form.weddingTime}
+                      onChange={(time) => updateField("weddingTime", time)}
+                    />
+
+                    <InvitationTextField
+                      label="예식장"
+                      value={form.venueName}
+                      onChange={(e) => updateField("venueName", e.target.value)}
+                      placeholder="예: 더채플앳청담"
+                    />
+
+                    <InvitationTextField
+                      label="홀 / 상세 위치"
+                      value={form.venueDetail}
+                      onChange={(e) => updateField("venueDetail", e.target.value)}
+                      placeholder="예: 3층 그랜드홀"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 오시는 길 */}
+              {activeSection === "directions" && (
+                <div className="space-y-8">
+                  <InvitationSectionTitle>오시는 길</InvitationSectionTitle>
+
                   <InvitationTextField
-                    label="예식 날짜"
-                    type="date"
-                    value={form.weddingDate}
-                    onChange={(e) => updateField("weddingDate", e.target.value)}
+                    label="예식장 주소"
+                    value={form.venueAddress}
+                    onChange={(e) => updateField("venueAddress", e.target.value)}
+                    placeholder="예: 서울특별시 강남구..."
                   />
 
-                  <InvitationTimeSelect
-                    label="예식 시간"
-                    value={form.weddingTime}
-                    onChange={(time) => updateField("weddingTime", time)}
+                  <InvitationTextArea
+                    label="교통 안내"
+                    rows={3}
+                    value={form.transportGuide}
+                    onChange={(e) => updateField("transportGuide", e.target.value)}
+                    placeholder="예: 2호선 강남역 3번 출구 도보 5분"
                   />
 
-                  <InvitationTextField
-                    label="예식장"
-                    value={form.venueName}
-                    onChange={(e) => updateField("venueName", e.target.value)}
-                    placeholder="예: 더채플앳청담"
+                  <InvitationTextArea
+                    label="자가용 · 주차 안내"
+                    rows={3}
+                    value={form.parkingGuide}
+                    onChange={(e) => updateField("parkingGuide", e.target.value)}
+                    placeholder="예: 예식장 지하주차장 2시간 무료"
                   />
 
-                  <InvitationTextField
-                    label="홀 / 상세 위치"
-                    value={form.venueDetail}
-                    onChange={(e) => updateField("venueDetail", e.target.value)}
-                    placeholder="예: 3층 그랜드홀"
+                  <InvitationTextArea
+                    label="대중교통 안내"
+                    rows={3}
+                    value={form.publicTransportGuide}
+                    onChange={(e) => updateField("publicTransportGuide", e.target.value)}
+                    placeholder="예: 버스 146, 401, 730번 이용"
                   />
+
+                  {form.venueAddress ? (
+                    <div className="overflow-hidden rounded-2xl border border-border">
+                      <iframe
+                        title="오시는 길 지도"
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(form.venueAddress)}&z=16&output=embed`}
+                        className="h-56 w-full"
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
+                      <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
+                      <p className="text-sm font-semibold text-text">지도 영역</p>
+                      <p className="mt-1 text-xs text-text-muted">주소를 입력하면 지도가 표시돼요.</p>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 오시는 길 */}
-            {activeSection === "directions" && (
-              <div className="space-y-8">
-                <InvitationSectionTitle>오시는 길</InvitationSectionTitle>
+              {/* 계좌 — 백엔드 스펙상 신랑측/신부측 각 1개만 지원 (배열 아님) */}
+              {activeSection === "account" && (
+                <div className="space-y-10">
+                  <InvitationSectionTitle>계좌 정보</InvitationSectionTitle>
 
-                <InvitationTextField
-                  label="예식장 주소"
-                  value={form.venueAddress}
-                  onChange={(e) => updateField("venueAddress", e.target.value)}
-                  placeholder="예: 서울특별시 강남구..."
-                />
-
-                <InvitationTextArea
-                  label="교통 안내"
-                  rows={3}
-                  value={form.transportGuide}
-                  onChange={(e) => updateField("transportGuide", e.target.value)}
-                  placeholder="예: 2호선 강남역 3번 출구 도보 5분"
-                />
-
-                <InvitationTextArea
-                  label="자가용 · 주차 안내"
-                  rows={3}
-                  value={form.parkingGuide}
-                  onChange={(e) => updateField("parkingGuide", e.target.value)}
-                  placeholder="예: 예식장 지하주차장 2시간 무료"
-                />
-
-                <InvitationTextArea
-                  label="대중교통 안내"
-                  rows={3}
-                  value={form.publicTransportGuide}
-                  onChange={(e) => updateField("publicTransportGuide", e.target.value)}
-                  placeholder="예: 버스 146, 401, 730번 이용"
-                />
-
-                {form.venueAddress ? (
-                  <div className="overflow-hidden rounded-2xl border border-border">
-                    <iframe
-                      title="오시는 길 지도"
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(form.venueAddress)}&z=16&output=embed`}
-                      className="h-56 w-full"
-                      loading="lazy"
-                    />
+                  <div>
+                    <h3 className="mb-4 text-sm font-bold text-text">신랑측 계좌</h3>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <InvitationTextField
+                        label="은행"
+                        value={form.groomBank}
+                        onChange={(e) => updateField("groomBank", e.target.value)}
+                        placeholder="은행명"
+                      />
+                      <InvitationTextField
+                        label="예금주"
+                        value={form.groomAccountHolder}
+                        onChange={(e) => updateField("groomAccountHolder", e.target.value)}
+                        placeholder="예금주"
+                      />
+                      <InvitationTextField
+                        label="계좌번호"
+                        value={form.groomAccount}
+                        onChange={(e) => updateField("groomAccount", e.target.value)}
+                        placeholder="계좌번호"
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
-                    <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
-                    <p className="text-sm font-semibold text-text">지도 영역</p>
-                    <p className="mt-1 text-xs text-text-muted">주소를 입력하면 지도가 표시돼요.</p>
-                  </div>
-                )}
-              </div>
-            )}
 
-            {/* 계좌 — 백엔드 스펙상 신랑측/신부측 각 1개만 지원 (배열 아님) */}
-            {activeSection === "account" && (
-              <div className="space-y-10">
-                <InvitationSectionTitle>계좌 정보</InvitationSectionTitle>
-
-                <div>
-                  <h3 className="mb-4 text-sm font-bold text-text">신랑측 계좌</h3>
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <InvitationTextField
-                      label="은행"
-                      value={form.groomBank}
-                      onChange={(e) => updateField("groomBank", e.target.value)}
-                      placeholder="은행명"
-                    />
-                    <InvitationTextField
-                      label="예금주"
-                      value={form.groomAccountHolder}
-                      onChange={(e) => updateField("groomAccountHolder", e.target.value)}
-                      placeholder="예금주"
-                    />
-                    <InvitationTextField
-                      label="계좌번호"
-                      value={form.groomAccount}
-                      onChange={(e) => updateField("groomAccount", e.target.value)}
-                      placeholder="계좌번호"
-                    />
+                  <div>
+                    <h3 className="mb-4 text-sm font-bold text-text">신부측 계좌</h3>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <InvitationTextField
+                        label="은행"
+                        value={form.brideBank}
+                        onChange={(e) => updateField("brideBank", e.target.value)}
+                        placeholder="은행명"
+                      />
+                      <InvitationTextField
+                        label="예금주"
+                        value={form.brideAccountHolder}
+                        onChange={(e) => updateField("brideAccountHolder", e.target.value)}
+                        placeholder="예금주"
+                      />
+                      <InvitationTextField
+                        label="계좌번호"
+                        value={form.brideAccount}
+                        onChange={(e) => updateField("brideAccount", e.target.value)}
+                        placeholder="계좌번호"
+                      />
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <h3 className="mb-4 text-sm font-bold text-text">신부측 계좌</h3>
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <InvitationTextField
-                      label="은행"
-                      value={form.brideBank}
-                      onChange={(e) => updateField("brideBank", e.target.value)}
-                      placeholder="은행명"
-                    />
-                    <InvitationTextField
-                      label="예금주"
-                      value={form.brideAccountHolder}
-                      onChange={(e) => updateField("brideAccountHolder", e.target.value)}
-                      placeholder="예금주"
-                    />
-                    <InvitationTextField
-                      label="계좌번호"
-                      value={form.brideAccount}
-                      onChange={(e) => updateField("brideAccount", e.target.value)}
-                      placeholder="계좌번호"
-                    />
+              {/* 갤러리 */}
+              {activeSection === "gallery" && (
+                <div className="space-y-8">
+                  <InvitationSectionTitle>갤러리</InvitationSectionTitle>
+
+                  <div className="rounded-2xl bg-surface p-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-bold text-text">사진 추가</p>
+                        <p className="mt-1 text-xs text-text-muted">청첩장에 보여줄 사진을 추가해주세요.</p>
+                      </div>
+
+                      <Button variant="main" size="sm" onClick={addGallery}>
+                        + 사진 추가
+                      </Button>
+                    </div>
                   </div>
+
+                  {form.gallery.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border py-16 text-center">
+                      <ImageIcon className="mx-auto mb-3 h-9 w-9 text-text-muted" />
+                      <p className="text-sm font-semibold text-text">아직 추가된 사진이 없어요.</p>
+                      <p className="mt-1 text-xs text-text-muted">사진 추가 버튼을 눌러주세요.</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {form.gallery.map((image, index) => (
+                        <div key={image.id ?? `new-${index}`} className="relative rounded-2xl border border-border bg-white p-3">
+                          {image.imageUrl ? (
+                            <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-surface">
+                              <img src={image.imageUrl} alt="" className="h-full w-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-surface">
+                              <ImageIcon className="h-8 w-8 text-text-muted" />
+                            </div>
+                          )}
+
+                          <input
+                            value={image.imageUrl}
+                            onChange={(e) => updateGallery(index, e.target.value)}
+                            disabled={Boolean(image.id)}
+                            placeholder="이미지 URL"
+                            className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition focus:border-primary disabled:opacity-60"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => requestRemoveGallery(index)}
+                            disabled={deletingGalleryId === image.id}
+                            className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-text-muted shadow-sm transition hover:text-red-500 disabled:opacity-50"
+                          >
+                            {deletingGalleryId === image.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 갤러리 */}
-            {activeSection === "gallery" && (
-              <div className="space-y-8">
-                <InvitationSectionTitle>갤러리</InvitationSectionTitle>
+              {/* 인사말 */}
+              {activeSection === "message" && (
+                <div className="space-y-8">
+                  <InvitationSectionTitle>인사말</InvitationSectionTitle>
 
-                <div className="rounded-2xl bg-surface p-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-text">사진 추가</p>
-                      <p className="mt-1 text-xs text-text-muted">청첩장에 보여줄 사진을 추가해주세요.</p>
+                  <InvitationTextArea
+                    label="메인 인사말"
+                    rows={6}
+                    value={form.mainGreeting}
+                    onChange={(e) => updateField("mainGreeting", e.target.value)}
+                    placeholder={`서로를 향한 마음이 하나 되는 날,
+  소중한 분들을 모시고 저희의 새로운 시작을 함께하고 싶습니다.`}
+                  />
+
+                  <InvitationTextArea
+                    label="초대 문구"
+                    rows={4}
+                    value={form.invitationMessage}
+                    onChange={(e) => updateField("invitationMessage", e.target.value)}
+                    placeholder="예: 귀한 걸음 하시어 축복해주시면 감사하겠습니다."
+                  />
+
+                  <InvitationTextArea
+                    label="추가 안내"
+                    rows={4}
+                    value={form.additionalMessage}
+                    onChange={(e) => updateField("additionalMessage", e.target.value)}
+                    placeholder="예: 화환은 정중히 사양합니다."
+                  />
+                </div>
+              )}
+
+              {/* 디자인 */}
+              {activeSection === "design" && (
+                <div className="space-y-8">
+                  <InvitationSectionTitle>디자인</InvitationSectionTitle>
+
+                  <div>
+                    <p className="mb-4 text-sm font-bold text-text">메인 색상</p>
+
+                    <div className="mt-4 mb-4">
+                      <InvitationTextField
+                        label="배경음악 URL"
+                        value={form.bgmUrl}
+                        onChange={(e) => updateField("bgmUrl", e.target.value)}
+                        placeholder="mp3 파일 URL을 입력해주세요"
+                      />
                     </div>
 
-                    <Button variant="main" size="sm" onClick={addGallery}>
-                      + 사진 추가
-                    </Button>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      {colorOptions.map((color) => {
+                        const selected = form.mainColor === color.background;
 
-                {form.gallery.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border py-16 text-center">
-                    <ImageIcon className="mx-auto mb-3 h-9 w-9 text-text-muted" />
-                    <p className="text-sm font-semibold text-text">아직 추가된 사진이 없어요.</p>
-                    <p className="mt-1 text-xs text-text-muted">사진 추가 버튼을 눌러주세요.</p>
+                        return (
+                          <SelectableCard
+                            key={color.background}
+                            isSelected={selected}
+                            onClick={() =>
+                              setForm((prev) => ({
+                                ...prev,
+                                templateId: color.templateId,
+                                mainColor: color.background,
+                                accentColor: color.accent,
+                                backgroundGradient: color.gradient,
+                              }))
+                            }
+                            className="flex items-center gap-3"
+                          >
+                            <span
+                              className="h-8 w-8 shrink-0 rounded-full border border-white shadow-sm"
+                              style={{ backgroundColor: color.background }}
+                            />
+
+                            <span
+                              className={`text-xs font-semibold ${selected ? "text-primary" : "text-text-muted"}`}
+                            >
+                              {color.name}
+                            </span>
+                          </SelectableCard>
+                        );
+                      })}
+                    </div>
                   </div>
-                ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {form.gallery.map((image, index) => (
-                      <div key={image.id ?? `new-${index}`} className="relative rounded-2xl border border-border bg-white p-3">
-                        {image.imageUrl ? (
-                          <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-surface">
-                            <img src={image.imageUrl} alt="" className="h-full w-full object-cover" />
-                          </div>
-                        ) : (
-                          <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-surface">
-                            <ImageIcon className="h-8 w-8 text-text-muted" />
+
+                  {/* 미리보기 */}
+                  <div className="rounded-[28px] bg-surface p-6">
+                    <p className="mb-4 text-xs font-bold uppercase tracking-wider text-text-muted">Preview</p>
+
+                    <div className="mx-auto max-w-sm overflow-hidden rounded-[28px] bg-white shadow-lg">
+                      <div
+                        className="px-5 py-14 text-center"
+                        style={{
+                          background:
+                            form.backgroundGradient ??
+                            `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
+                          color: getContrastTextColor(form.mainColor),
+                        }}
+                      >
+                        <p className="mb-3 text-xs tracking-[0.3em] opacity-80">WEDDING INVITATION</p>
+                        <h3 className="text-2xl font-serif font-semibold">{form.title || "저희 결혼합니다"}</h3>
+                      </div>
+
+                      <div className="px-6 py-10 text-center">
+                        {(form.groomPhoto || form.bridePhoto) && (
+                          <div className="mb-6 flex items-center justify-center gap-3">
+                            {form.groomPhoto && (
+                              <div className="h-16 w-16 overflow-hidden rounded-full border border-border">
+                                <img src={form.groomPhoto} alt="신랑" className="h-full w-full object-cover" />
+                              </div>
+                            )}
+                            {form.bridePhoto && (
+                              <div className="h-16 w-16 overflow-hidden rounded-full border border-border">
+                                <img src={form.bridePhoto} alt="신부" className="h-full w-full object-cover" />
+                              </div>
+                            )}
                           </div>
                         )}
 
-                        <input
-                          value={image.imageUrl}
-                          onChange={(e) => updateGallery(index, e.target.value)}
-                          disabled={Boolean(image.id)}
-                          placeholder="이미지 URL"
-                          className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition focus:border-primary disabled:opacity-60"
-                        />
-                        {image.id && (
-                          <p className="mt-2 text-[10px] text-text-muted">
-                            저장된 이미지입니다. (삭제 API가 아직 없어 화면에서만 지워지고, 다시
-                            불러오면 복원됩니다)
+                        <p className="font-serif text-lg font-semibold text-text">
+                          {form.groomName || "신랑"}
+                          <Heart
+                            className="mx-2 inline h-4 w-4 fill-current"
+                            style={{ color: form.accentColor ?? form.mainColor }}
+                          />
+                          {form.brideName || "신부"}
+                        </p>
+                        <p className="mt-3 text-sm text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
+
+                        {(form.groomParents || form.brideParents) && (
+                          <p className="mt-4 text-xs text-text-muted">
+                            {form.groomParents} {form.groomParents && form.brideParents ? "· " : ""}{form.brideParents}
                           </p>
                         )}
-
-                        <button
-                          type="button"
-                          onClick={() => removeGallery(index)}
-                          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-text-muted shadow-sm transition hover:text-red-500"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 인사말 */}
-            {activeSection === "message" && (
-              <div className="space-y-8">
-                <InvitationSectionTitle>인사말</InvitationSectionTitle>
-
-                <InvitationTextArea
-                  label="메인 인사말"
-                  rows={6}
-                  value={form.mainGreeting}
-                  onChange={(e) => updateField("mainGreeting", e.target.value)}
-                  placeholder={`서로를 향한 마음이 하나 되는 날,
-소중한 분들을 모시고 저희의 새로운 시작을 함께하고 싶습니다.`}
-                />
-
-                <InvitationTextArea
-                  label="초대 문구"
-                  rows={4}
-                  value={form.invitationMessage}
-                  onChange={(e) => updateField("invitationMessage", e.target.value)}
-                  placeholder="예: 귀한 걸음 하시어 축복해주시면 감사하겠습니다."
-                />
-
-                <InvitationTextArea
-                  label="추가 안내"
-                  rows={4}
-                  value={form.additionalMessage}
-                  onChange={(e) => updateField("additionalMessage", e.target.value)}
-                  placeholder="예: 화환은 정중히 사양합니다."
-                />
-              </div>
-            )}
-
-            {/* 디자인 */}
-            {activeSection === "design" && (
-              <div className="space-y-8">
-                <InvitationSectionTitle>디자인</InvitationSectionTitle>
-
-                <div>
-                  <p className="mb-4 text-sm font-bold text-text">메인 색상</p>
-
-                  <div className="mt-4 mb-4">
-                    <InvitationTextField
-                      label="배경음악 URL"
-                      value={form.bgmUrl}
-                      onChange={(e) => updateField("bgmUrl", e.target.value)}
-                      placeholder="mp3 파일 URL을 입력해주세요"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    {colorOptions.map((color) => {
-                      const selected = form.mainColor === color.background;
-
-                      return (
-                        <SelectableCard
-                          key={color.background}
-                          isSelected={selected}
-                          onClick={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              templateId: color.templateId,
-                              mainColor: color.background,
-                              accentColor: color.accent,
-                              backgroundGradient: color.gradient,
-                            }))
-                          }
-                          className="flex items-center gap-3"
-                        >
-                          <span
-                            className="h-8 w-8 shrink-0 rounded-full border border-white shadow-sm"
-                            style={{ backgroundColor: color.background }}
-                          />
-
-                          <span
-                            className={`text-xs font-semibold ${selected ? "text-primary" : "text-text-muted"}`}
-                          >
-                            {color.name}
-                          </span>
-                        </SelectableCard>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 미리보기 */}
-                <div className="rounded-[28px] bg-surface p-6">
-                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-text-muted">Preview</p>
-
-                  <div className="mx-auto max-w-sm overflow-hidden rounded-[28px] bg-white shadow-lg">
-                    <div
-                      className="px-5 py-14 text-center"
-                      style={{
-                        background:
-                          form.backgroundGradient ??
-                          `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
-                        color: getContrastTextColor(form.mainColor),
-                      }}
-                    >
-                      <p className="mb-3 text-xs tracking-[0.3em] opacity-80">WEDDING INVITATION</p>
-                      <h3 className="text-2xl font-serif font-semibold">{form.title || "저희 결혼합니다"}</h3>
-                    </div>
-
-                    <div className="px-6 py-10 text-center">
-                      {(form.groomPhoto || form.bridePhoto) && (
-                        <div className="mb-6 flex items-center justify-center gap-3">
-                          {form.groomPhoto && (
-                            <div className="h-16 w-16 overflow-hidden rounded-full border border-border">
-                              <img src={form.groomPhoto} alt="신랑" className="h-full w-full object-cover" />
-                            </div>
-                          )}
-                          {form.bridePhoto && (
-                            <div className="h-16 w-16 overflow-hidden rounded-full border border-border">
-                              <img src={form.bridePhoto} alt="신부" className="h-full w-full object-cover" />
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      <p className="font-serif text-lg font-semibold text-text">
-                        {form.groomName || "신랑"}
-                        <Heart
-                          className="mx-2 inline h-4 w-4 fill-current"
-                          style={{ color: form.accentColor ?? form.mainColor }}
-                        />
-                        {form.brideName || "신부"}
-                      </p>
-                      <p className="mt-3 text-sm text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
-
-                      {(form.groomParents || form.brideParents) && (
-                        <p className="mt-4 text-xs text-text-muted">
-                          {form.groomParents} {form.groomParents && form.brideParents ? "· " : ""}{form.brideParents}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 하단 네비게이션 */}
-            <div className="mt-12 flex items-center justify-between border-t border-border pt-7">
-              <Button
-                variant="secondary"
-                onClick={goPrev}
-                disabled={currentIndex === 0}
-                className="flex items-center gap-1"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                이전
-              </Button>
-
-              <span className="rounded-full bg-surface px-4 py-2 text-xs font-bold text-text-muted">
-                {currentIndex + 1} / {sections.length}
-              </span>
-
-              {currentIndex < sections.length - 1 ? (
+              {/* 하단 네비게이션 */}
+              <div className="mt-12 flex items-center justify-between border-t border-border pt-7">
                 <Button
-                  variant="main"
-                  onClick={goNext}
-                  disabled={activeSection === "basic" && !isTitleValid}
+                  variant="secondary"
+                  onClick={goPrev}
+                  disabled={currentIndex === 0}
                   className="flex items-center gap-1"
                 >
-                  다음
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" />
+                  이전
                 </Button>
-              ) : (
-                <Button variant="main" onClick={handlePreview} disabled={isSaving || !isTitleValid}>
-                  {isSaving ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      저장 중...
-                    </span>
-                  ) : (
-                    "미리보기"
-                  )}
-                </Button>
-              )}
-            </div>
-          </section>
 
-          {/* 오른쪽 미니 미리보기 */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)]">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-text-muted">Preview</p>
+                <span className="rounded-full bg-surface px-4 py-2 text-xs font-bold text-text-muted">
+                  {currentIndex + 1} / {sections.length}
+                </span>
 
-              <div className="overflow-hidden rounded-[24px] border border-border">
-                <div
-                  className="px-5 py-14 text-center"
-                  style={{
-                    background:
-                      form.backgroundGradient ??
-                      `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
-                    color: getContrastTextColor(form.mainColor),
-                  }}
-                >
-                  <p className="text-[9px] tracking-[0.25em] opacity-80">WEDDING INVITATION</p>
-                  <h2 className="mt-3 font-serif text-xl">{form.title || "저희 결혼합니다"}</h2>
-                </div>
+                {currentIndex < sections.length - 1 ? (
+                  <Button
+                    variant="main"
+                    onClick={goNext}
+                    disabled={activeSection === "basic" && !isTitleValid}
+                    className="flex items-center gap-1"
+                  >
+                    다음
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button variant="main" onClick={handlePreview} disabled={isSaving || !isTitleValid}>
+                    {isSaving ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        저장 중...
+                      </span>
+                    ) : (
+                      "미리보기"
+                    )}
+                  </Button>
+                )}
+              </div>
+            </section>
 
-                <div className="px-5 py-8 text-center">
-                  {(form.groomPhoto || form.bridePhoto) && (
-                    <div className="mb-4 flex items-center justify-center gap-2">
-                      {form.groomPhoto && (
-                        <div className="h-10 w-10 overflow-hidden rounded-full border border-border">
-                          <img src={form.groomPhoto} alt="신랑" className="h-full w-full object-cover" />
-                        </div>
-                      )}
-                      {form.bridePhoto && (
-                        <div className="h-10 w-10 overflow-hidden rounded-full border border-border">
-                          <img src={form.bridePhoto} alt="신부" className="h-full w-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-                  )}
+            {/* 오른쪽 미니 미리보기 */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 rounded-[28px] border border-border bg-white p-5 shadow-[0_10px_40px_rgba(80,50,40,0.05)]">
+                <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-text-muted">Preview</p>
 
-                  <p className="font-serif text-sm font-semibold text-text">
-                    {form.groomName || "신랑"}
-                    <Heart
-                      className="mx-1 inline h-3.5 w-3.5 fill-current"
-                      style={{ color: form.accentColor ?? form.mainColor }}
-                    />
-                    {form.brideName || "신부"}
-                  </p>
-                  <div className="mx-auto my-5 h-px w-10 bg-border" />
+                <div className="overflow-hidden rounded-[24px] border border-border">
+                  <div
+                    className="px-5 py-14 text-center"
+                    style={{
+                      background:
+                        form.backgroundGradient ??
+                        `linear-gradient(135deg, ${form.mainColor} 0%, ${form.accentColor ?? form.mainColor} 100%)`,
+                      color: getContrastTextColor(form.mainColor),
+                    }}
+                  >
+                    <p className="text-[9px] tracking-[0.25em] opacity-80">WEDDING INVITATION</p>
+                    <h2 className="mt-3 font-serif text-xl">{form.title || "저희 결혼합니다"}</h2>
+                  </div>
 
-                  <p className="text-xs leading-5 text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
-                  <p className="mt-1 text-xs text-text-muted">{form.venueName || "예식장"}</p>
-                  {(form.groomParents || form.brideParents) && (
-                    <p className="mt-2 text-[10px] text-text-muted">
-                      {form.groomParents} {form.groomParents && form.brideParents ? "· " : ""}{form.brideParents}
+                  <div className="px-5 py-8 text-center">
+                    {(form.groomPhoto || form.bridePhoto) && (
+                      <div className="mb-4 flex items-center justify-center gap-2">
+                        {form.groomPhoto && (
+                          <div className="h-10 w-10 overflow-hidden rounded-full border border-border">
+                            <img src={form.groomPhoto} alt="신랑" className="h-full w-full object-cover" />
+                          </div>
+                        )}
+                        {form.bridePhoto && (
+                          <div className="h-10 w-10 overflow-hidden rounded-full border border-border">
+                            <img src={form.bridePhoto} alt="신부" className="h-full w-full object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="font-serif text-sm font-semibold text-text">
+                      {form.groomName || "신랑"}
+                      <Heart
+                        className="mx-1 inline h-3.5 w-3.5 fill-current"
+                        style={{ color: form.accentColor ?? form.mainColor }}
+                      />
+                      {form.brideName || "신부"}
                     </p>
-                  )}
+                    <div className="mx-auto my-5 h-px w-10 bg-border" />
+
+                    <p className="text-xs leading-5 text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
+                    <p className="mt-1 text-xs text-text-muted">{form.venueName || "예식장"}</p>
+                    {(form.groomParents || form.brideParents) && (
+                      <p className="mt-2 text-[10px] text-text-muted">
+                        {form.groomParents} {form.groomParents && form.brideParents ? "· " : ""}{form.brideParents}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </aside>
-        </div>
-      </main>
-    </div>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <ConfirmDeleteModal
+        isOpen={confirmDeleteIndex !== null}
+        onClose={() => setConfirmDeleteIndex(null)}
+        onConfirm={handleConfirmGalleryDelete}
+        title="사진을 삭제할까요?"
+        message="삭제한 사진은 복구할 수 없어요"
+      />
+    </>
   );
 }
