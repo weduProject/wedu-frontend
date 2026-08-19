@@ -220,6 +220,17 @@ export function InvitationCardView({ draft, footerActions }: Props) {
                   <p className="text-xs text-text-muted">{draft.publicTransportGuide}</p>
                 )}
               </div>
+
+              {draft.venueAddress && (
+                <div className="mt-4 overflow-hidden rounded-2xl border border-border">
+                  <iframe
+                    title="오시는 길 지도"
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(draft.venueAddress)}&z=16&output=embed`}
+                    className="h-56 w-full"
+                    loading="lazy"
+                  />
+                </div>
+              )}
             </section>
           )}
 
@@ -230,11 +241,11 @@ export function InvitationCardView({ draft, footerActions }: Props) {
                 <ImageIcon className="h-4 w-4 text-primary" />
                 <h2 className="font-serif text-lg font-semibold text-text">갤러리</h2>
               </div>
-              <div className="grid grid-cols-2 place-items-center gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {galleryImages.map((url, idx) => (
                   <div
                     key={idx}
-                    className="aspect-square w-full overflow-hidden rounded-xl bg-primary-light"
+                    className="aspect-square w-[calc(50%-6px)] max-w-[220px] overflow-hidden rounded-xl bg-primary-light"
                   >
                     <img
                       src={url}

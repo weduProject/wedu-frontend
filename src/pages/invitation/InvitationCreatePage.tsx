@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Loader2,
   ArrowLeft,
+  Heart,
 } from "lucide-react";
 
 import { Button, SelectableCard } from "../../components";
@@ -33,6 +34,8 @@ import {
   syncInvitationGallery,
   type InvitationDraft,
 } from "./invitationApi";
+
+import { templates as invitationLandingTemplates } from "./InvitationPage";
 
 type SectionKey =
   | "basic"
@@ -59,14 +62,14 @@ const ROSEGOLD_GRADIENT =
 
 // 각 옵션의 background = 커버 배경색(또는 그라디언트), accent = 구분선·강조 텍스트에 쓰는 포인트색
 export const colorOptions = [
-  { name: "로즈골드", templateId: "rosegold", background: "#E8796C", accent: "#E8796C", gradient: ROSEGOLD_GRADIENT as string | undefined },
-  { name: "세이지 그린", templateId: "sage-green", background: "#9CAD8E", accent: "#9CAD8E", gradient: undefined as string | undefined },
-  { name: "소프트 핑크", templateId: "soft-pink", background: "#E8C4C8", accent: "#E8C4C8", gradient: undefined as string | undefined },
-  { name: "차콜 그레이", templateId: "charcoal-gray", background: "#4A4A4A", accent: "#4A4A4A", gradient: undefined as string | undefined },
-  { name: "네이비", templateId: "navy", background: "#2D3A4A", accent: "#2D3A4A", gradient: undefined as string | undefined },
-  { name: "라벤더", templateId: "lavender", background: "#C4C4E0", accent: "#C4C4E0", gradient: undefined as string | undefined },
-  { name: "웜 아이보리", templateId: "classic-ivory", background: "#D4C5A9", accent: "#D4C5A9", gradient: undefined as string | undefined },
-  { name: "피치", templateId: "peach", background: "#E8C8A0", accent: "#E8C8A0", gradient: undefined as string | undefined },
+  { name: "로즈골드", templateId: "rosegold", background: "#E8796C", accent: "#B76E79", gradient: ROSEGOLD_GRADIENT as string | undefined },
+  { name: "세이지 그린", templateId: "sage-green", background: "#9CAD8E", accent: "#6E7D62", gradient: undefined as string | undefined },
+  { name: "소프트 핑크", templateId: "soft-pink", background: "#E8C4C8", accent: "#D9828B", gradient: undefined as string | undefined },
+  { name: "차콜 그레이", templateId: "charcoal-gray", background: "#4A4A4A", accent: "#2D2D2D", gradient: undefined as string | undefined },
+  { name: "네이비", templateId: "navy", background: "#2D3A4A", accent: "#1A2430", gradient: undefined as string | undefined },
+  { name: "라벤더", templateId: "lavender", background: "#C4C4E0", accent: "#8F8FC0", gradient: undefined as string | undefined },
+  { name: "웜 아이보리", templateId: "classic-ivory", background: "#D4C5A9", accent: "#A38454", gradient: undefined as string | undefined },
+  { name: "피치", templateId: "peach", background: "#E8C8A0", accent: "#B76E79", gradient: undefined as string | undefined },
 ];
 
 // 배경색 밝기에 따라 위에 얹을 텍스트를 흰색/어두운색 중 대비가 되는 쪽으로 고름
@@ -78,6 +81,39 @@ function getContrastTextColor(hex: string): string {
   const b = parseInt(clean.slice(4, 6), 16);
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness > 165 ? "#221A18" : "#ffffff";
+}
+
+// mainColor를 계산해서 항상 존재하는 accentColor를 만들어냄 (고정 팔레트에서 "찾지" 않음).
+// -> colorOptions(디자인 단계 8개)에도, InvitationPage.tsx의 템플릿 4개 색상에도 없는
+//    임의의 mainColor가 들어와도(대소문자가 달라도) 항상 배경보다 진한 포인트 색을 보장한다.
+export function deriveAccentColor(hex: string, amount = 0.35): string {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return hex;
+  const r = Math.round(parseInt(clean.slice(0, 2), 16) * (1 - amount));
+  const g = Math.round(parseInt(clean.slice(2, 4), 16) * (1 - amount));
+  const b = Math.round(parseInt(clean.slice(4, 6), 16) * (1 - amount));
+  const toHex = (n: number) => n.toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+// mainColor에 해당하는 accent/gradient를 colorOptions(디자인탭 8개)와
+// InvitationPage.tsx의 템플릿(4개) 양쪽에서 찾는다.
+// 백엔드는 mainColor 문자열만 저장하고 accent/gradient는 저장하지 않으므로,
+// 서버에서 재조회할 때 원래 선택했던 색 조합(특히 템플릿 4개의 3단 그라디언트)을
+// 복원하려면 두 출처를 모두 확인해야 한다. (안 그러면 회색빛 대체 그라디언트로 보임)
+export function findColorMeta(mainColor?: string): { accent?: string; gradient?: string } {
+  if (!mainColor) return {};
+  const lower = mainColor.toLowerCase();
+
+  const fromPalette = colorOptions.find((c) => c.background.toLowerCase() === lower);
+  if (fromPalette) return { accent: fromPalette.accent, gradient: fromPalette.gradient };
+
+  const fromTemplate = invitationLandingTemplates.find(
+    (t) => t.colors[0].toLowerCase() === lower,
+  );
+  if (fromTemplate) return { accent: fromTemplate.accent, gradient: fromTemplate.bg };
+
+  return {};
 }
 
 interface TemplateHandoff {
@@ -128,19 +164,20 @@ function createEmptyForm(handoff: TemplateHandoff): InvitationDraftForm {
     brideAccount: "",
     brideAccountHolder: "",
     bgmUrl: "",
-  
+
     gallery: [],
 
     mainColor: handoff.mainColor ?? "#E8796C",
-    accentColor: handoff.accentColor ?? handoff.mainColor ?? "#E8796C",
+    accentColor: handoff.accentColor ?? deriveAccentColor(handoff.mainColor ?? "#E8796C"),
     backgroundGradient: handoff.backgroundGradient ?? ROSEGOLD_GRADIENT,
   };
 }
 
+// 서버 응답(InvitationDraft) -> 폼 상태로 변환.
+// accentColor는 고정 팔레트에서 "찾는" 대신 mainColor로부터 항상 계산해서 만든다.
+// (팔레트에 없는 색이거나 대소문자가 다른 경우에도 accentColor가 mainColor와 같아지는
+//  문제를 원천 차단하기 위함 — 2026-08-17 색상 매칭 버그 수정)
 export function draftToForm(draft: InvitationDraft): Partial<InvitationDraftForm> {
-  // mainColor에 해당하는 컬러 옵션을 찾아서 accentColor/backgroundGradient도 같이 복원
-  const matchedColor = colorOptions.find((c) => c.background === draft.mainColor);
-
   return {
     id: draft.id,
     status: draft.status,
@@ -175,8 +212,10 @@ export function draftToForm(draft: InvitationDraft): Partial<InvitationDraftForm
     brideAccountHolder: draft.brideAccountHolder ?? "",
     bgmUrl: draft.bgmUrl ?? "",
     mainColor: draft.mainColor ?? "#E8796C",
-    accentColor: matchedColor?.accent ?? draft.mainColor ?? "#E8796C",
-    backgroundGradient: matchedColor?.gradient,
+    accentColor:
+      findColorMeta(draft.mainColor).accent ??
+      (draft.mainColor ? deriveAccentColor(draft.mainColor) : "#B76E79"),
+    backgroundGradient: findColorMeta(draft.mainColor).gradient,
   };
 }
 
@@ -265,7 +304,8 @@ export default function InvitationCreatePage() {
           if (cameFromTemplate) {
             merged.templateId = handoff.templateId ?? merged.templateId;
             merged.mainColor = handoff.mainColor ?? merged.mainColor;
-            merged.accentColor = handoff.accentColor ?? merged.accentColor;
+            merged.accentColor =
+              handoff.accentColor ?? deriveAccentColor(handoff.mainColor ?? merged.mainColor);
             merged.backgroundGradient = handoff.backgroundGradient ?? merged.backgroundGradient;
           }
 
@@ -316,6 +356,8 @@ export default function InvitationCreatePage() {
       gallery: prev.gallery.filter((_, i) => i !== index),
     }));
   };
+
+  const isTitleValid = form.title.trim().length > 0;
 
   const currentIndex = sections.findIndex((section) => section.key === activeSection);
 
@@ -607,11 +649,22 @@ export default function InvitationCreatePage() {
                   placeholder="예: 버스 146, 401, 730번 이용"
                 />
 
-                <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
-                  <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
-                  <p className="text-sm font-semibold text-text">지도 영역</p>
-                  <p className="mt-1 text-xs text-text-muted">실제 지도 API 연결은 추후 진행합니다.</p>
-                </div>
+                {form.venueAddress ? (
+                  <div className="overflow-hidden rounded-2xl border border-border">
+                    <iframe
+                      title="오시는 길 지도"
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(form.venueAddress)}&z=16&output=embed`}
+                      className="h-56 w-full"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
+                    <MapPin className="mx-auto mb-3 h-8 w-8 text-primary" />
+                    <p className="text-sm font-semibold text-text">지도 영역</p>
+                    <p className="mt-1 text-xs text-text-muted">주소를 입력하면 지도가 표시돼요.</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -716,7 +769,10 @@ export default function InvitationCreatePage() {
                           className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition focus:border-primary disabled:opacity-60"
                         />
                         {image.id && (
-                          <p className="mt-2 text-[10px] text-text-muted">저장된 이미지입니다.</p>
+                          <p className="mt-2 text-[10px] text-text-muted">
+                            저장된 이미지입니다. (삭제 API가 아직 없어 화면에서만 지워지고, 다시
+                            불러오면 복원됩니다)
+                          </p>
                         )}
 
                         <button
@@ -852,7 +908,11 @@ export default function InvitationCreatePage() {
                       )}
 
                       <p className="font-serif text-lg font-semibold text-text">
-                        {form.groomName || "신랑"} <span className="mx-2 text-primary">&</span>{" "}
+                        {form.groomName || "신랑"}
+                        <Heart
+                          className="mx-2 inline h-4 w-4 fill-current"
+                          style={{ color: form.accentColor ?? form.mainColor }}
+                        />
                         {form.brideName || "신부"}
                       </p>
                       <p className="mt-3 text-sm text-text-muted">{form.weddingDate || "2026. 00. 00."}</p>
@@ -885,12 +945,17 @@ export default function InvitationCreatePage() {
               </span>
 
               {currentIndex < sections.length - 1 ? (
-                <Button variant="main" onClick={goNext} className="flex items-center gap-1">
+                <Button
+                  variant="main"
+                  onClick={goNext}
+                  disabled={activeSection === "basic" && !isTitleValid}
+                  className="flex items-center gap-1"
+                >
                   다음
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button variant="main" onClick={handlePreview} disabled={isSaving}>
+                <Button variant="main" onClick={handlePreview} disabled={isSaving || !isTitleValid}>
                   {isSaving ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -940,7 +1005,11 @@ export default function InvitationCreatePage() {
                   )}
 
                   <p className="font-serif text-sm font-semibold text-text">
-                    {form.groomName || "신랑"} <span className="mx-1 text-primary">&</span>{" "}
+                    {form.groomName || "신랑"}
+                    <Heart
+                      className="mx-1 inline h-3.5 w-3.5 fill-current"
+                      style={{ color: form.accentColor ?? form.mainColor }}
+                    />
                     {form.brideName || "신부"}
                   </p>
                   <div className="mx-auto my-5 h-px w-10 bg-border" />

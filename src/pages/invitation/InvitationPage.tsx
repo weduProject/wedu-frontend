@@ -17,7 +17,7 @@ import invitationHeroBg from "../../assets/invitation/hero.jpg";
 import { fetchMyInvitation } from "./invitationApi";
 import { useEffect, useState } from "react";
 
-interface InvitationTemplate {
+export interface InvitationTemplate {
   name: string;
   rating: string;
   type: string;
@@ -28,7 +28,7 @@ interface InvitationTemplate {
   features: string[];
 }
 
-const templates: InvitationTemplate[] = [
+export const templates: InvitationTemplate[] = [
   {
     name: "로맨틱 아이보리",
     rating: "4.9",

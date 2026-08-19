@@ -4,7 +4,7 @@ import { ArrowLeft, Share2, Mail, Loader2, Send } from "lucide-react";
 import { Button } from "../../components";
 import type { InvitationDraftForm } from "./components/InvitationFormControls";
 import { fetchMyInvitation, fetchInvitationGallery, publishInvitation } from "./invitationApi";
-import { colorOptions } from "./InvitationCreatePage";
+import { findColorMeta, deriveAccentColor } from "./InvitationCreatePage";
 import { InvitationCardView } from "./components/InvitationCardView";
 import { cacheInvitationDraft } from "./invitationShareCache";
 
@@ -73,7 +73,9 @@ export default function InvitationDetailPage() {
         if (cancelled) return;
 
         if (invitation) {
-          const matchedColor = colorOptions.find((c) => c.background === invitation.mainColor);
+          // accentColor는 고정 팔레트에서 "찾지" 않고 mainColor로부터 항상 계산해서 만든다.
+          // (팔레트에 없는 색이거나 대소문자가 다른 경우에도 accentColor가 mainColor와
+          //  같아져 하트 등 포인트 색이 배경에 묻히는 문제를 원천 차단 — 2026-08-17 수정)
           setDraft({
             ...FALLBACK_DRAFT,
             id: invitation.id,
@@ -108,8 +110,10 @@ export default function InvitationDetailPage() {
             brideAccount: invitation.brideAccount ?? "",
             brideAccountHolder: invitation.brideAccountHolder ?? "",
             mainColor: invitation.mainColor ?? "#B76E79",
-            accentColor: matchedColor?.accent ?? invitation.mainColor ?? "#B76E79",
-            backgroundGradient: matchedColor?.gradient,
+            accentColor:
+              findColorMeta(invitation.mainColor).accent ??
+              (invitation.mainColor ? deriveAccentColor(invitation.mainColor) : "#B76E79"),
+            backgroundGradient: findColorMeta(invitation.mainColor).gradient,
             bgmUrl: invitation.bgmUrl ?? "",
             gallery,
           });
@@ -238,7 +242,7 @@ export default function InvitationDetailPage() {
             <Button
               variant={canPublish ? "secondary" : "main"}
               size="md"
-              onClick={() => navigate("/invitation/create")}
+              onClick={() => navigate("/invitation/create", { state: { restoredForm: draft } })}
               className="inline-flex items-center gap-2"
             >
               <Mail className="h-4 w-4" />
