@@ -42,7 +42,7 @@ export default function BudgetPageContent({
 }: BudgetPageContentProps) {
   const safeTargetBudget = Number(targetBudget) || 0;
   
-  const totalPaid = items.reduce((acc, item) => acc + item.paidAmount, 0);
+  const totalPaid = items.filter(item => item.isPaid).reduce((acc, item) => acc + (item.paidAmount || item.budgetAmount), 0);
   const paidCount = items.filter(item => item.isPaid).length;
   const totalCount = items.length;
   
@@ -125,7 +125,7 @@ export default function BudgetPageContent({
           if (categoryItems.length === 0) return null;
 
           const catTotalBudget = categoryItems.reduce((acc, item) => acc + item.budgetAmount, 0);
-          const catTotalPaid = categoryItems.reduce((acc, item) => acc + item.paidAmount, 0);
+          const catTotalPaid = categoryItems.filter(item => item.isPaid).reduce((acc, item) => acc + (item.paidAmount || item.budgetAmount), 0);
           const catPaidCount = categoryItems.filter(item => item.isPaid).length;
           const catProgress = catTotalBudget === 0 ? 0 : Math.round((catTotalPaid / catTotalBudget) * 100);
           const Icon = CATEGORY_ICONS[category];
@@ -174,7 +174,7 @@ export default function BudgetPageContent({
 
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-bold text-text">
-                        {item.paidAmount === 0 ? '0원' : `${item.paidAmount}만원`} / {item.budgetAmount}만원
+                        {item.isPaid ? `${item.paidAmount || item.budgetAmount}만원` : `${item.budgetAmount}만원`}
                       </span>
                       
                       {/* 수정/삭제 버튼 숨김 처리 */}
