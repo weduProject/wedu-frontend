@@ -8,8 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 
-// ⚠️ 백엔드 enum이 FROM_ 프리픽스를 쓰는지 확인하기 위한 임시 테스트 함수.
-function normalizeBudgetRangeForTest(value: string): string {
+function toBackendBudgetRange(value: string): string {
   return /^\d/.test(value) ? `FROM_${value}` : value;
 }
 
@@ -108,7 +107,7 @@ export default function PartnerMbtiPage() {
           preparationType: quizAnswers.q3 as string,
           requiredServices: (quizAnswers.q4 as string[]) ?? [],
           priorityValues,
-          budgetRange: normalizeBudgetRangeForTest(quizAnswers.q6 as string), // ⚠️ 임시 테스트용
+          budgetRange: toBackendBudgetRange(quizAnswers.q6 as string),
           excludedElements: (quizAnswers.q7 as string[]) ?? [],
           scheduleRange: quizAnswers.q8 as string,
           partnerMbti: resolvedMbti,
