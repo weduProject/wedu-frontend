@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Check,
@@ -24,6 +24,7 @@ import {
   getLocalRecommendations,
   type RecommendedProduct,
 } from "./builderApi";
+import { fetchProducts, type DisplayProduct } from "../Shop/shopApi";
 
 const steps = ["1", "2", "3", "4"];
 
@@ -63,7 +64,7 @@ export default function BuilderPage() {
     selectBudget,
   } = useBuilder();
 
-  const currentStep = builder.step;
+    const currentStep = builder.step;
   const currentInfo = stepInfo[currentStep - 1];
 
   useEffect(() => {
@@ -74,11 +75,28 @@ export default function BuilderPage() {
     });
   }, [currentStep]);
 
-  // 예산까지 선택되면 "선택한 장르 + 원하는 가격대" 기준으로 추천 상품을 계산한다.
-  // (백엔드에 해당 추천 API가 아직 없어 네트워크 호출 없이 로컬에서 즉시 계산한다.
-  //  API가 준비되면 getLocalRecommendations(builder) 대신 fetchRecommendations(...)를 쓰면 됨.)
+  // 실제 상점 상품(fetchProducts) 목록을 한 번 불러와서, 예산까지 선택되면
+  // "선택한 장르 + 원하는 가격대" 기준으로 그 안에서 추천 상품을 계산한다.
+  // ⚠️ 2026-08-21: getLocalRecommendations는 이제 실제 상품 목록을 받아야 함
+  // (가짜 id를 그대로 노출하면 이후 찜하기 등에서 404를 유발하기 때문 — builderApi.ts 참고).
+  const [allProducts, setAllProducts] = useState<DisplayProduct[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchProducts({ size: 100 })
+      .then((products) => {
+        if (!cancelled) setAllProducts(products);
+      })
+      .catch((error) => {
+        console.warn("상품 목록 조회 실패, 추천 미리보기를 비웁니다:", error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const recommendedProducts: RecommendedProduct[] = builder.budget
-    ? getLocalRecommendations(builder)
+    ? getLocalRecommendations(builder, allProducts)
     : [];
 
   const canNext =
@@ -128,10 +146,7 @@ export default function BuilderPage() {
             const active = currentStep === stepNumber;
 
             return (
-              <div
-                key={stepNumber}
-                className="flex items-center"
-              >
+              <div key={stepNumber} className="flex items-center">
                 <div
                   className={`
                     flex h-9 w-9 items-center justify-center rounded-full
