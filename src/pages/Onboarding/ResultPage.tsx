@@ -110,7 +110,7 @@ function GradientNumberBadge({ number }: { number: number }) {
   );
 }
 
-// 핑크 배경 뱃지 — ConnectPage의 스텝 뱃지와 동일한 톤 (그라디언트 테두리 없이 solid bg-primary-light)
+// 핑크 배경 뱃지
 function GradientBadge({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center rounded-full bg-primary-light px-3 py-1 text-xs font-medium leading-none tracking-[0.3px] text-primary">
