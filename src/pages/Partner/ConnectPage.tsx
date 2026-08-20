@@ -4,6 +4,7 @@ import { Heart, Link2Off, Mail, Wallet, CalendarDays, Check, Calendar } from 'lu
 import { useAuth } from '../../contexts/AuthContext';
 import { apiFetch } from '../../lib/apiClient';
 import type { ApiEnvelope } from '../../lib/apiClient';
+import { Button } from '../../components';
 
 // GET /api/friends/me, POST /api/friends 공통 응답 (Swagger 확인: 2026-08-11)
 interface Partner {
@@ -156,13 +157,13 @@ export default function ConnectPage() {
             </div>
 
             <div className="flex justify-center">
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 onClick={() => setShowDisconnect(true)}
-                className="px-5 py-2.5 rounded-xl border border-border text-text-muted text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                className="!rounded-xl text-text-muted"
               >
                 연결 해제하기
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -172,9 +173,9 @@ export default function ConnectPage() {
       {!partner && (
         <>
           <div className="rounded-2xl bg-white border border-border overflow-hidden mb-6">
-            <div className="relative h-56 gradient-primary-bg flex flex-col items-center justify-center text-center px-6">
-              <Heart className="w-10 h-10 text-white mb-4" strokeWidth={1.5} />
-              <p className="text-white font-semibold text-base leading-relaxed drop-shadow">
+            <div className="relative h-56 border border-primary-light bg-gradient-to-br from-[#fff2f0] via-[#fffafa] to-[#fce9e8] flex flex-col items-center justify-center text-center px-6">
+              <Heart className="w-10 h-10 text-primary mb-4" strokeWidth={1.5} />
+              <p className="text-text font-semibold text-base leading-relaxed">
                 아직 파트너와 연결되지 않았어요.<br />
                 이메일로 파트너를 추가해보세요.
               </p>
@@ -194,13 +195,13 @@ export default function ConnectPage() {
                       className="w-full rounded-xl border border-border py-3 pl-10 pr-4 text-sm text-text focus:border-primary focus:outline-none"
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isAdding || !emailInput.trim()}
-                    className="shrink-0 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white disabled:opacity-40 hover:opacity-90 transition-opacity cursor-pointer"
+                    className="shrink-0 !rounded-xl"
                   >
                     {isAdding ? '연결 중...' : '연결하기'}
-                  </button>
+                  </Button>
                 </div>
                 {addError && <p className="text-xs text-error">{addError}</p>}
               </form>
@@ -245,21 +246,21 @@ export default function ConnectPage() {
             </p>
             {disconnectError && <p className="text-xs text-error mb-3">{disconnectError}</p>}
             <div className="flex gap-3 mt-6">
-              <button
-                type="button"
+                            <Button
+                variant="secondary"
                 onClick={() => { setShowDisconnect(false); setDisconnectError(null); }}
-                className="flex-1 px-4 py-3 rounded-xl border border-border text-text-muted text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex-1 !rounded-xl !px-4 !py-3 text-text-muted"
               >
                 취소
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={handleDisconnect}
                 disabled={isDisconnecting}
-                className="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 cursor-pointer"
+                className="flex-1 !rounded-xl !px-4 !py-3 !border-0 !bg-red-500 !text-white hover:enabled:!bg-red-600"
               >
                 {isDisconnecting ? '해제 중...' : '해제하기'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
