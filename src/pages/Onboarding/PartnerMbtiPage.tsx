@@ -4,7 +4,13 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useOnboarding } from './OnboardingContext';
 import { apiFetch } from '../../lib/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
+import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
+
+function toBackendBudgetRange(value: string): string {
+  return /^\d/.test(value) ? `FROM_${value}` : value;
+}
 
 const MBTI_STEPS = [
   {
@@ -58,12 +64,14 @@ const ALL_MBTI = [
 
 export default function PartnerMbtiPage() {
   const navigate = useNavigate();
+  const { user, markOnboardingComplete } = useAuth();
   const { setPartnerMbti, quizAnswers } = useOnboarding();
 
   const [mode, setMode] = useState<'step' | 'direct'>('step');
   const [stepAnswers, setStepAnswers] = useState(['', '', '', '']);
   const [selectedMbti, setSelectedMbti] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const stepMbti = stepAnswers.every(Boolean) ? stepAnswers.join('') : '';
   const resolvedMbti = mode === 'step' ? stepMbti : selectedMbti;
@@ -75,12 +83,22 @@ export default function PartnerMbtiPage() {
     setLoading(true);
 
     try {
+      if (!user?.onboardingCompleted) {
+        const onboardingRes = await apiFetch('/api/users/me/onboarding', { method: 'POST' });
+        if (!onboardingRes.ok && onboardingRes.status !== 409) {
+          setShowErrorModal(true);
+          setLoading(false);
+          return;
+        }
+        markOnboardingComplete();
+      }
+
       const priorityValues = ((quizAnswers.q5 as string[]) ?? []).map((val, idx) => ({
         value: val,
         rank: idx + 1,
       }));
 
-      await apiFetch('/api/psychological-tests', {
+      const testRes = await apiFetch('/api/psychological-tests', {
         method: 'POST',
         body: JSON.stringify({
           moodType: quizAnswers.q1 as string,
@@ -89,14 +107,22 @@ export default function PartnerMbtiPage() {
           preparationType: quizAnswers.q3 as string,
           requiredServices: (quizAnswers.q4 as string[]) ?? [],
           priorityValues,
-          budgetRange: quizAnswers.q6 as string,
+          budgetRange: toBackendBudgetRange(quizAnswers.q6 as string),
           excludedElements: (quizAnswers.q7 as string[]) ?? [],
           scheduleRange: quizAnswers.q8 as string,
           partnerMbti: resolvedMbti,
         }),
       });
+
+      if (!testRes.ok) {
+        setShowErrorModal(true);
+        setLoading(false);
+        return;
+      }
     } catch {
-      // API 실패해도 화면 흐름은 계속 진행
+      setShowErrorModal(true);
+      setLoading(false);
+      return;
     } finally {
       setLoading(false);
     }
@@ -105,6 +131,16 @@ export default function PartnerMbtiPage() {
   }
 
   return (
+    <>
+    <ConfirmDeleteModal
+      isOpen={showErrorModal}
+      onClose={() => setShowErrorModal(false)}
+      onConfirm={() => setShowErrorModal(false)}
+      title="저장 중 오류가 발생했습니다"
+      message="잠시 후 다시 시도해주세요."
+      confirmLabel="확인"
+      danger={false}
+    />
     <div className="bg-surface -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
       <div className="mx-auto w-full max-w-2xl px-5 py-10 md:px-8">
         {/* STEP 배지 */}
@@ -230,5 +266,6 @@ export default function PartnerMbtiPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

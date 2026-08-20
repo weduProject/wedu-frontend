@@ -6,7 +6,6 @@ import {
   ChevronRight,
   ShoppingCart,
   Target,
-  Loader2,
 } from "lucide-react";
 
 import { Button } from "../../components";
@@ -22,10 +21,10 @@ import {
 } from "./builderDummy";
 
 import {
-  buildRecommendationParams,
-  fetchRecommendations,
+  getLocalRecommendations,
   type RecommendedProduct,
 } from "./builderApi";
+import { fetchProducts, type DisplayProduct } from "../Shop/shopApi";
 
 const steps = ["1", "2", "3", "4"];
 
@@ -65,12 +64,8 @@ export default function BuilderPage() {
     selectBudget,
   } = useBuilder();
 
-  const currentStep = builder.step;
+    const currentStep = builder.step;
   const currentInfo = stepInfo[currentStep - 1];
-
-  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
-  const [recommendationError, setRecommendationError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({
@@ -80,39 +75,29 @@ export default function BuilderPage() {
     });
   }, [currentStep]);
 
-  // 예산까지 선택되면 "선택한 장르 + 원하는 가격대" 기준으로 실제 추천 API를 호출한다.
+  // 실제 상점 상품(fetchProducts) 목록을 한 번 불러와서, 예산까지 선택되면
+  // "선택한 장르 + 원하는 가격대" 기준으로 그 안에서 추천 상품을 계산한다.
+  // ⚠️ 2026-08-21: getLocalRecommendations는 이제 실제 상품 목록을 받아야 함
+  // (가짜 id를 그대로 노출하면 이후 찜하기 등에서 404를 유발하기 때문 — builderApi.ts 참고).
+  const [allProducts, setAllProducts] = useState<DisplayProduct[]>([]);
+
   useEffect(() => {
-    if (!builder.budget) {
-      setRecommendedProducts([]);
-      return;
-    }
-
     let cancelled = false;
-    const { genres, minPrice, maxPrice } = buildRecommendationParams(builder);
-
-    setIsLoadingRecommendations(true);
-    setRecommendationError(null);
-
-    fetchRecommendations({ genres, minPrice, maxPrice })
+    fetchProducts({ size: 100 })
       .then((products) => {
-        if (!cancelled) setRecommendedProducts(products);
+        if (!cancelled) setAllProducts(products);
       })
       .catch((error) => {
-        if (!cancelled) {
-          console.error("추천 상품 조회 실패:", error);
-          setRecommendationError("추천 상품을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
-          setRecommendedProducts([]);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingRecommendations(false);
+        console.warn("상품 목록 조회 실패, 추천 미리보기를 비웁니다:", error);
       });
-
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [builder.weddingHall, builder.seudeume, builder.honeymoon, builder.budget]);
+  }, []);
+
+  const recommendedProducts: RecommendedProduct[] = builder.budget
+    ? getLocalRecommendations(builder, allProducts)
+    : [];
 
   const canNext =
     (currentStep === 1 && builder.weddingHall !== null) ||
@@ -161,10 +146,7 @@ export default function BuilderPage() {
             const active = currentStep === stepNumber;
 
             return (
-              <div
-                key={stepNumber}
-                className="flex items-center"
-              >
+              <div key={stepNumber} className="flex items-center">
                 <div
                   className={`
                     flex h-9 w-9 items-center justify-center rounded-full
@@ -430,16 +412,7 @@ export default function BuilderPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {isLoadingRecommendations ? (
-                    <div className="flex items-center justify-center gap-2 rounded-2xl bg-white p-8 text-sm text-text-muted">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      맞춤 상품을 찾고 있어요...
-                    </div>
-                  ) : recommendationError ? (
-                    <div className="rounded-2xl bg-white p-6 text-center text-sm text-text-muted">
-                      {recommendationError}
-                    </div>
-                  ) : recommendedProducts.length > 0 ? (
+                  {recommendedProducts.length > 0 ? (
                     recommendedProducts.map((product) => (
                       <div
                         key={product.id}

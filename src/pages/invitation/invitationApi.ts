@@ -1,74 +1,207 @@
-/**
- * ⚠️ 스키마 관련 참고
- * -------------------------------------------------------------------------
- * builderApi.ts와 동일하게, 이 파일도 Swagger UI의 엔드포인트 목록(경로+설명)만 가지고
- * 작성되었습니다. InvitationDraft 의 필드명은 화면(피그마 스크린샷)에 나온 입력 항목을
- * 기준으로 합리적으로 추론한 것이며, 실제 백엔드 DTO와 필드명이 다를 수 있습니다.
- * 다른 곳은 손댈 필요 없이 이 파일의 InvitationDraft 타입과 아래 함수들만 실제 스펙에
- * 맞게 고치면 됩니다.
- * -------------------------------------------------------------------------
- */
+const INVITATION_API_BASE = "https://api.wedu.io.kr";
 
-import { apiRequest } from "../../lib/apiClient";
+// 청첩장 전용 API 요청 함수.
+function getInvitationTokens(): string[] {
+  const keys = ["wedu_access_token", "accessToken", "access_token", "token"];
+  const values: string[] = [];
 
-export interface InvitationAccount {
-  bank: string;
-  accountHolder: string;
-  accountNumber: string;
-  kakaoPayUrl?: string;
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (const key of keys) {
+      try {
+        const value = storage.getItem(key)?.trim();
+        if (value && !values.includes(value)) values.push(value);
+      } catch {
+        // storage 접근이 제한된 환경에서는 다음 저장소/키를 계속 확인한다.
+      }
+    }
+  }
+
+  return values;
+}
+
+async function invitationRequest<T>(
+  path: string,
+  options: RequestInit = {},
+  fallbackErrorMessage = "청첩장 요청에 실패했습니다.",
+): Promise<T> {
+  const tokens = getInvitationTokens();
+  // 토큰이 여러 키에 남아 있는 경우 401이면 다음 토큰으로 재시도한다.
+  const candidates = tokens.length > 0 ? tokens : [null];
+  let lastStatus = 0;
+
+  for (const token of candidates) {
+    const headers = new Headers(options.headers);
+    if (!headers.has("Content-Type") && options.body !== undefined) {
+      headers.set("Content-Type", "application/json");
+    }
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    let response: Response;
+    try {
+      response = await fetch(`${INVITATION_API_BASE}${path}`, { ...options, headers });
+    } catch {
+      // 네트워크 자체가 끊긴 경우라 HTTP status가 없음. status는 undefined로 둔다.
+      throw new InvitationApiError("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
+    }
+
+    lastStatus = response.status;
+
+    if (response.status === 401 && candidates.length > 1) {
+      continue;
+    }
+
+    if (response.status === 204) return undefined as T;
+
+    let body: unknown = null;
+    try {
+      body = await response.json();
+    } catch {
+      if (!response.ok) {
+        // 본문이 JSON이 아니라 서버 error.code는 알 수 없지만, status는 응답에서 확인 가능하다.
+        throw new InvitationApiError(`${fallbackErrorMessage} (${response.status})`, response.status);
+      }
+      return undefined as T;
+    }
+
+    const envelope = body as ApiEnvelope<T> | null;
+    if (!response.ok || !body || envelope?.success === false) {
+      throw new InvitationApiError(
+        envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`,
+        response.status,
+        envelope?.error?.code,
+      );
+    }
+
+    // 백엔드 공통 래퍼({success,data,error})와 raw 응답 모두 대응한다.
+    if (envelope && typeof envelope === "object" && "success" in envelope) {
+      return envelope as T;
+    }
+    return body as T;
+  }
+
+  throw new InvitationApiError(`${fallbackErrorMessage} (${lastStatus || 401})`, lastStatus || 401);
+}
+
+/** 백엔드 공통 응답 래퍼 */
+interface ApiEnvelope<T> {
+  success: boolean;
+  data: T;
+  error?: { code: string; message: string };
+}
+
+// HTTP status / 서버 에러 code를 함께 담는 에러 클래스
+export class InvitationApiError extends Error {
+  status?: number;
+  code?: string;
+
+  constructor(message: string, status?: number, code?: string) {
+    super(message);
+    this.name = "InvitationApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
+async function unwrap<T>(promise: Promise<ApiEnvelope<T> | T>): Promise<T> {
+  const res = await promise;
+  if (res && typeof res === "object" && "success" in res) {
+    const envelope = res as ApiEnvelope<T>;
+    if (!envelope.success) {
+      // invitationRequest를 거치지 않고 unwrap이 단독으로 쓰이는 경우를 대비한 방어 코드.
+      // status는 이 시점에 알 수 없어 undefined로 둔다.
+      throw new InvitationApiError(
+        envelope.error?.message ?? "요청 처리에 실패했습니다.",
+        undefined,
+        envelope.error?.code,
+      );
+    }
+    return envelope.data;
+  }
+  return res as T;
 }
 
 export interface InvitationDraft {
   id?: number;
-  status?: "DRAFT" | "PUBLISHED";
+  userId?: number;
   templateId: string;
-  mainColor: string;
-
-  // 기본 정보
   title: string;
-  groomName: string;
-  groomPhone: string;
-  brideName: string;
-  bridePhone: string;
+  status?: "DRAFT" | "PUBLISHED";
 
-  // 혼주 정보
-  groomFatherName?: string;
-  groomMotherName?: string;
-  brideFatherName?: string;
-  brideMotherName?: string;
+  // 신랑/신부 기본 정보
+  groomName: string;
+  brideName: string;
+  groomPhoto?: string;
+  bridePhoto?: string;
+  groomContact?: string;
+  brideContact?: string;
+
+  // 혼주 정보 (양가 각각 한 줄 문자열)
+  groomParents?: string;
+  brideParents?: string;
+  groomParentContact?: string;
+  brideParentContact?: string;
 
   // 예식 정보
   weddingDate?: string; // YYYY-MM-DD
   weddingTime?: string; // HH:mm
   venueName?: string;
-  venueHall?: string; // 예: "3층 그랜드볼룸"
-  greetingMessage?: string;
-
-  // 오시는 길
-  address?: string;
-  addressDetail?: string;
+  venueAddress?: string;
+  venueDetail?: string;
   latitude?: number;
   longitude?: number;
-  naverMapUrl?: string;
 
-  // 계좌 정보
-  groomAccounts: InvitationAccount[];
-  brideAccounts: InvitationAccount[];
+  // 인사말 / 안내 문구
+  mainGreeting?: string;
+  invitationMessage?: string;
+  additionalMessage?: string;
 
-  // 공개 청첩장 URL (발행 후 서버가 내려줌)
+  // 오시는 길 안내
+  transportGuide?: string;
+  parkingGuide?: string;
+  publicTransportGuide?: string;
+
+  // 계좌 정보 (신랑/신부 각 1개)
+  groomBank?: string;
+  groomAccount?: string;
+  groomAccountHolder?: string;
+  brideBank?: string;
+  brideAccount?: string;
+  brideAccountHolder?: string;
+
+  // 디자인
+  mainColor?: string;
+  fontFamily?: string;
+  bgmUrl?: string;
+  designSettings?: string;
+
+  // 발행 후 서버가 내려주는 공개 URL (스웨거엔 명시 안 됐지만 status가 PUBLISHED면 내려올 가능성)
   publicUrl?: string;
 }
 
 export const EMPTY_INVITATION_DRAFT: InvitationDraft = {
   templateId: "classic-ivory",
-  mainColor: "#C9A96E",
   title: "",
   groomName: "",
-  groomPhone: "",
   brideName: "",
-  bridePhone: "",
-  groomAccounts: [],
-  brideAccounts: [],
+  groomContact: "",
+  brideContact: "",
+  groomParents: "",
+  brideParents: "",
+  groomParentContact: "",
+  brideParentContact: "",
+  mainGreeting: "",
+  invitationMessage: "",
+  additionalMessage: "",
+  transportGuide: "",
+  parkingGuide: "",
+  publicTransportGuide: "",
+  groomBank: "",
+  groomAccount: "",
+  groomAccountHolder: "",
+  brideBank: "",
+  brideAccount: "",
+  brideAccountHolder: "",
+  mainColor: "#C9A96E",
 };
 
 export interface InvitationGalleryImage {
@@ -83,10 +216,12 @@ export interface InvitationGalleryImage {
  */
 export async function fetchMyInvitation(): Promise<InvitationDraft | null> {
   try {
-    const data = await apiRequest<InvitationDraft>(
-      "/api/invitations/me",
-      { method: "GET" },
-      "청첩장 조회에 실패했습니다.",
+    const data = await unwrap(
+      invitationRequest<ApiEnvelope<InvitationDraft>>(
+        "/api/invitations/me",
+        { method: "GET" },
+        "청첩장 조회에 실패했습니다.",
+      ),
     );
     return data ?? null;
   } catch (error) {
@@ -101,13 +236,15 @@ export async function fetchMyInvitation(): Promise<InvitationDraft | null> {
  * POST /api/invitations
  */
 export async function createInvitation(draft: InvitationDraft): Promise<InvitationDraft> {
-  return apiRequest<InvitationDraft>(
-    "/api/invitations",
-    {
-      method: "POST",
-      body: JSON.stringify(draft),
-    },
-    "청첩장 생성에 실패했습니다.",
+  return unwrap(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
+      "/api/invitations",
+      {
+        method: "POST",
+        body: JSON.stringify(draft),
+      },
+      "청첩장 생성에 실패했습니다.",
+    ),
   );
 }
 
@@ -118,25 +255,43 @@ export async function createInvitation(draft: InvitationDraft): Promise<Invitati
 export async function updateInvitation(
   draft: Partial<InvitationDraft>,
 ): Promise<InvitationDraft> {
-  return apiRequest<InvitationDraft>(
-    "/api/invitations/me",
-    {
-      method: "PATCH",
-      body: JSON.stringify(draft),
-    },
-    "청첩장 저장에 실패했습니다.",
+  return unwrap(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
+      "/api/invitations/me",
+      {
+        method: "PATCH",
+        body: JSON.stringify(draft),
+      },
+      "청첩장 저장에 실패했습니다.",
+    ),
   );
 }
 
 /**
  * 생성 또는 수정을 한 번에 처리하는 헬퍼.
  * id가 없으면 생성, 있으면 수정 요청을 보낸다.
+ *
+ * ⚠️ 방어 로직: id 없이 생성을 시도했는데 "이미 생성된 청첩장이 있습니다" 같은 충돌
+ * 에러가 나면(중복 클릭, 이전 세션에서 이미 생성된 경우 등) 서버에 있는 기존 청첩장을
+ * 다시 조회해서 update로 폴백한다.
  */
 export async function saveInvitation(draft: InvitationDraft): Promise<InvitationDraft> {
   if (draft.id) {
     return updateInvitation(draft);
   }
-  return createInvitation(draft);
+
+  try {
+    return await createInvitation(draft);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("이미 생성된 청첩장")) {
+      const existing = await fetchMyInvitation();
+      if (existing?.id) {
+        return updateInvitation({ ...draft, id: existing.id });
+      }
+    }
+    throw error;
+  }
 }
 
 /**
@@ -144,10 +299,12 @@ export async function saveInvitation(draft: InvitationDraft): Promise<Invitation
  * PATCH /api/invitations/me/publish
  */
 export async function publishInvitation(): Promise<InvitationDraft> {
-  return apiRequest<InvitationDraft>(
-    "/api/invitations/me/publish",
-    { method: "PATCH" },
-    "청첩장 발행에 실패했습니다.",
+  return unwrap(
+    invitationRequest<ApiEnvelope<InvitationDraft>>(
+      "/api/invitations/me/publish",
+      { method: "PATCH" },
+      "청첩장 발행에 실패했습니다.",
+    ),
   );
 }
 
@@ -156,12 +313,20 @@ export async function publishInvitation(): Promise<InvitationDraft> {
  * GET /api/invitations/me/gallery
  */
 export async function fetchInvitationGallery(): Promise<InvitationGalleryImage[]> {
-  const data = await apiRequest<InvitationGalleryImage[]>(
-    "/api/invitations/me/gallery",
-    { method: "GET" },
-    "갤러리 조회에 실패했습니다.",
-  );
-  return data ?? [];
+  try {
+    const data = await unwrap(
+      invitationRequest<ApiEnvelope<InvitationGalleryImage[]>>(
+        "/api/invitations/me/gallery",
+        { method: "GET" },
+        "갤러리 조회에 실패했습니다.",
+      ),
+    );
+    return data ?? [];
+  } catch (error) {
+    // 아직 청첩장 자체가 없으면 갤러리도 없는 게 정상 -> 빈 배열로 처리
+    console.warn("[invitation] 갤러리 조회 실패(신규 작성으로 진행):", error);
+    return [];
+  }
 }
 
 /**
@@ -170,15 +335,57 @@ export async function fetchInvitationGallery(): Promise<InvitationGalleryImage[]
  */
 export async function addInvitationGalleryImage(
   imageUrl: string,
+  sortOrder?: number,
 ): Promise<InvitationGalleryImage> {
-  return apiRequest<InvitationGalleryImage>(
-    "/api/invitations/me/gallery",
-    {
-      method: "POST",
-      body: JSON.stringify({ imageUrl }),
-    },
-    "갤러리 이미지 추가에 실패했습니다.",
+  return unwrap(
+    invitationRequest<ApiEnvelope<InvitationGalleryImage>>(
+      "/api/invitations/me/gallery",
+      {
+        method: "POST",
+        body: JSON.stringify({ imageUrl, sortOrder }),
+      },
+      "갤러리 이미지 추가에 실패했습니다.",
+    ),
   );
+}
+
+/**
+ * 청첩장 갤러리 이미지 삭제
+ * DELETE /api/invitations/me/gallery/{imageId}
+ */
+export async function deleteInvitationGalleryImage(imageId: number): Promise<void> {
+  await unwrap(
+    invitationRequest<ApiEnvelope<Record<string, never>>>(
+      `/api/invitations/me/gallery/${imageId}`,
+      { method: "DELETE" },
+      "갤러리 이미지 삭제에 실패했습니다.",
+    ),
+  );
+}
+
+/**
+ * 새로 추가된(아직 id가 없는) 갤러리 이미지들만 서버에 반영한다.
+ * 이미 저장된 이미지(id 있음)는 다시 보내지 않는다.
+ * 삭제는 별도로 deleteInvitationGalleryImage()를 통해 즉시 반영되므로 여기서 다루지 않는다.
+ */
+export async function syncInvitationGallery(
+  images: InvitationGalleryImage[],
+): Promise<InvitationGalleryImage[]> {
+  const pending = images.filter((img) => !img.id && img.imageUrl.trim().length > 0);
+  const created = await Promise.all(
+    pending.map((img) => addInvitationGalleryImage(img.imageUrl, img.sortOrder)),
+  );
+
+  const alreadySaved = images.filter((img) => img.id);
+  return [...alreadySaved, ...created];
+}
+
+/**
+ * 공개 청첩장 조회 API는 현재 Swagger에 없으므로 네트워크 요청을 하지 않는다.
+ * 공유 페이지는 URL에 포함된 제작 데이터 또는 작성 브라우저의 캐시를 사용한다.
+ */
+export async function fetchInvitationById(_id: number | string): Promise<InvitationDraft | null> {
+  return null;
 }
 
 /**
@@ -187,7 +394,7 @@ export async function addInvitationGalleryImage(
  */
 export async function fetchMyShareLink(): Promise<string | null> {
   try {
-    const data = await apiRequest<{ url?: string; token?: string }>(
+    const data = await invitationRequest<{ url?: string; token?: string }>(
       "/api/share-links/me",
       { method: "GET" },
       "공유 링크 조회에 실패했습니다.",
