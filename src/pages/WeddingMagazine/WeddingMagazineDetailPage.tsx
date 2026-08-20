@@ -17,20 +17,12 @@ export default function WeddingMagazineDetailPage() {
     );
   }
 
-    return (
+  return (
     <div className="-mx-5 md:-mx-8 -mt-5 md:-mt-8 -mb-5 md:-mb-8">
-      {/* 히어로 이미지 — 완전 풀블리드, 헤더에 바로 붙음 */}
+      {/* 히어로 이미지 — 풀블리드, 헤더에 바로 붙음. 1935×1080 고화질이라 화질 걱정 없음 */}
       <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
         <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-        {/* 하단 경계 — 프로그레시브 블러: 아래로 갈수록 블러가 약하게 강해짐 */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-14 md:h-16 backdrop-blur-sm [mask-image:linear-gradient(to_top,black,transparent)] [-webkit-mask-image:linear-gradient(to_top,black,transparent)]"
-        />
-        {/* 하단 경계 — 배경색으로 자연스럽게 녹아드는 컬러 페이드 (surface 색상은 실제 페이지 배경색에 맞춰 조정) */}
-        <div className="absolute inset-x-0 bottom-0 h-14 md:h-16 bg-gradient-to-t from-surface to-transparent" />
-
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <button
           type="button"
           onClick={() => navigate('/magazine')}
