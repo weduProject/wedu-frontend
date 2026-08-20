@@ -60,30 +60,6 @@ interface RecommendationsResponseRaw {
   recommendations?: Array<{ productId: number; reason: string }>;
 }
 
-interface RecommendedProductRaw {
-  id?: number;
-  productId?: number;
-  name?: string;
-  title?: string;
-  price?: number;
-  categoryType?: string;
-  category?: string;
-  imageUrl?: string;
-  thumbnailUrl?: string;
-}
-
-function normalizeProduct(raw: RecommendedProductRaw): RecommendedProduct {
-  const category = raw.categoryType ?? raw.category ?? "기타";
-  return {
-    id: raw.id ?? raw.productId ?? 0,
-    title: raw.title ?? raw.name ?? "추천 상품",
-    category,
-    price: raw.price ?? 0,
-    iconKey: categoryToIconKey(category),
-    imageUrl: raw.imageUrl ?? raw.thumbnailUrl,
-  };
-}
-
 function normalizeProposal(raw: ProposalMeResponseRaw | null | undefined): ProposalSummary {
   const selections: ProposalSummary["selections"] = {};
 
@@ -188,39 +164,6 @@ export async function fetchRecommendations(): Promise<RecommendedProduct[]> {
 
   return results.filter((p): p is RecommendedProduct => p !== null);
 }
-
-/**
- * ⚠️ 매칭 스코어링 참고용 태그 데이터. 여기 있는 id(101~115)는 실제 상점 DB에 존재하지
- * 않는 더미 값이라 절대 화면에 그대로 노출하거나 찜하기 대상으로 쓰면 안 된다
- * (2026-08-21: 그렇게 했다가 찜하기 저장은 되는데 상세조회 404로 "찜했는데 목록엔 안
- * 보이는" 문제 재현됨). getLocalRecommendations는 이 태그를 점수 계산에만 참고하고,
- * 실제로 반환하는 id/가격/이미지는 반드시 진짜 상품(allProducts)에서 가져온다.
- */
-interface CatalogEntry {
-  id: number;
-  title: string;
-  category: string;
-  price: number;
-  tags: string[];
-}
-
-const RECOMMENDATION_CATALOG: CatalogEntry[] = [
-  { id: 101, title: "루프탑 프라이빗 세팅", category: "공간/이벤트", price: 450_000, tags: ["야경", "루프탑", "분위기", "감성", "럭셔리"] },
-  { id: 102, title: "한강 피크닉 박스", category: "공간/이벤트", price: 180_000, tags: ["피크닉", "야외", "감성", "힐링"] },
-  { id: 103, title: "이벤트 플로럴 데코", category: "플라워", price: 220_000, tags: ["꽃", "장미", "로맨틱", "감성"] },
-  { id: 104, title: "캔들 & 조명 세팅", category: "플라워", price: 150_000, tags: ["캔들", "조명", "아늑", "로맨틱"] },
-  { id: 105, title: "스냅 촬영 패키지", category: "사진/영상", price: 350_000, tags: ["사진", "이벤트", "감성", "추억"] },
-  { id: 106, title: "이벤트 영상 편지", category: "사진/영상", price: 280_000, tags: ["영상", "감성", "서프라이즈"] },
-  { id: 107, title: "호텔 스위트룸 프로포즈", category: "공간/이벤트", price: 800_000, tags: ["럭셔리", "호텔", "우아", "프리미엄", "야경"] },
-  { id: 108, title: "파인다이닝 코스 예약", category: "다이닝", price: 400_000, tags: ["양식", "와인", "럭셔리", "우아"] },
-  { id: 109, title: "오마카세 프라이빗 룸", category: "다이닝", price: 500_000, tags: ["일식", "프리미엄", "프라이빗"] },
-  { id: 110, title: "한강 야경 유람선 대관", category: "공간/이벤트", price: 900_000, tags: ["야경", "이벤트", "특별", "럭셔리"] },
-  { id: 111, title: "커플 반지 각인 서비스", category: "주얼리", price: 250_000, tags: ["반지", "각인", "기념"] },
-  { id: 112, title: "서프라이즈 풍선 데코", category: "공간/이벤트", price: 120_000, tags: ["파티", "이벤트", "활발"] },
-  { id: 113, title: "홈파티 케이터링 세트", category: "다이닝", price: 300_000, tags: ["뷔페", "가족", "파티"] },
-  { id: 114, title: "디저트 & 케이크 세트", category: "다이닝", price: 90_000, tags: ["카페", "디저트", "달콤"] },
-  { id: 115, title: "라이브 연주 섭외", category: "이벤트", price: 500_000, tags: ["감성", "로맨틱", "특별", "음악"] },
-];
 
 export function getLocalRecommendations(
   builder: BuilderState,
