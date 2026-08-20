@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import type { ReactNode } from "react";
 import type { BuilderItem } from "./builderDummy";
 import { weddingHallList, seudeumeList, honeymoonList, budgetList } from "./builderDummy";
@@ -50,16 +51,24 @@ function itemFromSelection(
 export function BuilderProvider({ children }: { children: ReactNode }) {
   const [builder, setBuilder] = useState<BuilderState>(INITIAL_STATE);
   const [isRestoring, setIsRestoring] = useState(true);
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   useEffect(() => {
-    if (!getToken()) {
+    if (isAuthLoading) {
+      setIsRestoring(true);
+      return;
+    }
+
+    if (!user || !getToken()) {
       setIsRestoring(false);
       return;
     }
 
     let cancelled = false;
+    setIsRestoring(true);
+
     fetchMyProposal()
-      .then(async (proposal) => {
+      .then((proposal) => {
         if (cancelled) return;
         setBuilder((prev) => ({
           ...prev,
@@ -78,7 +87,6 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
         }));
       })
       .catch((error) => {
-        // 신규/미선택 사용자에게 404 등의 오류가 나더라도 빌더 사용 자체는 막지 않는다.
         console.warn("내 프로포즈 선택 현황 복원 실패:", error);
       })
       .finally(() => {
@@ -88,7 +96,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAuthLoading, user]);
 
   const nextStep = () => setBuilder((prev) => ({ ...prev, step: Math.min(prev.step + 1, 4) }));
   const prevStep = () => setBuilder((prev) => ({ ...prev, step: Math.max(prev.step - 1, 1) }));
@@ -112,6 +120,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     setter: (prev: BuilderState) => BuilderState,
   ) => {
     const previous = builder;
+    const previousCategoryValue = previous[category];
     setBuilder(setter);
 
     if (!getToken()) return;
@@ -119,7 +128,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     try {
       await selectProposalOption(PROPOSAL_CATEGORY[category], item.id);
     } catch (error) {
-      setBuilder(previous);
+      setBuilder((prev) => ({ ...prev, [category]: previousCategoryValue }));
       console.error("프로포즈 옵션 저장 실패:", error);
       window.alert("선택한 프로포즈 옵션을 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
     }

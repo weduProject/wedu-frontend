@@ -45,8 +45,10 @@ export default function BuilderCartPage() {
     setIsLoading(true);
     try {
       setRecommendationError(null);
+      let didFail = false;
       const products = await fetchRecommendations().catch((error) => {
         console.warn("추천 상품 API 조회 실패:", error);
+        didFail = true;
         return [];
       });
 
@@ -57,9 +59,12 @@ export default function BuilderCartPage() {
         setRecommendedProducts(products);
       } else if (!user) {
         setRecommendedProducts(getLocalRecommendations(builder));
-      } else {
+      } else if (didFail) {
         setRecommendedProducts([]);
         setRecommendationError("맞춤 추천 상품을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      } else {
+        // 정상 응답이지만 추천 결과가 없는 경우: 일반 빈 상태 UI를 보여준다.
+        setRecommendedProducts([]);
       }
 
       if (user) {
