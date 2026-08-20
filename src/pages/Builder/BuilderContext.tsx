@@ -1,15 +1,20 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import type { BuilderItem } from "./builderDummy";
-import { weddingHallList, seudeumeList, honeymoonList, budgetList } from "./builderDummy";
-import {
-  cancelProposalOption,
-  fetchMyProposal,
-  PROPOSAL_CATEGORY,
-  selectProposalOption,
-} from "./builderApi";
-import { getToken } from "../../lib/apiClient";
+
+/**
+ * ⚠️ 2026-08-21 백엔드 확인 완료: /api/proposals/options는 "장소/분위기/음식/예산" 같은
+ * 빌더 개념과 무관하다. category(RING/PHOTO/EVENT/LETTER/FLOWER/ETC)는 상품 종류 슬롯이고
+ * productId는 실제 상점 DB에 존재하는 진짜 상품 id여야 한다 — 서버가 그 id로 이름/가격을
+ * 조회해 스냅샷 저장하기 때문에, builderDummy.ts의 가짜 로컬 id(1~6)를 보내면 서버에
+ * 실제로 존재하는 엉뚱한 상품이 잘못된 카테고리로 저장되는 데이터 오염이 발생한다.
+ *
+ * 그래서 이 컨텍스트는 백엔드 저장(selectProposalOption/cancelProposalOption/
+ * fetchMyProposal) 호출을 전부 제거하고 순수 로컬 상태로만 동작한다.
+ * "장소/분위기/예산" 취향 저장이 필요하면 온보딩 심리테스트(POST /api/psychological-tests)
+ * 쪽 흐름을 쓰는 게 맞고, "견적에 실제 상품을 담는" 기능이 필요하면 /api/proposals/options에
+ * 실제 shopApi 상품(category/productId)을 골라 넣는 방식으로 완전히 새로 설계해야 한다.
+ */
 
 export type BuilderState = {
   step: number;
@@ -41,114 +46,32 @@ const INITIAL_STATE: BuilderState = {
   budget: null,
 };
 
-function itemFromSelection(
-  optionId: number,
-  lists: BuilderItem[],
-): BuilderItem | null {
-  return lists.find((item) => item.id === optionId) ?? null;
-}
-
 export function BuilderProvider({ children }: { children: ReactNode }) {
   const [builder, setBuilder] = useState<BuilderState>(INITIAL_STATE);
-  const [isRestoring, setIsRestoring] = useState(true);
-  const { user, isLoading: isAuthLoading } = useAuth();
-
-  useEffect(() => {
-    if (isAuthLoading) {
-      setIsRestoring(true);
-      return;
-    }
-
-    if (!user || !getToken()) {
-      setIsRestoring(false);
-      return;
-    }
-
-    let cancelled = false;
-    setIsRestoring(true);
-
-    fetchMyProposal()
-      .then((proposal) => {
-        if (cancelled) return;
-        setBuilder((prev) => ({
-          ...prev,
-          weddingHall: proposal.selections[PROPOSAL_CATEGORY.weddingHall]
-            ? itemFromSelection(proposal.selections[PROPOSAL_CATEGORY.weddingHall]!.optionId, weddingHallList)
-            : null,
-          seudeume: proposal.selections[PROPOSAL_CATEGORY.seudeume]
-            ? itemFromSelection(proposal.selections[PROPOSAL_CATEGORY.seudeume]!.optionId, seudeumeList)
-            : null,
-          honeymoon: proposal.selections[PROPOSAL_CATEGORY.honeymoon]
-            ? itemFromSelection(proposal.selections[PROPOSAL_CATEGORY.honeymoon]!.optionId, honeymoonList)
-            : null,
-          budget: proposal.selections[PROPOSAL_CATEGORY.budget]
-            ? itemFromSelection(proposal.selections[PROPOSAL_CATEGORY.budget]!.optionId, budgetList)
-            : null,
-        }));
-      })
-      .catch((error) => {
-        console.warn("내 프로포즈 선택 현황 복원 실패:", error);
-      })
-      .finally(() => {
-        if (!cancelled) setIsRestoring(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthLoading, user]);
 
   const nextStep = () => setBuilder((prev) => ({ ...prev, step: Math.min(prev.step + 1, 4) }));
   const prevStep = () => setBuilder((prev) => ({ ...prev, step: Math.max(prev.step - 1, 1) }));
 
   const reset = () => {
     setBuilder(INITIAL_STATE);
-    if (getToken()) {
-      void Promise.all(
-        Object.values(PROPOSAL_CATEGORY).map((category) =>
-          cancelProposalOption(category).catch((error) =>
-            console.warn(`프로포즈 ${category} 선택 취소 실패:`, error),
-          ),
-        ),
-      );
-    }
-  };
-
-  const saveSelection = async (
-    category: keyof typeof PROPOSAL_CATEGORY,
-    item: BuilderItem,
-    setter: (prev: BuilderState) => BuilderState,
-  ) => {
-    const previous = builder;
-    const previousCategoryValue = previous[category];
-    setBuilder(setter);
-
-    if (!getToken()) return;
-
-    try {
-      await selectProposalOption(PROPOSAL_CATEGORY[category], item.id);
-    } catch (error) {
-      setBuilder((prev) => ({ ...prev, [category]: previousCategoryValue }));
-      console.error("프로포즈 옵션 저장 실패:", error);
-      window.alert("선택한 프로포즈 옵션을 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
-    }
   };
 
   const selectWeddingHall = (item: BuilderItem) =>
-    void saveSelection("weddingHall", item, (prev) => ({ ...prev, weddingHall: item }));
+    setBuilder((prev) => ({ ...prev, weddingHall: item }));
   const selectSeudeume = (item: BuilderItem) =>
-    void saveSelection("seudeume", item, (prev) => ({ ...prev, seudeume: item }));
+    setBuilder((prev) => ({ ...prev, seudeume: item }));
   const selectHoneymoon = (item: BuilderItem) =>
-    void saveSelection("honeymoon", item, (prev) => ({ ...prev, honeymoon: item }));
+    setBuilder((prev) => ({ ...prev, honeymoon: item }));
   const selectBudget = (item: BuilderItem) =>
-    void saveSelection("budget", item, (prev) => ({ ...prev, budget: item }));
-
+    setBuilder((prev) => ({ ...prev, budget: item }));
 
   return (
     <BuilderContext.Provider
       value={{
         builder,
-        isRestoring,
+        // 백엔드 저장을 안 쓰니 복원할 것도 없다. 항상 false로 두되, BuilderStartPage 등
+        // 기존 소비처가 이 값을 참조하고 있어 필드 자체는 남겨둔다.
+        isRestoring: false,
         nextStep,
         prevStep,
         reset,

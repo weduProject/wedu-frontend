@@ -2,13 +2,26 @@ import { apiRequest } from "../../lib/apiClient";
 import type { BuilderState } from "./BuilderContext";
 import { categoryToIconKey } from "./builderIcons";
 import { fetchProductDetail } from "../Shop/shopApi";
+import type { DisplayProduct } from "../Shop/shopApi";
 
-/** BuilderContext의 선택 슬롯 → 서버 category 파라미터 매핑 */
+/**
+ * ⚠️ 2026-08-21 백엔드 확인 완료 — 이 매핑은 폐기됨. BuilderContext.tsx에서
+ * 더 이상 이 상수를 사용하지 않는다.
+ *
+ * category(RING/PHOTO/EVENT/LETTER/FLOWER/ETC)는 "프로포즈에 담을 상품 종류 슬롯"이고,
+ * productId는 실제 상점(shopApi) DB에 존재하는 진짜 상품 id여야 한다. 빌더가 다루는
+ * 장소/분위기/음식/예산은 이 개념과 전혀 무관해서, weddingHall→EVENT 같은 매핑은
+ * 서버에 잘못된 이름/가격이 스냅샷 저장되는 데이터 오염을 유발했다.
+ *
+ * "견적에 실제 상품 담기" UI를 다시 만들 경우, builderDummy.ts의 가짜 카탈로그가 아니라
+ * shopApi.fetchProducts()로 가져온 실제 상품 중에서 category/productId를 골라
+ * selectProposalOption을 호출하도록 완전히 새로 설계해야 한다.
+ */
 export const PROPOSAL_CATEGORY = {
-  weddingHall: "PLACE",
-  seudeume: "MOOD",
-  honeymoon: "FOOD",
-  budget: "BUDGET",
+  weddingHall: "EVENT",
+  seudeume: "FLOWER",
+  honeymoon: "PHOTO",
+  budget: "LETTER",
 } as const;
 
 export type ProposalCategory =
@@ -27,18 +40,15 @@ export interface RecommendedProduct {
 }
 
 export interface ProposalSummary {
-  selections: Partial<Record<ProposalCategory, { optionId: number; name?: string }>>;
-  estimatedMinPrice: number;
-  estimatedMaxPrice: number;
-  recommendedProducts: RecommendedProduct[];
+  id?: number;
+  selections: Partial<Record<ProposalCategory, { productId: number; name?: string; price?: number }>>;
+  totalPrice: number;
 }
 
-/** 서버 원본 응답 형태 (추정) */
 interface ProposalMeResponseRaw {
-  selections?: Array<{ category: string; optionId: number; name?: string }> | Record<string, { optionId: number; name?: string }>;
-  estimatedMinPrice?: number;
-  estimatedMaxPrice?: number;
-  recommendedProducts?: RecommendedProductRaw[];
+  id?: number;
+  items?: Array<{ category: string; productId: number; name?: string; price?: number }>;
+  totalPrice?: number;
 }
 
 /**
@@ -50,71 +60,40 @@ interface RecommendationsResponseRaw {
   recommendations?: Array<{ productId: number; reason: string }>;
 }
 
-interface RecommendedProductRaw {
-  id?: number;
-  productId?: number;
-  name?: string;
-  title?: string;
-  price?: number;
-  categoryType?: string;
-  category?: string;
-  imageUrl?: string;
-  thumbnailUrl?: string;
-}
-
-function normalizeProduct(raw: RecommendedProductRaw): RecommendedProduct {
-  const category = raw.categoryType ?? raw.category ?? "기타";
-  return {
-    id: raw.id ?? raw.productId ?? 0,
-    title: raw.title ?? raw.name ?? "추천 상품",
-    category,
-    price: raw.price ?? 0,
-    iconKey: categoryToIconKey(category),
-    imageUrl: raw.imageUrl ?? raw.thumbnailUrl,
-  };
-}
-
 function normalizeProposal(raw: ProposalMeResponseRaw | null | undefined): ProposalSummary {
   const selections: ProposalSummary["selections"] = {};
 
-  if (Array.isArray(raw?.selections)) {
-    raw.selections.forEach((s) => {
-      selections[s.category as ProposalCategory] = {
-        optionId: s.optionId,
-        name: s.name,
-      };
-    });
-  } else if (raw?.selections) {
-    Object.entries(raw.selections).forEach(([category, value]) => {
-      selections[category as ProposalCategory] = {
-        optionId: value.optionId,
-        name: value.name,
-      };
-    });
-  }
+  (raw?.items ?? []).forEach((item) => {
+    selections[item.category as ProposalCategory] = {
+      productId: item.productId,
+      name: item.name,
+      price: item.price,
+    };
+  });
 
   return {
+    id: raw?.id,
     selections,
-    estimatedMinPrice: raw?.estimatedMinPrice ?? 0,
-    estimatedMaxPrice: raw?.estimatedMaxPrice ?? 0,
-    recommendedProducts: (raw?.recommendedProducts ?? []).map(normalizeProduct),
+    totalPrice: raw?.totalPrice ?? 0,
   };
 }
 
 /**
  * 프로포즈 옵션 선택/변경
  * POST /api/proposals/options
+ *
+ * ⚠️ 2026-08-21 백엔드 확인: category는 상품 종류 슬롯(RING/PHOTO/EVENT/LETTER/FLOWER/ETC),
+ * productId는 실제 상점 DB의 진짜 상품 id여야 한다. 현재 BuilderContext.tsx는 이 함수를
+ * 호출하지 않는다 (아래 PROPOSAL_CATEGORY 관련 주석 참고). "견적에 실제 상품 담기" 기능을
+ * 다시 설계할 때 사용할 것.
  */
 export async function selectProposalOption(
   category: ProposalCategory,
-  optionId: number,
+  productId: number,
 ): Promise<void> {
   await apiRequest<void>(
     "/api/proposals/options",
-    {
-      method: "POST",
-      body: JSON.stringify({ category, optionId }),
-    },
+    { method: "POST", body: JSON.stringify({ category, productId }) },
     "프로포즈 옵션 선택에 실패했습니다.",
   );
 }
@@ -132,7 +111,7 @@ export async function cancelProposalOption(category: ProposalCategory): Promise<
 }
 
 /**
- * 내 프로포즈 선택 현황/견적(+ 맞춤 추천 상품) 조회
+ * 내 프로포즈 선택 현황/견적 조회
  * GET /api/proposals/me
  */
 export async function fetchMyProposal(): Promise<ProposalSummary> {
@@ -148,10 +127,11 @@ export async function fetchMyProposal(): Promise<ProposalSummary> {
  * 심리테스트 기반 맞춤 상품 추천
  * GET /api/recommendations
  *
- * 파라미터 없음 (Swagger 확인 완료 — 로그인 유저의 심리테스트 결과만으로 서버가 추천함).
- * 응답은 productId + reason만 내려오므로, 각 productId에 대해 fetchProductDetail을
- * 호출해 실제 상품 정보(이름/가격/이미지 등)와 합쳐서 반환한다. 상세 조회가 실패한
- * 항목은 조용히 건너뛴다 (추천 목록 전체가 깨지지 않도록).
+ * ⚠️ 2026-08-21 확인: 빌더(BuilderState)의 장소/분위기/음식/예산 선택을 전혀 참조하지
+ * 않고 오직 온보딩 심리테스트 결과만 본다 — 빌더 도메인과 무관한 API. 심리테스트
+ * 미완료 유저에게는 COMMON_400 + "심리테스트 결과를 찾을 수 없습니다"로 응답함.
+ * 현재 이 함수는 어디서도 호출하지 않는다 (BuilderCartPage는 getLocalRecommendations만
+ * 사용). 백엔드에 빌더 전용 추천 API가 생기면 그때 다시 연결할 것.
  */
 export async function fetchRecommendations(): Promise<RecommendedProduct[]> {
   const raw = await apiRequest<RecommendationsResponseRaw>(
@@ -185,71 +165,69 @@ export async function fetchRecommendations(): Promise<RecommendedProduct[]> {
   return results.filter((p): p is RecommendedProduct => p !== null);
 }
 
-/**
- * 로컬 추천 카탈로그.
- * builderDummy.ts 의 장소/분위기/음식 태그와 겹치도록 태그를 맞춰뒀다.
- * 백엔드 추천 API가 준비되기 전까지 이 목록에서 점수 계산으로 추천 상품을 뽑는다.
- */
-interface CatalogEntry {
-  id: number;
-  title: string;
-  category: string;
-  price: number;
-  tags: string[];
-}
-
-const RECOMMENDATION_CATALOG: CatalogEntry[] = [
-  { id: 101, title: "루프탑 프라이빗 세팅", category: "공간/이벤트", price: 450_000, tags: ["야경", "루프탑", "분위기", "감성", "럭셔리"] },
-  { id: 102, title: "한강 피크닉 박스", category: "공간/이벤트", price: 180_000, tags: ["피크닉", "야외", "감성", "힐링"] },
-  { id: 103, title: "이벤트 플로럴 데코", category: "플라워", price: 220_000, tags: ["꽃", "장미", "로맨틱", "감성"] },
-  { id: 104, title: "캔들 & 조명 세팅", category: "플라워", price: 150_000, tags: ["캔들", "조명", "아늑", "로맨틱"] },
-  { id: 105, title: "스냅 촬영 패키지", category: "사진/영상", price: 350_000, tags: ["사진", "이벤트", "감성", "추억"] },
-  { id: 106, title: "이벤트 영상 편지", category: "사진/영상", price: 280_000, tags: ["영상", "감성", "서프라이즈"] },
-  { id: 107, title: "호텔 스위트룸 프로포즈", category: "공간/이벤트", price: 800_000, tags: ["럭셔리", "호텔", "우아", "프리미엄", "야경"] },
-  { id: 108, title: "파인다이닝 코스 예약", category: "다이닝", price: 400_000, tags: ["양식", "와인", "럭셔리", "우아"] },
-  { id: 109, title: "오마카세 프라이빗 룸", category: "다이닝", price: 500_000, tags: ["일식", "프리미엄", "프라이빗"] },
-  { id: 110, title: "한강 야경 유람선 대관", category: "공간/이벤트", price: 900_000, tags: ["야경", "이벤트", "특별", "럭셔리"] },
-  { id: 111, title: "커플 반지 각인 서비스", category: "주얼리", price: 250_000, tags: ["반지", "각인", "기념"] },
-  { id: 112, title: "서프라이즈 풍선 데코", category: "공간/이벤트", price: 120_000, tags: ["파티", "이벤트", "활발"] },
-  { id: 113, title: "홈파티 케이터링 세트", category: "다이닝", price: 300_000, tags: ["뷔페", "가족", "파티"] },
-  { id: 114, title: "디저트 & 케이크 세트", category: "다이닝", price: 90_000, tags: ["카페", "디저트", "달콤"] },
-  { id: 115, title: "라이브 연주 섭외", category: "이벤트", price: 500_000, tags: ["감성", "로맨틱", "특별", "음악"] },
-];
-
-/**
- * 태그 겹침 점수 + 예산 범위로 로컬 카탈로그에서 추천 상품을 계산한다.
- * 네트워크 호출이 없어 항상 즉시, 안정적으로 결과를 반환한다.
- */
 export function getLocalRecommendations(
   builder: BuilderState,
+  allProducts: DisplayProduct[],
   limit = 5,
 ): RecommendedProduct[] {
   const { genres, minPrice, maxPrice } = buildRecommendationParams(builder);
   const genreSet = new Set(genres.map((g) => g.toLowerCase()));
 
-  const scored = RECOMMENDATION_CATALOG.map((entry) => {
-    const overlap = entry.tags.filter((tag) => genreSet.has(tag.toLowerCase())).length;
-    return { entry, overlap };
+  const scored = allProducts.map((product) => {
+    const productTags = [product.categoryType, product.title, ...(product.tastes ?? []), ...(product.styles ?? [])]
+      .filter((v): v is string => Boolean(v))
+      .map((v) => v.toLowerCase());
+    const overlap = productTags.filter((tag) => genreSet.has(tag)).length;
+    return { product, overlap };
   });
 
-  const withinBudget = scored.filter(({ entry }) => {
-    if (typeof minPrice === "number" && entry.price < minPrice * 0.3) return false;
-    if (typeof maxPrice === "number" && entry.price > maxPrice) return false;
+  // "예산"은 추천된 상품들의 합계(totalPrice)가 선택한 구간(minPrice~maxPrice) 안에
+  // 들어와야 한다는 뜻이다 (2026-08-21 최종 확인). 개별 상품 가격은 예산 상한
+  // (maxPrice)보다 비싸지만 않으면 후보가 될 수 있다 — 여러 개를 합쳐서
+  // 구간을 채우는 것도 자연스러우니까.
+  const candidates = scored.filter(({ product }) => {
+    if (typeof maxPrice === "number" && product.price > maxPrice) return false;
     return true;
   });
 
-  const pool = withinBudget.length > 0 ? withinBudget : scored;
+  // 취향 태그가 겹치는 상품을 우선하고, 그중에서도 비싼 순으로 정렬해서
+  // 합계가 예산 구간에 최대한 가깝게(특히 minPrice 이상으로) 채워지도록 한다.
+  const sorted = candidates.sort(
+    (a, b) => b.overlap - a.overlap || b.product.price - a.product.price,
+  );
 
-  return pool
-    .sort((a, b) => b.overlap - a.overlap || a.entry.price - b.entry.price)
-    .slice(0, limit)
-    .map(({ entry }) => ({
-      id: entry.id,
-      title: entry.title,
-      category: entry.category,
-      price: entry.price,
-      iconKey: categoryToIconKey(entry.category),
-    }));
+  // 하한(minPrice)만 있고 상한이 없는 구간("500만원 이상" 등)은 limit개로는
+  // 합계를 못 채울 수 있다. 그런 경우 하한을 채울 때까지 limit을 무시하고 계속 담는다.
+  // (2026-08-21: limit=5 고정이라 500만원 이상 구간에서 상품을 다 담아도 합계가
+  // minPrice 미만이 되어 늘 빈 목록이 뜨던 문제 수정)
+  const hasOpenEndedMin = typeof minPrice === "number" && typeof maxPrice !== "number";
+
+  const picked: DisplayProduct[] = [];
+  let total = 0;
+  for (const { product } of sorted) {
+    if (!hasOpenEndedMin && picked.length >= limit) break;
+    if (typeof maxPrice === "number" && total + product.price > maxPrice) continue;
+    picked.push(product);
+    total += product.price;
+    // 하한이 없는 구간에서 이미 목표 하한을 채웠고 limit도 넘겼다면 그만 담는다.
+    if (hasOpenEndedMin && total >= minPrice! && picked.length >= limit) break;
+  }
+
+  // 담긴 상품들의 합계가 여전히 하한(minPrice)에 못 미치면, 예산 구간 자체를
+  // 만족시킬 수 없는 상황이라 빈 목록을 반환한다 (하한을 넘기려고 예산 상한을
+  // 초과하는 상품을 억지로 넣지 않는다).
+  if (typeof minPrice === "number" && total < minPrice) {
+    return [];
+  }
+
+  return picked.map((product) => ({
+    id: product.id,
+    title: product.title,
+    category: product.categoryType,
+    price: product.price,
+    iconKey: categoryToIconKey(product.categoryType),
+    imageUrl: product.image,
+  }));
 }
 
 /**
@@ -288,8 +266,7 @@ export function buildRecommendationParams(builder: BuilderState) {
 }
 
 /**
- * 추천 상품을 찜하기 / 찜 취소 (실제 스펙에 별도 "장바구니" API가 없어
- * 문서화된 Wishlist API를 담아두기 용도로 사용한다)
+ * 추천 상품을 찜하기 / 찜 취소
  * POST/DELETE /api/wishlists/items/{productId}
  */
 export async function addToWishlist(productId: number): Promise<void> {

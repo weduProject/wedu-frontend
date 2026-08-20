@@ -12,80 +12,52 @@ import {
 import { Button } from "../../components";
 import { useBuilder } from "./BuilderContext";
 import { BuilderIcon } from "./builderIcons";
-import {
-  getLocalRecommendations,
-  fetchRecommendations,
-  fetchWishlistProductIds,
-  addToWishlist,
-  removeFromWishlist,
-  type RecommendedProduct,
-} from "./builderApi";
+import { getLocalRecommendations, type RecommendedProduct } from "./builderApi";
+import { fetchProducts } from "../Shop/shopApi";
+import { useWishlist } from "../Shop/utils/useWishlist";
 
 export default function BuilderCartPage() {
   const navigate = useNavigate();
   const { builder } = useBuilder();
   const { user, isLoading: isAuthLoading } = useAuth();
 
+  // ⚠️ 2026-08-21 확인: Swagger의 "Proposal(나만의 프로포즈 만들기)" 그룹에는
+  // 옵션 선택/취소/조회 3개 엔드포인트뿐이고 추천 API가 없다. GET /api/recommendations는
+  // 별도 그룹(심리테스트 전용)에 속해있고 빌더의 장소/분위기/음식/예산 선택을 전혀
+  // 참조하지 않는다 — 애초에 빌더 도메인과 무관한 API였다. 그래서 서버 호출 없이
+  // 실제 상점 상품(fetchProducts) 중에서 로컬로 매칭해서 추천한다. 예전에 가짜
+  // id(101~115)를 그대로 쓰던 방식은 찜하기 시 상세조회 404를 유발해서 제거함.
   const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 상품별 찜 상태 + 처리중 여부
-  const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    fetchProducts({ size: 100 })
+      .then((allProducts) => {
+        if (cancelled) return;
+        setRecommendedProducts(getLocalRecommendations(builder, allProducts));
+      })
+      .catch((error) => {
+        console.warn("상품 목록 조회 실패, 추천 상품을 비웁니다:", error);
+        if (!cancelled) setRecommendedProducts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [builder.weddingHall, builder.seudeume, builder.honeymoon, builder.budget]);
+
+  // 찜 상태는 전역 WishlistContext를 그대로 쓴다.
+  // (여기서 로컬 상태로 따로 관리하면, /shop/wishlist 등 다른 화면과 상태가
+  //  어긋나서 "찜했는데 목록엔 안 보이는" 문제가 생긴다)
+  const { wishedIds, toggleWish } = useWishlist();
+  const wishlistedIds = new Set(wishedIds);
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [recommendationError, setRecommendationError] = useState<string | null>(null);
-
-  /**
-   * 추천 상품 + 찜 목록을 함께 불러온다.
-   * 추천 상품은 실제 API(fetchRecommendations)를 우선 시도하고, 실패하거나
-   * 빈 배열이면 로컬 계산(getLocalRecommendations)으로 자연스럽게 폴백한다.
-   * 찜 목록은 실패해도 화면 전체가 막히지 않도록 빈 목록으로 처리한다.
-   */
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-      setRecommendationError(null);
-      let didFail = false;
-      const products = await fetchRecommendations().catch((error) => {
-        console.warn("추천 상품 API 조회 실패:", error);
-        didFail = true;
-        return [];
-      });
-
-      // 비로그인 상태에서만 로컬 샘플을 화면에 보여준다.
-      // 로그인 상태에서 가짜 상품 ID를 찜 API에 보내면 /shop/wishlist가 404로 깨질 수 있으므로
-      // 서버 추천 조회에 실패했을 때는 절대로 더미 상품을 찜 목록에 노출하지 않는다.
-      if (products.length > 0) {
-        setRecommendedProducts(products);
-      } else if (!user) {
-        setRecommendedProducts(getLocalRecommendations(builder));
-      } else if (didFail) {
-        setRecommendedProducts([]);
-        setRecommendationError("맞춤 추천 상품을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
-      } else {
-        // 정상 응답이지만 추천 결과가 없는 경우: 일반 빈 상태 UI를 보여준다.
-        setRecommendedProducts([]);
-      }
-
-      if (user) {
-        const wishlistIds = await fetchWishlistProductIds().catch((error) => {
-          console.warn("찜 목록 조회 실패:", error);
-          return new Set<number>();
-        });
-        setWishlistedIds(wishlistIds);
-      } else {
-        setWishlistedIds(new Set<number>());
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isAuthLoading) return;
-    void loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthLoading, user]);
 
   const totalPrice = recommendedProducts.reduce((sum, p) => sum + p.price, 0);
 
@@ -93,6 +65,8 @@ export default function BuilderCartPage() {
    * 찜하기 / 찜 취소 토글.
    * 실제 스펙에는 프로포즈 전용 "장바구니" API가 없어, 담아두는 동작은
    * 문서화된 Wishlist API(POST/DELETE /api/wishlists/items/{productId})로 처리한다.
+   * recommendedProducts가 이제 항상 실제 상점 상품이라 별도 예외 처리 없이
+   * 바로 찜 API를 호출해도 안전하다.
    */
   const requireLogin = () => {
     setShowLoginModal(true);
@@ -105,21 +79,9 @@ export default function BuilderCartPage() {
     }
     if (pendingIds.has(product.id)) return;
 
-    const isWishlisted = wishlistedIds.has(product.id);
     setPendingIds((prev) => new Set(prev).add(product.id));
-
     try {
-      if (isWishlisted) {
-        await removeFromWishlist(product.id);
-        setWishlistedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(product.id);
-          return next;
-        });
-      } else {
-        await addToWishlist(product.id);
-        setWishlistedIds((prev) => new Set(prev).add(product.id));
-      }
+      await toggleWish(product.id);
     } catch (error) {
       console.error("찜하기 처리 실패:", error);
       alert("찜하기 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -151,12 +113,7 @@ export default function BuilderCartPage() {
     });
 
     try {
-      await Promise.all(targets.map((p) => addToWishlist(p.id)));
-      setWishlistedIds((prev) => {
-        const next = new Set(prev);
-        targets.forEach((p) => next.add(p.id));
-        return next;
-      });
+      await Promise.all(targets.map((p) => toggleWish(p.id)));
       alert("추천 상품을 찜 목록에 담았습니다.");
     } catch (error) {
       console.error("추천 상품 찜하기 실패:", error);
@@ -224,16 +181,10 @@ export default function BuilderCartPage() {
             )}
           </div>
 
-          {isLoading || isAuthLoading ? (
+          {isAuthLoading || isLoading ? (
             <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-text-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
               추천 상품을 불러오는 중...
-            </div>
-          ) : recommendationError ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-10 text-center text-text-muted">
-              <Sparkles className="h-8 w-8 text-text-muted" />
-              <p className="text-sm">{recommendationError}</p>
-              <Button variant="secondary" size="sm" onClick={loadData}>다시 시도</Button>
             </div>
           ) : recommendedProducts.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-text-muted">

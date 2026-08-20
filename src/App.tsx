@@ -132,7 +132,11 @@ export default function App() {
 
                       <Route
                         path="/builder-start"
-                        element={<BuilderStartPage />}
+                        element={
+                          <BuilderProvider>
+                            <BuilderStartPage />
+                          </BuilderProvider>
+                        }
                       />
                       <Route
                         path="/builder"
