@@ -1,22 +1,6 @@
-/**
- * ✅ 스키마 확정본 (2026-08-17 스웨거 확인 기준)
- * -------------------------------------------------------------------------
- * 아래 InvitationDraft 필드명/구조는 실제 백엔드 DTO 기준으로 확정된 내용입니다.
- * - 응답은 전부 { success, data, error } 형태로 감싸져서 내려옵니다. (GET/PATCH /me도
- *   동일하다고 보고 unwrap 처리했습니다. 실제 응답이 다르면 unwrap()만 고치면 됩니다.)
- * - 계좌 정보는 배열이 아니라 신랑측/신부측 각각 은행 1개만 지원합니다.
- * - 갤러리는 별도 리소스(/me/gallery)로 분리되어 있고, 삭제 엔드포인트는 아직 없습니다.
- * -------------------------------------------------------------------------
- */
-
 const INVITATION_API_BASE = "https://api.wedu.io.kr";
 
-/**
- * 청첩장 전용 API 요청 함수.
- * 공용 apiClient는 wedu_access_token만 읽는데, 현재 OAuth 콜백에서는
- * accessToken이라는 키로 저장되는 경우가 있어 청첩장에서는 두 저장 방식을 모두 지원한다.
- * (src/pages/invitation 폴더 밖은 수정하지 않기 위한 방어 로직)
- */
+// 청첩장 전용 API 요청 함수.
 function getInvitationTokens(): string[] {
   const keys = ["wedu_access_token", "accessToken", "access_token", "token"];
   const values: string[] = [];
@@ -56,7 +40,8 @@ async function invitationRequest<T>(
     try {
       response = await fetch(`${INVITATION_API_BASE}${path}`, { ...options, headers });
     } catch {
-      throw new Error("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
+      // 네트워크 자체가 끊긴 경우라 HTTP status가 없음. status는 undefined로 둔다.
+      throw new InvitationApiError("서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.");
     }
 
     lastStatus = response.status;
@@ -71,13 +56,20 @@ async function invitationRequest<T>(
     try {
       body = await response.json();
     } catch {
-      if (!response.ok) throw new Error(`${fallbackErrorMessage} (${response.status})`);
+      if (!response.ok) {
+        // 본문이 JSON이 아니라 서버 error.code는 알 수 없지만, status는 응답에서 확인 가능하다.
+        throw new InvitationApiError(`${fallbackErrorMessage} (${response.status})`, response.status);
+      }
       return undefined as T;
     }
 
     const envelope = body as ApiEnvelope<T> | null;
     if (!response.ok || !body || envelope?.success === false) {
-      throw new Error(envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`);
+      throw new InvitationApiError(
+        envelope?.error?.message ?? `${fallbackErrorMessage} (${response.status})`,
+        response.status,
+        envelope?.error?.code,
+      );
     }
 
     // 백엔드 공통 래퍼({success,data,error})와 raw 응답 모두 대응한다.
@@ -87,7 +79,7 @@ async function invitationRequest<T>(
     return body as T;
   }
 
-  throw new Error(`${fallbackErrorMessage} (${lastStatus || 401})`);
+  throw new InvitationApiError(`${fallbackErrorMessage} (${lastStatus || 401})`, lastStatus || 401);
 }
 
 /** 백엔드 공통 응답 래퍼 */
@@ -97,12 +89,31 @@ interface ApiEnvelope<T> {
   error?: { code: string; message: string };
 }
 
+// HTTP status / 서버 에러 code를 함께 담는 에러 클래스
+export class InvitationApiError extends Error {
+  status?: number;
+  code?: string;
+
+  constructor(message: string, status?: number, code?: string) {
+    super(message);
+    this.name = "InvitationApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 async function unwrap<T>(promise: Promise<ApiEnvelope<T> | T>): Promise<T> {
   const res = await promise;
   if (res && typeof res === "object" && "success" in res) {
     const envelope = res as ApiEnvelope<T>;
     if (!envelope.success) {
-      throw new Error(envelope.error?.message ?? "요청 처리에 실패했습니다.");
+      // invitationRequest를 거치지 않고 unwrap이 단독으로 쓰이는 경우를 대비한 방어 코드.
+      // status는 이 시점에 알 수 없어 undefined로 둔다.
+      throw new InvitationApiError(
+        envelope.error?.message ?? "요청 처리에 실패했습니다.",
+        undefined,
+        envelope.error?.code,
+      );
     }
     return envelope.data;
   }
@@ -339,8 +350,23 @@ export async function addInvitationGalleryImage(
 }
 
 /**
+ * 청첩장 갤러리 이미지 삭제
+ * DELETE /api/invitations/me/gallery/{imageId}
+ */
+export async function deleteInvitationGalleryImage(imageId: number): Promise<void> {
+  await unwrap(
+    invitationRequest<ApiEnvelope<Record<string, never>>>(
+      `/api/invitations/me/gallery/${imageId}`,
+      { method: "DELETE" },
+      "갤러리 이미지 삭제에 실패했습니다.",
+    ),
+  );
+}
+
+/**
  * 새로 추가된(아직 id가 없는) 갤러리 이미지들만 서버에 반영한다.
- * 이미 저장된 이미지(id 있음)는 다시 보내지 않는다. (삭제 API가 없어 삭제는 지원하지 않음)
+ * 이미 저장된 이미지(id 있음)는 다시 보내지 않는다.
+ * 삭제는 별도로 deleteInvitationGalleryImage()를 통해 즉시 반영되므로 여기서 다루지 않는다.
  */
 export async function syncInvitationGallery(
   images: InvitationGalleryImage[],
