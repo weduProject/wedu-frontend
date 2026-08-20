@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components";
-import { MapPin, Drama, UtensilsCrossed, Gift, Lock, Target, ShoppingCart } from "lucide-react";
+import { MapPin, Drama, UtensilsCrossed, Gift, Lock, Target, ShoppingCart, RotateCcw } from "lucide-react";
+import { useBuilder } from "./BuilderContext";
 
 const steps = [
   {
@@ -49,6 +50,17 @@ const features = [
 
 export default function BuilderStartPage() {
   const navigate = useNavigate();
+  const { builder, reset, isRestoring } = useBuilder();
+
+  const hasProgress = Boolean(
+    builder.weddingHall || builder.seudeume || builder.honeymoon || builder.budget
+  );
+
+  const handleRestart = () => {
+    if (!window.confirm("이전 선택을 모두 지우고 처음부터 다시 시작할까요?")) return;
+    reset();
+    navigate("/builder");
+  };
 
   return (
     <div className="bg-surface/50 -mx-5 -mt-5 -mb-5 md:-mx-8 md:-mt-8 md:-mb-8">
@@ -93,13 +105,39 @@ export default function BuilderStartPage() {
         </div>
 
         <div className="flex flex-col items-center justify-center mb-16">
-          <Button
-            size="lg"
-            className="shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
-            onClick={() => navigate("/builder")}
-          >
-            시작하기 →
-          </Button>
+          {!isRestoring && hasProgress ? (
+            <div className="flex flex-col items-center gap-3">
+              <div className="mb-1 rounded-full bg-primary-light px-4 py-1.5 text-xs font-bold text-primary">
+                이전에 진행하던 플랜이 있어요
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  size="lg"
+                  className="shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                  onClick={() => navigate("/builder")}
+                >
+                  이어서 하기 →
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="flex items-center gap-1.5 transition-all hover:-translate-y-0.5"
+                  onClick={handleRestart}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  다시 시작하기
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              size="lg"
+              className="shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+              onClick={() => navigate("/builder")}
+            >
+              시작하기 →
+            </Button>
+          )}
           <p className="text-xs text-text-muted mt-4 font-medium">약 3분 정도 소요돼요</p>
         </div>
 
