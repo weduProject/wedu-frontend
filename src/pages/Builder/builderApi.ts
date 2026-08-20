@@ -1,27 +1,7 @@
-/**
- * ⚠️ 2026-08-17 데모데이 점검 결과 반영
- * -------------------------------------------------------------------------
- * 스웨거를 확인한 결과 "옵션 선택 저장(POST /api/proposals/options)"과
- * "심리테스트 기반 추천(GET /api/recommendations)"에 대응하는 백엔드 API가
- * 아직 존재하지 않는 것으로 확인되었습니다. (매 옵션 클릭마다 400 네트워크 에러가
- * 발생하고, 추천 결과는 항상 로딩 후 실패로 끝나던 원인)
- *
- * 그래서 지금은:
- *   1) 옵션을 선택해도 서버로 저장 요청을 보내지 않습니다 (로컬 상태만 사용).
- *   2) 추천 상품은 네트워크 호출 없이 로컬 카탈로그(RECOMMENDATION_CATALOG)에서
- *      선택한 태그 + 예산 범위로 직접 계산해서 보여줍니다.
- *
- * 아래 selectProposalOption / cancelProposalOption / fetchMyProposal /
- * fetchRecommendations 함수 자체는 백엔드 API가 준비되면 바로 쓸 수 있도록
- * 그대로 남겨뒀습니다 (현재는 아무 곳에서도 호출하지 않음). 백엔드 연동이 되면
- * BuilderContext.tsx / BuilderPage.tsx / BuilderCartPage.tsx 에서
- * getLocalRecommendations(...) 호출을 fetchRecommendations(...) 로 바꿔주면 됩니다.
- * -------------------------------------------------------------------------
- */
-
 import { apiRequest } from "../../lib/apiClient";
 import type { BuilderState } from "./BuilderContext";
 import { categoryToIconKey } from "./builderIcons";
+import { fetchProductDetail } from "../Shop/shopApi";
 
 /** BuilderContext의 선택 슬롯 → 서버 category 파라미터 매핑 */
 export const PROPOSAL_CATEGORY = {
@@ -42,6 +22,8 @@ export interface RecommendedProduct {
   price: number;
   iconKey: string;
   imageUrl?: string;
+  /** 백엔드가 심리테스트 결과 기반으로 이 상품을 추천한 이유 (예: "로맨틱 성향과 잘 맞아요") */
+  reason?: string;
 }
 
 export interface ProposalSummary {
@@ -57,6 +39,15 @@ interface ProposalMeResponseRaw {
   estimatedMinPrice?: number;
   estimatedMaxPrice?: number;
   recommendedProducts?: RecommendedProductRaw[];
+}
+
+/**
+ * GET /api/recommendations 실제 응답 형태 (2026-08-20 Swagger 재배포 기준 확정).
+ * productId + reason만 내려주고 상품 상세(이름/가격/카테고리/이미지)는 안 준다 —
+ * 상세는 shopApi.fetchProductDetail로 각각 조회해서 합쳐야 함.
+ */
+interface RecommendationsResponseRaw {
+  recommendations?: Array<{ productId: number; reason: string }>;
 }
 
 interface RecommendedProductRaw {
@@ -148,35 +139,41 @@ export async function fetchMyProposal(): Promise<ProposalSummary> {
  * 심리테스트 기반 맞춤 상품 추천
  * GET /api/recommendations
  *
- * 빌더에서 선택한 장소/분위기/음식의 태그를 genres 로, 예산 구간을 minPrice/maxPrice 로 넘겨서
- * "선택한 장르 + 원하는 가격대" 기준 추천을 받는다. 서버가 이 쿼리 파라미터를 쓰지 않고
- * 로그인 유저의 심리테스트 결과만으로 추천한다면 파라미터는 무시되고 정상 동작한다.
+ * 파라미터 없음 (Swagger 확인 완료 — 로그인 유저의 심리테스트 결과만으로 서버가 추천함).
+ * 응답은 productId + reason만 내려오므로, 각 productId에 대해 fetchProductDetail을
+ * 호출해 실제 상품 정보(이름/가격/이미지 등)와 합쳐서 반환한다. 상세 조회가 실패한
+ * 항목은 조용히 건너뛴다 (추천 목록 전체가 깨지지 않도록).
  */
-export async function fetchRecommendations(params: {
-  genres?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-}): Promise<RecommendedProduct[]> {
-  const query = new URLSearchParams();
-
-  if (params.genres && params.genres.length > 0) {
-    query.set("genres", params.genres.join(","));
-  }
-  if (typeof params.minPrice === "number") {
-    query.set("minPrice", String(params.minPrice));
-  }
-  if (typeof params.maxPrice === "number" && Number.isFinite(params.maxPrice)) {
-    query.set("maxPrice", String(params.maxPrice));
-  }
-
-  const qs = query.toString();
-  const raw = await apiRequest<RecommendedProductRaw[]>(
-    `/api/recommendations${qs ? `?${qs}` : ""}`,
+export async function fetchRecommendations(): Promise<RecommendedProduct[]> {
+  const raw = await apiRequest<RecommendationsResponseRaw>(
+    "/api/recommendations",
     { method: "GET" },
     "추천 상품을 불러오지 못했습니다.",
   );
 
-  return (raw ?? []).map(normalizeProduct);
+  const items = raw?.recommendations ?? [];
+  if (items.length === 0) return [];
+
+  const results = await Promise.all(
+    items.map(async ({ productId, reason }): Promise<RecommendedProduct | null> => {
+      try {
+        const detail = await fetchProductDetail(productId);
+        return {
+          id: detail.id,
+          title: detail.title,
+          category: detail.categoryType,
+          price: detail.price,
+          iconKey: categoryToIconKey(detail.categoryType),
+          imageUrl: detail.image,
+          reason,
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return results.filter((p): p is RecommendedProduct => p !== null);
 }
 
 /**
