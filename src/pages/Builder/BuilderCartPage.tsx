@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   ArrowLeft,
   ShoppingCart,
@@ -23,6 +24,7 @@ import {
 export default function BuilderCartPage() {
   const navigate = useNavigate();
   const { builder } = useBuilder();
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +32,8 @@ export default function BuilderCartPage() {
   // 상품별 찜 상태 + 처리중 여부
   const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
 
   /**
    * 추천 상품 + 찜 목록을 함께 불러온다.
@@ -40,28 +44,48 @@ export default function BuilderCartPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [products, wishlistIds] = await Promise.all([
-        fetchRecommendations().catch((error) => {
-          console.warn("추천 상품 API 조회 실패(로컬 계산으로 대체):", error);
-          return [];
-        }),
-        fetchWishlistProductIds().catch((error) => {
-          console.warn("찜 목록 조회 실패(빈 목록으로 진행):", error);
-          return new Set<number>();
-        }),
-      ]);
+      setRecommendationError(null);
+      let didFail = false;
+      const products = await fetchRecommendations().catch((error) => {
+        console.warn("추천 상품 API 조회 실패:", error);
+        didFail = true;
+        return [];
+      });
 
-      setRecommendedProducts(products.length > 0 ? products : getLocalRecommendations(builder));
-      setWishlistedIds(wishlistIds);
+      // 비로그인 상태에서만 로컬 샘플을 화면에 보여준다.
+      // 로그인 상태에서 가짜 상품 ID를 찜 API에 보내면 /shop/wishlist가 404로 깨질 수 있으므로
+      // 서버 추천 조회에 실패했을 때는 절대로 더미 상품을 찜 목록에 노출하지 않는다.
+      if (products.length > 0) {
+        setRecommendedProducts(products);
+      } else if (!user) {
+        setRecommendedProducts(getLocalRecommendations(builder));
+      } else if (didFail) {
+        setRecommendedProducts([]);
+        setRecommendationError("맞춤 추천 상품을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      } else {
+        // 정상 응답이지만 추천 결과가 없는 경우: 일반 빈 상태 UI를 보여준다.
+        setRecommendedProducts([]);
+      }
+
+      if (user) {
+        const wishlistIds = await fetchWishlistProductIds().catch((error) => {
+          console.warn("찜 목록 조회 실패:", error);
+          return new Set<number>();
+        });
+        setWishlistedIds(wishlistIds);
+      } else {
+        setWishlistedIds(new Set<number>());
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    if (isAuthLoading) return;
+    void loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthLoading, user]);
 
   const totalPrice = recommendedProducts.reduce((sum, p) => sum + p.price, 0);
 
@@ -70,7 +94,15 @@ export default function BuilderCartPage() {
    * 실제 스펙에는 프로포즈 전용 "장바구니" API가 없어, 담아두는 동작은
    * 문서화된 Wishlist API(POST/DELETE /api/wishlists/items/{productId})로 처리한다.
    */
+  const requireLogin = () => {
+    setShowLoginModal(true);
+  };
+
   const toggleWishlist = async (product: RecommendedProduct) => {
+    if (!user) {
+      requireLogin();
+      return;
+    }
     if (pendingIds.has(product.id)) return;
 
     const isWishlisted = wishlistedIds.has(product.id);
@@ -101,6 +133,11 @@ export default function BuilderCartPage() {
   };
 
   const handleAddAllToWishlist = async () => {
+    if (!user) {
+      requireLogin();
+      return;
+    }
+
     const targets = recommendedProducts.filter((p) => !wishlistedIds.has(p.id));
     if (targets.length === 0) {
       alert("이미 모든 추천 상품을 찜하셨어요.");
@@ -187,10 +224,16 @@ export default function BuilderCartPage() {
             )}
           </div>
 
-          {isLoading ? (
+          {isLoading || isAuthLoading ? (
             <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-text-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
               추천 상품을 불러오는 중...
+            </div>
+          ) : recommendationError ? (
+            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-10 text-center text-text-muted">
+              <Sparkles className="h-8 w-8 text-text-muted" />
+              <p className="text-sm">{recommendationError}</p>
+              <Button variant="secondary" size="sm" onClick={loadData}>다시 시도</Button>
             </div>
           ) : recommendedProducts.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-text-muted">
@@ -285,6 +328,44 @@ export default function BuilderCartPage() {
           </Button>
         </div>
       </div>
+
+      {showLoginModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5"
+          role="presentation"
+          onClick={() => setShowLoginModal(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="builder-login-modal-title"
+            className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="builder-login-modal-title" className="text-lg font-bold text-text">
+              로그인이 필요한 기능이에요
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-text-muted">
+              찜하기는 로그인 후 이용할 수 있어요. 로그인하고 다시 시도해주세요.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setShowLoginModal(false)}
+              >
+                취소
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => navigate("/login", { state: { from: "/builder/cart" } })}
+              >
+                로그인하러 가기
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

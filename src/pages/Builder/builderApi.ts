@@ -35,7 +35,7 @@ export interface ProposalSummary {
 
 /** 서버 원본 응답 형태 (추정) */
 interface ProposalMeResponseRaw {
-  selections?: Array<{ category: string; optionId: number; name?: string }>;
+  selections?: Array<{ category: string; optionId: number; name?: string }> | Record<string, { optionId: number; name?: string }>;
   estimatedMinPrice?: number;
   estimatedMaxPrice?: number;
   recommendedProducts?: RecommendedProductRaw[];
@@ -77,12 +77,21 @@ function normalizeProduct(raw: RecommendedProductRaw): RecommendedProduct {
 function normalizeProposal(raw: ProposalMeResponseRaw | null | undefined): ProposalSummary {
   const selections: ProposalSummary["selections"] = {};
 
-  (raw?.selections ?? []).forEach((s) => {
-    selections[s.category as ProposalCategory] = {
-      optionId: s.optionId,
-      name: s.name,
-    };
-  });
+  if (Array.isArray(raw?.selections)) {
+    raw.selections.forEach((s) => {
+      selections[s.category as ProposalCategory] = {
+        optionId: s.optionId,
+        name: s.name,
+      };
+    });
+  } else if (raw?.selections) {
+    Object.entries(raw.selections).forEach(([category, value]) => {
+      selections[category as ProposalCategory] = {
+        optionId: value.optionId,
+        name: value.name,
+      };
+    });
+  }
 
   return {
     selections,
@@ -309,11 +318,15 @@ interface WishlistItemRaw {
  * GET /api/wishlists/me
  */
 export async function fetchWishlistProductIds(): Promise<Set<number>> {
-  const raw = await apiRequest<WishlistItemRaw[]>(
+  const raw = await apiRequest<{ productIds?: number[] } | WishlistItemRaw[]>(
     "/api/wishlists/me",
     { method: "GET" },
     "찜 목록 조회에 실패했습니다.",
   );
 
-  return new Set((raw ?? []).map((item) => item.productId ?? item.id ?? 0));
+  if (Array.isArray(raw)) {
+    return new Set(raw.map((item) => item.productId ?? item.id ?? 0).filter((id) => id > 0));
+  }
+
+  return new Set((raw?.productIds ?? []).filter((id) => id > 0));
 }
