@@ -104,37 +104,17 @@ export const STYLE_DATA: Record<string, {
 
 function GradientNumberBadge({ number }: { number: number }) {
   return (
-    <span
-      className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-      style={{
-        background: 'linear-gradient(111.47deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)',
-      }}
-    >
-      {/* 안쪽 원 — 카드 배경(흰색)으로 덮어서 링만 남김 */}
-      <span className="absolute inset-[2px] rounded-full bg-white" />
-      {/* 숫자 텍스트 — 같은 그라디언트를 텍스트에 직접 클리핑 */}
-      <span
-        className="relative text-[11px] font-bold"
-        style={{
-          background: 'linear-gradient(111.47deg, #F79689 0%, #E8796C 33.33%, #FEABA0 66.67%, #E8796C 100%)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-        }}
-      >
-        {number}
-      </span>
+    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-primary-light text-xs font-bold text-primary">
+      {number}
     </span>
   );
 }
 
-// 그라디언트 테두리 뱃지 — 바깥 래퍼가 그라디언트 배경, 안쪽 span이 흰 배경으로 1px 얇게 감싸는 방식
+// 핑크 배경 뱃지 — ConnectPage의 스텝 뱃지와 동일한 톤 (그라디언트 테두리 없이 solid bg-primary-light)
 function GradientBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex rounded-full p-[2px] gradient-primary-bg">
-      <span className="flex items-center rounded-full bg-white px-3 py-1 text-xs font-medium leading-none tracking-[0.3px] text-primary">
-        {label}
-      </span>
+    <span className="inline-flex items-center rounded-full bg-primary-light px-3 py-1 text-xs font-medium leading-none tracking-[0.3px] text-primary">
+      {label}
     </span>
   );
 }
