@@ -19,14 +19,14 @@ export default function WeddingMagazineDetailPage() {
 
   return (
     <div className="-mx-5 md:-mx-8 -mt-5 md:-mt-8 -mb-5 md:-mb-8">
-      {/* 히어로 이미지 */}
+      {/* 히어로 이미지 — 풀블리드, 헤더에 바로 붙음. 1935×1080 고화질이라 화질 걱정 없음 */}
       <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
         <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <button
           type="button"
           onClick={() => navigate('/magazine')}
-          className="absolute top-5 left-5 flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors cursor-pointer"
+          className="absolute top-8 left-5 md:top-10 flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" strokeWidth={2} />
           목록으로

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User, BookOpen, Newspaper, Calculator, Mail, Users } from 'lucide-react';
+import { Heart, ShoppingBag, ChevronDown, Sparkles, CreditCard, ListChecks, Calendar, User, BookOpen, Newspaper, Calculator, Mail, Users, Store } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../pages/Shop/utils/useWishlist';
@@ -9,7 +9,11 @@ import { useCart } from '../../pages/Shop/CartContext';
 const PRIMARY_LINKS = [
   { label: '홈', path: '/home' },
   { label: '심리테스트', path: '/onboarding' },
-  { label: '프로포즈 플래닝', path: '/shop' },
+] as const;
+
+const PROPOSAL_LINKS = [
+  { label: '나만의 프로포즈', path: '/builder-start', Icon: Sparkles },
+  { label: '프로포즈 편집실', path: '/shop', Icon: Store },
 ] as const;
 
 const WEDDING_LINKS = [
@@ -21,7 +25,6 @@ const WEDDING_LINKS = [
 ] as const;
 
 const TOOL_LINKS = [
-  { label: '나만의 프로포즈', path: '/builder-start', Icon: Sparkles },
   { label: 'D-day 관리', path: '/dday', Icon: Heart },
   { label: '예산 관리', path: '/budget', Icon: CreditCard },
   { label: '체크리스트', path: '/checklist', Icon: ListChecks },
@@ -43,11 +46,14 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [isWeddingOpen, setIsWeddingOpen] = useState(false);
+  const [isProposalOpen, setIsProposalOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(true);
   const [mobileWeddingOpen, setMobileWeddingOpen] = useState(true);
+  const [mobileProposalOpen, setMobileProposalOpen] = useState(true);
   const toolsRef = useRef<HTMLDivElement>(null);
   const weddingRef = useRef<HTMLDivElement>(null);
+  const proposalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleScroll() {
@@ -64,6 +70,9 @@ export default function Header() {
       }
       if (weddingRef.current && !weddingRef.current.contains(e.target as Node)) {
         setIsWeddingOpen(false);
+      }
+      if (proposalRef.current && !proposalRef.current.contains(e.target as Node)) {
+        setIsProposalOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -104,6 +113,52 @@ export default function Header() {
               {item.label}
             </NavLink>
           ))}
+
+          {/* 프로포즈 플래닝 드롭다운 — 버튼과 메뉴 사이 gap을 pt-2(패딩)로 감싸서 마우스 이탈 방지 */}
+          <div
+            ref={proposalRef}
+            className="relative"
+            onMouseEnter={() => setIsProposalOpen(true)}
+            onMouseLeave={() => setIsProposalOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsProposalOpen((prev) => !prev)}
+              aria-expanded={isProposalOpen}
+              className="flex items-center gap-1 text-sm font-medium text-[#3E3939] transition-colors hover:text-primary"
+            >
+              프로포즈 플래닝
+              <ChevronDown
+                className={clsx('h-4 w-4 transition-transform duration-200', isProposalOpen && 'rotate-180')}
+                strokeWidth={1.8}
+              />
+            </button>
+
+            {isProposalOpen && (
+              <div className="absolute left-0 top-full w-48 pt-2">
+                <div className="rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                  {PROPOSAL_LINKS.map(({ label, path, Icon }) => (
+                    <NavLink
+                      key={path}
+                      to={path}
+                      onClick={() => setIsProposalOpen(false)}
+                      className={({ isActive }) =>
+                        clsx(
+                          'group flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm no-underline transition-colors',
+                          isActive
+                            ? 'bg-primary-light font-semibold text-primary'
+                            : 'text-text hover:bg-primary-light hover:text-primary',
+                        )
+                      }
+                    >
+                      <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                      {label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* 웨딩 플래닝 드롭다운 — 버튼과 메뉴 사이 gap을 pt-2(패딩)로 감싸서 마우스 이탈 방지 */}
           <div
@@ -267,6 +322,45 @@ export default function Header() {
                     {item.label}
                   </NavLink>
                 ))}
+
+                <button
+                  type="button"
+                  onClick={() => setMobileProposalOpen((prev) => !prev)}
+                  className="flex w-full items-center justify-between bg-transparent py-3 text-left text-base font-medium text-text"
+                >
+                  <span>프로포즈 플래닝</span>
+                  <ChevronDown
+                    className={clsx('h-5 w-5 transition-transform duration-300', mobileProposalOpen && 'rotate-180')}
+                    strokeWidth={1.8}
+                  />
+                </button>
+                <div
+                  className={clsx(
+                    'grid transition-[grid-template-rows] duration-300 ease-out',
+                    mobileProposalOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="flex flex-col">
+                      {PROPOSAL_LINKS.map(({ label, path, Icon }) => (
+                        <NavLink
+                          key={path}
+                          to={path}
+                          onClick={() => setIsMobileOpen(false)}
+                          className={({ isActive }) =>
+                            clsx(
+                              'flex items-center gap-2.5 py-2.5 pl-4 text-sm no-underline transition-colors',
+                              isActive ? 'font-semibold text-primary' : 'text-text',
+                            )
+                          }
+                        >
+                          <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                          {label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
                 <button
                   type="button"

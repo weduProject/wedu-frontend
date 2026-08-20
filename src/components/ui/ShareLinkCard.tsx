@@ -82,20 +82,20 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
 
   return (
     <>
-      <BaseCard className="mt-5 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+      <BaseCard className="mt-5" contentClassName="gap-5">
+        <div className="flex items-center gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light/50">
             <Share2 className="h-5 w-5 text-primary" strokeWidth={2} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-text mb-1">{pageName} 공유하기</h3>
+            <h3 className="text-base font-bold text-text mb-1.5">{pageName} 공유하기</h3>
             <p className="text-sm text-text-muted">링크를 받은 사람은 로그인 없이 페이지를 볼 수 있어요</p>
           </div>
         </div>
 
         {/* URL 표시 + 복사 버튼 */}
-        <div className="flex items-center gap-2">
-          <BaseCard className="flex-1 !min-w-0 !bg-gray-50 !py-2.5 !px-3 overflow-hidden">
+        <div className="flex items-center gap-4">
+          <BaseCard className="flex-1 !min-w-0 !bg-gray-50 !py-3 !px-4 overflow-hidden">
             <span className="text-sm text-text-muted truncate block">
               {isFetching ? '링크 불러오는 중...' : (shareUrl ?? '링크를 불러올 수 없어요.')}
             </span>
@@ -115,7 +115,7 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
         </div>
 
         {/* 재발급 버튼 */}
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-5 border-t border-border">
           <Button
             variant="secondary"
             size="md"

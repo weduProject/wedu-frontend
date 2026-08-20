@@ -7,9 +7,11 @@ interface BaseCardProps {
   shadow?: boolean;
   children: ReactNode;
   className?: string;
+  /** children을 감싸는 내부 flex 컨테이너의 간격을 조정하고 싶을 때 사용 (기본값: gap-1) */
+  contentClassName?: string;
 }
 
-export default function BaseCard({ title, extra, shadow = true, children, className }: BaseCardProps) {
+export default function BaseCard({ title, extra, shadow = true, children, className, contentClassName }: BaseCardProps) {
   return (
     <article
       className={clsx(
@@ -24,7 +26,7 @@ export default function BaseCard({ title, extra, shadow = true, children, classN
           {extra && <div className="text-[13px]">{extra}</div>}
         </div>
       )}
-      <div className="flex flex-col gap-1">{children}</div>
+      <div className={clsx('flex flex-col gap-1', contentClassName)}>{children}</div>
     </article>
   );
 }

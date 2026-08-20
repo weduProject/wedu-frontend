@@ -13,6 +13,7 @@ import { useBuilder } from "./BuilderContext";
 import { BuilderIcon } from "./builderIcons";
 import {
   getLocalRecommendations,
+  fetchRecommendations,
   fetchWishlistProductIds,
   addToWishlist,
   removeFromWishlist,
@@ -23,32 +24,42 @@ export default function BuilderCartPage() {
   const navigate = useNavigate();
   const { builder } = useBuilder();
 
-  // 백엔드에 추천 API가 아직 없어 네트워크 호출 없이 로컬에서 즉시 계산한다.
-  // (API가 준비되면 여기를 fetchRecommendations(...)로 바꾸면 됨)
-  const recommendedProducts = getLocalRecommendations(builder);
-
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // 상품별 찜 상태 + 처리중 여부
   const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
 
-  /** 이미 찜해둔 상품 목록을 불러온다. 실패해도 화면 전체가 막히지 않도록 빈 목록으로 처리한다. */
-  const loadWishlist = async () => {
+  /**
+   * 추천 상품 + 찜 목록을 함께 불러온다.
+   * 추천 상품은 실제 API(fetchRecommendations)를 우선 시도하고, 실패하거나
+   * 빈 배열이면 로컬 계산(getLocalRecommendations)으로 자연스럽게 폴백한다.
+   * 찜 목록은 실패해도 화면 전체가 막히지 않도록 빈 목록으로 처리한다.
+   */
+  const loadData = async () => {
     setIsLoading(true);
     try {
-      const wishlistIds = await fetchWishlistProductIds();
+      const [products, wishlistIds] = await Promise.all([
+        fetchRecommendations().catch((error) => {
+          console.warn("추천 상품 API 조회 실패(로컬 계산으로 대체):", error);
+          return [];
+        }),
+        fetchWishlistProductIds().catch((error) => {
+          console.warn("찜 목록 조회 실패(빈 목록으로 진행):", error);
+          return new Set<number>();
+        }),
+      ]);
+
+      setRecommendedProducts(products.length > 0 ? products : getLocalRecommendations(builder));
       setWishlistedIds(wishlistIds);
-    } catch (error) {
-      console.warn("찜 목록 조회 실패(빈 목록으로 진행):", error);
-      setWishlistedIds(new Set());
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadWishlist();
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -179,7 +190,7 @@ export default function BuilderCartPage() {
           {isLoading ? (
             <div className="flex min-h-[160px] items-center justify-center gap-2 text-sm text-text-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
-              찜 목록을 불러오는 중...
+              추천 상품을 불러오는 중...
             </div>
           ) : recommendedProducts.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-10 text-center text-text-muted">
@@ -202,7 +213,6 @@ export default function BuilderCartPage() {
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary">
                           <BuilderIcon icon={product.iconKey} className="h-5 w-5" />
                         </div>
-
                         <div className="min-w-0">
                           <p className="truncate text-sm font-bold text-text">
                             {product.title}
@@ -211,6 +221,12 @@ export default function BuilderCartPage() {
                           <p className="mt-1 text-xs text-text-muted">
                             {product.category}
                           </p>
+
+                          {product.reason && (
+                            <p className="mt-1 text-xs italic text-primary/70">
+                              {product.reason}
+                            </p>
+                          )}
                         </div>
                       </div>
 

@@ -8,6 +8,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components';
 import ConfirmDeleteModal from '../../components/ui/ConfirmDeleteModal';
 
+function toBackendBudgetRange(value: string): string {
+  return /^\d/.test(value) ? `FROM_${value}` : value;
+}
+
 const MBTI_STEPS = [
   {
     question: '파트너는 어느 쪽에 더 가까운가요?',
@@ -103,7 +107,7 @@ export default function PartnerMbtiPage() {
           preparationType: quizAnswers.q3 as string,
           requiredServices: (quizAnswers.q4 as string[]) ?? [],
           priorityValues,
-          budgetRange: quizAnswers.q6 as string,
+          budgetRange: toBackendBudgetRange(quizAnswers.q6 as string),
           excludedElements: (quizAnswers.q7 as string[]) ?? [],
           scheduleRange: quizAnswers.q8 as string,
           partnerMbti: resolvedMbti,
