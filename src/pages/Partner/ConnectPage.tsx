@@ -246,7 +246,7 @@ export default function ConnectPage() {
             </p>
             {disconnectError && <p className="text-xs text-error mb-3">{disconnectError}</p>}
             <div className="flex gap-3 mt-6">
-                            <Button
+              <Button
                 variant="secondary"
                 onClick={() => { setShowDisconnect(false); setDisconnectError(null); }}
                 className="flex-1 !rounded-xl !px-4 !py-3 text-text-muted"
