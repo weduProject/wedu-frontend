@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Copy, Share2, CheckCheck, RefreshCw } from 'lucide-react';
 import Button from './Button';
 import BaseCard from './BaseCard';
@@ -19,8 +19,7 @@ function extractToken(data: unknown): string | null {
   }
   return null;
 }
-
-export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProps) {
+function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
@@ -150,3 +149,4 @@ export default function ShareLinkCard({ pageName, sharePath }: ShareLinkCardProp
     </>
   );
 }
+export default memo(ShareLinkCard);
